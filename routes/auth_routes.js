@@ -22,6 +22,8 @@ auth_router.get("/details", auth_fxn.get_user_details);
 // Logout page
 auth_router.get("/logout", auth_fxn.get_logout);
 
+// JSON Obtaining fxn
+auth_router.get("/data", auth_fxn.get_data); 
 
 // exporting express router
 module.exports = auth_router;
