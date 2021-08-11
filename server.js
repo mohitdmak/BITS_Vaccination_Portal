@@ -18,8 +18,13 @@ mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 
+// Importing Creds for Mongo access
+const username = require("./config/mongo.js").MONGO_INITDB_ROOT_USERNAME;
+const password = require("./config/mongo.js").MONGO_INITDB_ROOT_PASSWORD;
+
 // setting db uri
-const db_uri = "mongodb://MongoContainer:27017/Portal";
+const db_uri = `mongodb://${username}:${password}@MongoContainer:27017/Portal?authSource=admin`;
+
 
 // Open port for node app, once redis and mongodb is connected
 redisClient.on('connect', async function () {
