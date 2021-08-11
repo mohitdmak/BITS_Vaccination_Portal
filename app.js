@@ -76,6 +76,11 @@ app.get("/", (req, res) => {
     res.status(200).json({"response": "Welcome to BITS VACCINATION PORTAL", "auth_url": RedirectionUrl, "logout_url": LogoutUrl});
 });
 
+// Auth route
+const auth_routes = require("./routes/auth_routes.js");
+app.use("/auth", auth_routes);
+
+
 
  // exporting express app and redis client
 module.exports = {
