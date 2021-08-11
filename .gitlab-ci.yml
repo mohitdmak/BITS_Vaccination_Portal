@@ -17,6 +17,12 @@ variables:
     DOCKER_HOST: tcp://docker:2375/
     DOCKER_DRIVER: overlay2
 
+# Dind service for docker
+services:
+  - docker:19.03.13-dind
+
+before_script:
+  - docker info
 
 # List stages for jobs, and their order of execution
 stages:          
@@ -34,7 +40,7 @@ build-job:
   # Run docker-compose
   script:
     - echo "Compiling the code in containers..."
-    - docker-compose up 
+    - docker-compose build
 
 
 # This pushes the tagged containers to their registry
