@@ -1,6 +1,9 @@
 # Oauth2 API Credentials
 config/oauth2-api-creds.json
 
+# Mongo Express Container env file
+config/mongo-express.env
+
 # Session Credentials
 config/session-secret.js
 

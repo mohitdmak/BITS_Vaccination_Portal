@@ -33,6 +33,31 @@ services:
       - 27017:27017
 
 
+  # Container to provide interface to running mongo container
+  mongo-express_container:
+
+    # default image
+    image: mongo-express
+
+    container_name: MongoExpressContainer
+    
+    # Supplying configs
+    # env_file:
+    #   - ./db/mongo-express.env
+
+    # Main mongo server needs to start first
+    depends_on:
+      - mongo_container
+
+    # environment configs
+    env_file:
+      - config/mongo-express.env       
+
+    # Linking host os here
+    ports:
+      - 8080:8081
+
+
   # Container to run development environment
   dev_container:
 
