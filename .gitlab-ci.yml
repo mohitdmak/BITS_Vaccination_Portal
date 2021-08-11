@@ -26,7 +26,7 @@ stages:
 # This runs to tag containers by upping them once
 build-job:
   # Building on docker image
-  image: docker:19.03.12       
+  image: docker/compose:latest       
   stage: build
 
   # Run docker-compose
