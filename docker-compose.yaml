@@ -17,10 +17,10 @@ services:
     # Setting Container name to be called from express app
     container_name: MongoContainer
 
-    # setting env configs
-    # env_file: 
-    #   - ./db/mongo.env
-  
+    # Mongo DB Config
+    env_file:
+      - config/mongo.env
+
     # DB needs to always be up
     restart: always
 
@@ -39,19 +39,19 @@ services:
     # default image
     image: mongo-express
 
+    # Default name
     container_name: MongoExpressContainer
     
-    # Supplying configs
-    # env_file:
-    #   - ./db/mongo-express.env
-
-    # Main mongo server needs to start first
-    depends_on:
-      - mongo_container
-
     # environment configs
     env_file:
       - config/mongo-express.env       
+
+    # Main mongo server needs to start first
+    depends_on:
+      - dev_container
+
+    # Restart always, since Mongo container needs time to be up
+    restart: always
 
     # Linking host os here
     ports:
@@ -76,8 +76,8 @@ services:
 
     # Creating volume bind between source code and working dir
     volumes:
-      - .:/Gsmaster
-      - /Gsmaster/node_modules/
+      - .:/Portal
+      - /Portal/node_modules/
 
     # Binding port 3000 with host os.
     ports:

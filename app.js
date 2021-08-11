@@ -73,7 +73,7 @@ app.get("/", (req, res) => {
     LogoutUrl = "/auth/logout/";
 
    // Intro response with routes of all APIs.
-    res.status(200).json({"response": "Welcome to Gsmaster", "auth_url": RedirectionUrl, "logout_url": LogoutUrl});
+    res.status(200).json({"response": "Welcome to BITS VACCINATION PORTAL", "auth_url": RedirectionUrl, "logout_url": LogoutUrl});
 });
 
 

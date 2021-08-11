@@ -7,15 +7,11 @@ WORKDIR /data
 # Using custom configs for mongo
 COPY ./db/mongod.conf /etc/mongod.conf
 
-# Installing and running mongo as a service
-# RUN mongod 
-
-# configure the Docker entrypoint for MongoDB
-    # environment:
-    #  - MONGO_INITDB_ROOT_USERNAME=root
-    #   - MONGO_INITDB_ROOT_PASSWORD=1234
-
 # expose MongoDB's default port of 27017
 EXPOSE 27017
 
+# Expose HTTP Port too
+EXPOSE 28017
+
+# Start mongod service
 CMD ["mongod"]
