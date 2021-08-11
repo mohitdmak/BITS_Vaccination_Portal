@@ -1,0 +1,25 @@
+# Node alpine image
+FROM node:16-alpine
+
+# setting working directory
+WORKDIR /Portal
+# source code dependancies
+COPY ./package.json .
+
+# Nodemon for automatic restart on failures for tests
+RUN npm install -g nodemon
+
+# Get latest npm version
+RUN npm install -g npm@7.20.1
+
+# install dependencies
+RUN npm install 
+
+# Copy source code
+COPY . .
+
+# Exposing running port for nginx
+EXPOSE 3000
+
+# Dev environment
+CMD ["npm", "run", "dev_local"]

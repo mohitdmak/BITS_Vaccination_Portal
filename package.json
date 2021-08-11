@@ -1,0 +1,31 @@
+{
+  "name": "gsmaster",
+  "version": "1.0.0",
+  "description": "Official Site Server Code for Gsmaster",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm run test",
+    "dev_local": "nodemon server.js",
+    "dev_server": "nodemon server.js",
+    "production": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohitdmak/Gsmaster.git"
+  },
+  "author": "Mohit Makwana",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mohitdmak/Gsmaster/issues"
+  },
+  "homepage": "https://github.com/mohitdmak/Gsmaster#readme",
+  "dependencies": {
+    "connect-redis": "^6.0.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "googleapis": "^82.0.0",
+    "mongoose": "^5.13.4",
+    "redis": "^3.1.2",
+    "validator": "^13.6.0"
+  }
+}
