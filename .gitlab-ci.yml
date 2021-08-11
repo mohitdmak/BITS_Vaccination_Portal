@@ -40,7 +40,7 @@ stage-job:
     stage: staging
     
     # Use containers built by build-job
-    dependancies:
+    dependencies:
       - build-job
 
     # Login to dockerhub and push
