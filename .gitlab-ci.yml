@@ -42,6 +42,8 @@ build-job:
   # Run docker-compose
   script:
     - echo "Compiling the code in containers..."
+    - touch config/mongo.env
+    - touch config/mongo-express.env
     - docker-compose build
 
 
@@ -58,6 +60,8 @@ stage-job:
 
     # Login to dockerhub and push
     script:
+    - touch config/mongo.env
+    - touch config/mongo-express.env
     - docker-compose build
     - echo "Pushing Docker Images to Registry..."
     - docker login -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_PASSWORD
