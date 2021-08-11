@@ -3,10 +3,13 @@ var {google} = require('googleapis');
 const ClientId = require("../config/oauth2-api-creds.json").web.client_id;
 const ClientSecret = require("../config/oauth2-api-creds.json").web.client_secret;
 
+// Importing Student Model
+var Student = require("../models/student");
+
+
 // Setting appropriate callback url
 var RedirectionUrl;
 RedirectionUrl = "http://localhost:1370/auth/oauthCallback";
-
 
 // Oauth2 client raw
 var OAuth2 = google.auth.OAuth2;
@@ -29,6 +32,8 @@ function getAuthUrl () {
     var url = oauth2Client.generateAuthUrl({
         access_type: 'offline',
         scope: scopes, // If you only need one scope you can pass it as string
+
+        // We ensure that only emails of BITS Pilani (Pilani Campus) are validated
         hd: 'pilani.bits-pilani.ac.in'
     });
 
@@ -36,7 +41,7 @@ function getAuthUrl () {
 }
 
 // Obtaining token from Oauth2 client and setting it in sessions dict
-const set_tokens = (req, res) => {
+const set_tokens = async (req, res) => {
 
     // setting new details in oauth2Client
     var oauth2Client = getOAuthClient();
@@ -44,16 +49,43 @@ const set_tokens = (req, res) => {
     var code = req.query.code;
 
     // embedding tokens in session and oauth2Client
-    oauth2Client.getToken(code, function(err, tokens) {
+    oauth2Client.getToken(code, async function(err, tokens) {
 
       // Now tokens contains an access_token and an optional refresh_token. Save them.
       if(!err) {
         oauth2Client.setCredentials(tokens);
         session["tokens"]=tokens;
         console.log(tokens);
-       
-        // redirecting to user details page
-        res.redirect('/auth/details');
+
+        // getting student details
+        var oauth2 = google.oauth2({
+            auth: oauth2Client,
+            version: 'v2'
+        });
+        try{
+            var user = await oauth2.userinfo.get();
+        }
+        catch(err){
+            res.status(500).json(err);
+        }
+
+        // creating student model
+        var student = new Student({
+            "name" : user.data.name,
+            "email" : user.data.email,
+            "pic" : user.data.picture
+        });
+
+        // saving to database
+        try{
+            await student.save();
+            // redirecting to user details page
+            res.redirect('/auth/details');
+        }
+        catch(err){
+            console.log(err);
+            res.status(500).json(err);
+        }
       }
       else{
         console.log(err);

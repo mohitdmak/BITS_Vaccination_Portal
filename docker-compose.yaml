@@ -30,7 +30,7 @@ services:
 
     # Setting ports config
     ports:
-      - 27017:27017
+      - 27017
 
 
   # Container to provide interface to running mongo container
