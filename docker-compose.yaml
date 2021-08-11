@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3.3"
 
 # Docker containers in the network
 services:
