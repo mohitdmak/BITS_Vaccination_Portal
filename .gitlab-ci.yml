@@ -12,17 +12,15 @@ workflow:
 
 # Variables for container registry
 variables:
-    DOCKER_REGISTRY_USER: $DOCKER_REGISTRY_USER
-    DOCKER_REGISTRY_PASSWORD: $DOCKER_REGISTRY_PASSWORD
-    DOCKER_HOST: tcp://docker:2375/
-    DOCKER_DRIVER: overlay2
+  DOCKER_REGISTRY_USER: $DOCKER_REGISTRY_USER
+  DOCKER_REGISTRY_PASSWORD: $DOCKER_REGISTRY_PASSWORD
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
 
 # Dind service for docker
 services:
   - docker:19.03.13-dind
 
-before_script:
-  - docker info
 
 # List stages for jobs, and their order of execution
 stages:          
@@ -37,6 +35,10 @@ build-job:
   image: docker/compose:latest       
   stage: build
 
+  # Running before script to print env vars for debugging
+  before_script:
+    - docker info
+
   # Run docker-compose
   script:
     - echo "Compiling the code in containers..."
@@ -45,6 +47,9 @@ build-job:
 
 # This pushes the tagged containers to their registry
 stage-job:
+    # Building on docker image
+    image: docker/compose:latest
+    # Stage images to push
     stage: staging
     
     # Use containers built by build-job
