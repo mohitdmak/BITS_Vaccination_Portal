@@ -58,6 +58,7 @@ stage-job:
 
     # Login to dockerhub and push
     script:
+    - docker-compose build
     - echo "Pushing Docker Images to Registry..."
     - docker login -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_PASSWORD
     - docker-compose push
