@@ -121,6 +121,43 @@ const get_user_details = async (req, res) => {
     }
 };
 
+// The protected page
+const get_data = async (req, res) => {
+
+    // getting oauth2Client
+    var oauth2Client = getOAuthClient();
+
+    if(req.session["tokens"]){
+        oauth2Client.setCredentials(req.session["tokens"]);
+        // getting user details
+        var oauth2 = google.oauth2({
+            auth: oauth2Client,
+            version: 'v2'
+        });
+        try{
+            var user = await oauth2.userinfo.get();
+            console.log(user.data);
+
+            var cp = require('child_process');
+            var d = 'new';
+            cp.exec(`cd PyDIVOC &&  python3 solve.py ${d}`, function(err, stdout, stderr) {
+                  // handle err, stdout, stderr
+                console.log(err);
+                console.log(stdout);
+                console.log(stderr);
+            });
+
+        }catch(err){
+            console.log(err);
+            res.status(500).json(err);
+        }
+    }
+    else{
+        res.status(401).json({"error":"No tokens found"});
+    }
+};
+
+
 // landing page
 const get_auth_url = (req, res) => {
 
@@ -147,5 +184,6 @@ module.exports = {
     get_auth_url,
     set_tokens,
     get_logout,
-    getOAuthClient
+    getOAuthClient,
+    get_data
 }
