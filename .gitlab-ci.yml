@@ -24,7 +24,9 @@ stages:
 
 
 # This runs to tag containers by upping them once
-build-job:       
+build-job:
+  # Building on docker image
+  image: docker:19.03.12       
   stage: build
 
   # Run docker-compose
@@ -36,6 +38,10 @@ build-job:
 # This pushes the tagged containers to their registry
 stage-job:
     stage: staging
+    
+    # Use containers built by build-job
+    dependancies:
+      - build-job
 
     # Login to dockerhub and push
     script:
