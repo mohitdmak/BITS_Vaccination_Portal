@@ -28,7 +28,8 @@ function getAuthUrl () {
     ];
     var url = oauth2Client.generateAuthUrl({
         access_type: 'offline',
-        scope: scopes // If you only need one scope you can pass it as string
+        scope: scopes, // If you only need one scope you can pass it as string
+        hd: 'pilani.bits-pilani.ac.in'
     });
 
     return url;

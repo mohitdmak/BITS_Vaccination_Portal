@@ -9,6 +9,7 @@ var auth_router = express.Router();
 
 
 //* Defining routes
+
 // Auth landing page
 auth_router.get("/", auth_fxn.get_auth_url);
 
