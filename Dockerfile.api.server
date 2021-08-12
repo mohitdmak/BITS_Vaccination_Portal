@@ -1,0 +1,46 @@
+# Node alpine image
+FROM node:latest
+
+# setting working directory
+WORKDIR /Portal
+# source code dependancies
+COPY ./package.json .
+
+# Nodemon for automatic restart on failures for tests
+RUN npm install -g nodemon
+
+# Get latest npm version
+RUN npm install -g npm@7.20.1
+
+# install dependencies
+RUN npm install 
+
+# Copy source code
+COPY . .
+
+# Exposing running port for nginx
+EXPOSE 3000
+
+RUN apt-get update && \
+    apt-get install -y \
+        python3 \
+        python3-pip \
+        python3-setuptools \
+        groff \
+        less \
+    && pip3 install --upgrade pip \
+    && apt-get clean
+
+RUN apt-get update ##[edited]
+RUN apt-get install ffmpeg libsm6 libxext6  -y
+
+RUN apt-get update && apt-get install poppler-utils -y
+
+RUN cd PyDIVOC && pip3 install -r requirements.txt && python3 setup.py build
+ 
+RUN  chmod -R 777 /Portal
+
+RUN apt-get update && apt-get install ghostscript graphicsmagick
+
+# Dev environment
+CMD ["npm", "run", "dev_server"]
