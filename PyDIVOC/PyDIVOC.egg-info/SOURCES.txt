@@ -1,0 +1,9 @@
+README.md
+setup.py
+PyDIVOC/__init__.py
+PyDIVOC/divoc_qr.py
+PyDIVOC.egg-info/PKG-INFO
+PyDIVOC.egg-info/SOURCES.txt
+PyDIVOC.egg-info/dependency_links.txt
+PyDIVOC.egg-info/requires.txt
+PyDIVOC.egg-info/top_level.txt
