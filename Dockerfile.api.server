@@ -43,4 +43,4 @@ RUN  chmod -R 777 /Portal
 RUN apt-get update && apt-get install ghostscript graphicsmagick
 
 # Dev environment
-CMD ["npm", "run", "dev_local"]
+CMD ["npm", "run", "dev_server"]
