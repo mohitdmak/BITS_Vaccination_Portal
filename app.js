@@ -4,6 +4,9 @@ const express = require("express");
 // creating express app instance
 const app = express();
 
+// import cors module
+const cors = require("cors");
+
 
 //* MIDDLEWARE :
 
@@ -11,6 +14,9 @@ const app = express();
 app.use(express.urlencoded({ extended:true }));
 // this parses data submitted in json format.
 app.use(express.json());
+
+// cors settings
+app.use(cors());
 
 // run behind a proxy (nginx)
 app.set('trust proxy', 1);
