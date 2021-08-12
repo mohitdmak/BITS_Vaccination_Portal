@@ -87,7 +87,7 @@ const set_session_data = async (user, req, res) => {
         var student = await Student.find({email: user.data.email});
         if(student.length){
             req.session["student"] = student;
-            res.redirect('/auth/details');
+            res.redirect('/api/auth/details');
         }
         else{
             // creating student model
@@ -104,7 +104,7 @@ const set_session_data = async (user, req, res) => {
             try{
                 await student.save();
                 // redirecting to user details page
-                res.redirect('/auth/details');
+                res.redirect('/api/auth/details');
             }
             catch(err){
                 console.log(err);
