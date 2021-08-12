@@ -18,8 +18,8 @@ services:
     container_name: MongoContainer
 
     # Mongo DB Config
-    env_file:
-      - config/mongo.env
+    # env_file:
+      # - config/mongo.env
 
     # DB needs to always be up
     restart: always
@@ -44,7 +44,7 @@ services:
     
     # environment configs
     env_file:
-      - config/mongo-express.env       
+      - config/mongo-express2.env       
 
     # Main mongo server needs to start first
     depends_on:
