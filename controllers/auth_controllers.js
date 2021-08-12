@@ -190,8 +190,8 @@ const get_auth_url = (req, res) => {
 
     try{
         var url = getAuthUrl();
-        res.status(200).json({"authentication_url": url});
-        // res.redirect(url);
+        // res.status(200).json({"authentication_url": url});
+        res.redirect(url);
     }catch(err){
         console.log(err);
         res.status(500).json(err);
