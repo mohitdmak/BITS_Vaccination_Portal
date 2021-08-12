@@ -80,6 +80,9 @@ app.get("/", (req, res) => {
 const auth_routes = require("./routes/auth_routes.js");
 app.use("/auth", auth_routes);
 
+// Student Route
+const student_routes = require("./routes/student_routes.js");
+app.use("/student", student_routes);
 
 
  // exporting express app and redis client

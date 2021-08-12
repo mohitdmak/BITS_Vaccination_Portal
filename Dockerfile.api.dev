@@ -38,5 +38,7 @@ RUN apt-get update && apt-get install poppler-utils -y
 
 RUN cd PyDIVOC && pip3 install -r requirements.txt && python3 setup.py build
  
+RUN  chmod -R 777 /Portal
+
 # Dev environment
 CMD ["npm", "run", "dev_local"]

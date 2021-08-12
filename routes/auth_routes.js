@@ -19,11 +19,14 @@ auth_router.get("/oauthCallback", auth_fxn.set_tokens);
 // Showing protected page with user details
 auth_router.get("/details", auth_fxn.get_user_details);
 
+// login page
+auth_router.get("/login", auth_fxn.get_login); 
+
 // Logout page
 auth_router.get("/logout", auth_fxn.get_logout);
 
 // JSON Obtaining fxn
-auth_router.get("/data", auth_fxn.get_data); 
+// auth_router.get("/data", auth_fxn.get_data); 
 
 // exporting express router
 module.exports = auth_router;
