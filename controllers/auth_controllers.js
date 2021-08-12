@@ -10,10 +10,10 @@ var Student = require("../models/student");
 // Setting appropriate callback url
 var RedirectionUrl;
 if(process.env.npm_lifecycle_event === 'dev_local'){
-    RedirectionUrl = "http://localhost:1370/auth/oauthCallback";
+    RedirectionUrl = "http://localhost:1370/api/auth/oauthCallback";
 }
 else if(process.env.npm_lifecycle_event === 'dev_server'){
-    RedirectionUrl = "https://vaccination.bits-dvm.org/auth/oauthCallback";
+    RedirectionUrl = "https://vaccination.bits-dvm.org/api/auth/oauthCallback";
 }
 
 // Oauth2 client raw
