@@ -3,6 +3,31 @@ version: "3.3"
 # Docker containers in the network
 services:
 
+  # Container to run frontend
+  client_container:
+
+    # Passing build context
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+
+    # Syncing with dockerhub stored image
+    image: mohitdmak/bits_vaccination_portal:client
+
+    # setting container name
+    container_name: ClientContainer
+
+    # Critical container
+    restart: always
+
+    # Set volumes
+    volumes:
+      - ./client/:/app
+
+    # Set ports config
+    ports:
+      - 1380:80
+
   # Container to run mongo db in same docker network
   mongo_container:
 
