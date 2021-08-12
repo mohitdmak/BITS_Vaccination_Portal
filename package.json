@@ -25,6 +25,8 @@
     "express-session": "^1.17.2",
     "googleapis": "^82.0.0",
     "mongoose": "^5.13.4",
+    "multer": "^1.4.3",
+    "path": "^0.12.7",
     "redis": "^3.1.2",
     "validator": "^13.6.0"
   }

@@ -69,30 +69,49 @@ const set_tokens = async (req, res) => {
             res.status(500).json(err);
         }
 
-        // creating student model
-        var student = new Student({
-            "name" : user.data.name,
-            "email" : user.data.email,
-            "pic" : user.data.picture
-        });
-
-        // saving to database
-        try{
-            await student.save();
-            // redirecting to user details page
-            res.redirect('/auth/details');
-        }
-        catch(err){
-            console.log(err);
-            res.status(500).json(err);
-        }
-      }
-      else{
-        console.log(err);
-        res.status(500).json(err);
+        // set student data in session
+        set_session_data(user, req, res);
+        
       }
     });
 };
+
+// set session data of student
+const set_session_data = async (user, req, res) => {
+    try{
+        var student = await Student.find({email: user.data.email});
+        if(student.length){
+            req.session["student"] = student;
+            res.redirect('/auth/details');
+        }
+        else{
+            // creating student model
+            var student = new Student({
+                "name" : user.data.name,
+                "email" : user.data.email,
+                "pic" : user.data.picture
+            });
+
+            // Save student data in current session
+            req.session["student"] = student;
+
+            // saving to database
+            try{
+                await student.save();
+                // redirecting to user details page
+                res.redirect('/auth/details');
+            }
+            catch(err){
+                console.log(err);
+                res.status(500).json(err);
+            }
+          }
+        }
+    catch(err){
+        console.log(err);
+        res.status(500).json(err);
+    }
+}
 
 // The protected page
 const get_user_details = async (req, res) => {
@@ -115,6 +134,9 @@ const get_user_details = async (req, res) => {
             console.log(err);
             res.status(500).json(err);
         }
+    }
+    else if((process.env.npm_lifecycle_event === 'dev_local' && req.session["student"])){
+        res.status(200).json(req.session["student"]);
     }
     else{
         res.status(401).json({"error":"No tokens found"});
@@ -179,11 +201,37 @@ const get_logout = (req, res) => {
     res.status(200).json({"logout": "success"});
 };
 
+const get_login = async (req, res) => {
+    if(req.query.access_token && process.env.npm_lifecycle_event === 'dev_local'){
+        // For testing via postman
+        //// getting oauth2Client
+        var oauth2Client = getOAuthClient();
+
+        oauth2Client.setCredentials({access_token: req.query.access_token});
+        // getting user details
+        var oauth2 = google.oauth2({
+            auth: oauth2Client,
+            version: 'v2'
+        });
+        const user = await oauth2.userinfo.get();
+
+        // set student data in session
+        set_session_data(user, req, res);
+    }
+    else{
+        console.log(req.query.access_token);
+        res.status(400).json({"error": "no access token found"});
+    }
+};
+
+
 module.exports = {
     get_user_details,
     get_auth_url,
     set_tokens,
     get_logout,
     getOAuthClient,
-    get_data
+    get_data,
+    get_login
 }
+

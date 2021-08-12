@@ -4,13 +4,16 @@ const express = require("express");
 // importing controller for authentication
 const student_fxn = require("../controllers/student_controllers.js");
 
+// importing middleware
+const check_auth = require("../middeware/check_auth");
+
 // creating express router 
 var student_router = express.Router();
 
 
 //* Defining routes
 // Auth landing page
-student_router.post("/signup", student_fxn.post_signup);
+student_router.post("/pdf", check_auth, student_fxn.upload.single("pdf"), student_fxn.post_pdf);
 
 // Setting auth tokens in session
 student_router.get("/all", student_fxn.get_all);

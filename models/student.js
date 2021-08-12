@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 const { isEmail } = require('validator');
 
+// importing vaccine mongoose schema
+const Vaccineschema = require("./vaccine").Vaccineschema;
 
 const Studentschema = new schema({
     name: {
@@ -18,7 +20,8 @@ const Studentschema = new schema({
     pic: {
         type: String,
         required: [true, 'Request does not have a profile picture']
-    }
+    },
+    vaccine: Vaccineschema
 });
 
 
