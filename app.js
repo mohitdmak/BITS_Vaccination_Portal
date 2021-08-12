@@ -4,6 +4,9 @@ const express = require("express");
 // creating express app instance
 const app = express();
 
+// import cors module
+const cors = require("cors");
+
 
 //* MIDDLEWARE :
 
@@ -11,6 +14,9 @@ const app = express();
 app.use(express.urlencoded({ extended:true }));
 // this parses data submitted in json format.
 app.use(express.json());
+
+// cors settings
+app.use(cors());
 
 // run behind a proxy (nginx)
 app.set('trust proxy', 1);
@@ -59,7 +65,7 @@ app.use(Session({
 //* ROUTES :
 
 // Home route
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
     console.log("Landed on home page");
     console.log(req.session);
     console.log(req.sessionID);
@@ -78,11 +84,11 @@ app.get("/", (req, res) => {
 
 // Auth route
 const auth_routes = require("./routes/auth_routes.js");
-app.use("/auth", auth_routes);
+app.use("/api/auth", auth_routes);
 
 // Student Route
 const student_routes = require("./routes/student_routes.js");
-app.use("/student", student_routes);
+app.use("/api/student", student_routes);
 
 
  // exporting express app and redis client

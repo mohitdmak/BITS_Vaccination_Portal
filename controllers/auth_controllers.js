@@ -9,7 +9,12 @@ var Student = require("../models/student");
 
 // Setting appropriate callback url
 var RedirectionUrl;
-RedirectionUrl = "http://localhost:1370/auth/oauthCallback";
+if(process.env.npm_lifecycle_event === 'dev_local'){
+    RedirectionUrl = "http://localhost:1370/api/auth/oauthCallback";
+}
+else if(process.env.npm_lifecycle_event === 'dev_server'){
+    RedirectionUrl = "https://vaccination.bits-dvm.org/api/auth/oauthCallback";
+}
 
 // Oauth2 client raw
 var OAuth2 = google.auth.OAuth2;
@@ -82,7 +87,7 @@ const set_session_data = async (user, req, res) => {
         var student = await Student.find({email: user.data.email});
         if(student.length){
             req.session["student"] = student;
-            res.redirect('/auth/details');
+            res.redirect('/api/auth/details');
         }
         else{
             // creating student model
@@ -99,7 +104,7 @@ const set_session_data = async (user, req, res) => {
             try{
                 await student.save();
                 // redirecting to user details page
-                res.redirect('/auth/details');
+                res.redirect('/api/auth/details');
             }
             catch(err){
                 console.log(err);
@@ -185,8 +190,8 @@ const get_auth_url = (req, res) => {
 
     try{
         var url = getAuthUrl();
-        res.status(200).json({"authentication_url": url});
-        // res.redirect(url);
+        // res.status(200).json({"authentication_url": url});
+        res.redirect(url);
     }catch(err){
         console.log(err);
         res.status(500).json(err);

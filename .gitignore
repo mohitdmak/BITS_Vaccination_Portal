@@ -1,6 +1,9 @@
 # Oauth2 API Credentials
 config/oauth2-api-creds.json
 
+# Mongo without password
+config/mongo-express2.env
+
 # Mongo creds js supplier
 config/mongo.js
 
