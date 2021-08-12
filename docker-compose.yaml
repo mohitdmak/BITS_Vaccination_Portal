@@ -107,7 +107,7 @@ services:
 
     # Binding port 80 with host os port 1340
     ports:
-      - 1370:80
+      - 1370:443
 
     # Using nginx config defined in folder
     volumes:
