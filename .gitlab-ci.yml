@@ -45,7 +45,8 @@ build-job:
     # Touching env files ignored for the gitlab runner 
     - touch config/mongo.env
     - touch config/mongo-express.env
-    - docker-compose build
+    - touch config/mongo-express2.env
+    - docker-compose -f docker-compose.prod.yaml build
 
 
 # This pushes the tagged containers to their registry
@@ -64,11 +65,12 @@ stage-job:
     # Touching env files ignored for the gitlab runner
     - touch config/mongo.env
     - touch config/mongo-express.env
+    - touch config/mongo-express2.env
     # Push to registry
-    - docker-compose build
+    - docker-compose -f docker-compose.prod.yaml build
     - echo "Pushing Docker Images to Registry..."
     - docker login -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_PASSWORD
-    - docker-compose push
+    - docker-compose -f docker-compose.prod.yaml push
 
 
 # This would pull code from hosted repo into server directly
