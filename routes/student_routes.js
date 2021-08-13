@@ -13,7 +13,10 @@ var student_router = express.Router();
 
 //* Defining routes
 // Auth landing page
-student_router.post("/pdf", check_auth, student_fxn.upload.single("pdf"), student_fxn.post_pdf);
+student_router.post("/post_pdf", check_auth, student_fxn.upload.single("pdf"), student_fxn.post_pdf);
+
+// getting student's pdf
+student_router.get("/get_pdf", check_auth, student_fxn.get_pdf);
 
 // Setting auth tokens in session
 student_router.get("/all", student_fxn.get_all);

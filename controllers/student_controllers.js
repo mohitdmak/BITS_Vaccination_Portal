@@ -10,19 +10,30 @@ const multer = require('multer');
 const path = require('path');
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, './media/');
+        cb(null, './media/pdf/');
     },
 
     // By default, multer removes file extensions so let's add them back
     filename: function(req, file, cb) {
-        cb(null, file.fieldname + '-' + req.session["student"][0].email + path.extname(file.originalname));
+        cb(null, file.fieldname + '-' + req.session["student"].email + path.extname(file.originalname));
     }
 });
 
 // Importing function to generate OauthClient
 var { getOAuthClient } = require("./auth_controllers");
 
-let upload = multer({ storage: storage});
+let upload = multer(
+    { storage: storage,
+      fileFilter: function (req, file, cb) {
+          if(file.mimetype !== 'application/pdf') {
+              return cb(null, false)
+          }
+          else{
+              cb(null, true)
+          }
+      }
+    }
+ );
 
 
 // Handler for POST REQs submitting pdfs
@@ -51,12 +62,14 @@ const post_pdf = async ( req, res) => {
     // 'pdf' is the name of our file input field in the HTML form
     // req.file contains information of uploaded file
     if(req.session["student"]){
+
+        //!!!!!!!!!!!!!!!!!!!!!! ALLOW ONLY PDFS
         try{
             if (req.fileValidationError) {
                 return res.send(req.fileValidationError);
             }
             else if (!req.file) {
-                return res.send('Please select an image to upload');
+                return res.send('Please select a pdf to upload');
             }
             else{
                 get_data(req, res);
@@ -127,8 +140,16 @@ const get_data = async (req, res) => {
            var vac = await vaccine.save();
 
            // find db student instance
-           var student = await Student.findOneAndUpdate({email: req.session["student"][0].email}, {vaccine: vac}, {new: true});
+           var student = await Student.findOneAndUpdate({email: req.session["student"].email}, {vaccine: vac, pdf: file_name}, {new: true});
+
+           //update session data for current student
+           req.session["student"] = student;
            console.log(student.vaccine.QR.type);
+           console.log(student);
+           console.log(req.session["student"]);
+
+           // saving session data (!!!!!DOESNT DO AUTO IF REQ IS POST)
+           req.session.save();
         });
        // return saved status
        res.status(201).json({"file saved": req.file.path});
@@ -139,6 +160,30 @@ const get_data = async (req, res) => {
     }
 };
 
+
+// serving stored pdf file
+const get_pdf = async (req, res) => {
+    // get current logged in student
+    try{
+        // get downloaded file path
+        var serve_file = req.session["student"].pdf;
+        console.log(String(serve_file)); 
+        res.download(String(serve_file), function(err){
+            if(err){
+                console.log(err);
+                res.status(500).json(err);
+            }
+            else{
+                console.log("Pdf FILE for student is served");
+            }
+        });
+    }
+    // forward login errors
+    catch(err){
+        console.log(err);
+        res.status(500).json(err);
+    }
+}
 
 
 // landing page
@@ -166,5 +211,6 @@ module.exports = {
     get_student_details,
     get_logout,
     post_pdf,
-    upload
+    upload,
+    get_pdf
 }

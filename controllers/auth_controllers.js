@@ -86,7 +86,7 @@ const set_session_data = async (user, req, res) => {
     try{
         var student = await Student.find({email: user.data.email});
         if(student.length){
-            req.session["student"] = student;
+            req.session["student"] = student[0];
             res.redirect('/api/auth/details');
         }
         else{
@@ -98,12 +98,12 @@ const set_session_data = async (user, req, res) => {
             });
 
             // Save student data in current session
-            req.session["student"] = student;
+            // req.session["student"] = student;
 
             // saving to database
             try{
-                await student.save();
-                // redirecting to user details page
+                var new_student = await student.save();
+                req.session["student"] = new_student;
                 res.redirect('/api/auth/details');
             }
             catch(err){

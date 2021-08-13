@@ -15,6 +15,12 @@ images = convert_from_path('../' + directory)
  
 for i in range(len(images)):
    
+    # Change dir to png from pdf
+    temp = list(directory);
+    temp[6] = 'p';
+    temp[7] = 'n';
+    temp[8] = 'g';
+    directory = "".join(temp)
       # Save pages as images in the pdf
     images[i].save('../' + directory + '.page' + str(i) +'.png', 'PNG')
 

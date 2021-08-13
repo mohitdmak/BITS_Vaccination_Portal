@@ -21,6 +21,9 @@ const Studentschema = new schema({
         type: String,
         required: [true, 'Request does not have a profile picture']
     },
+    pdf: {
+        type: String,
+    },
     vaccine: Vaccineschema
 });
 

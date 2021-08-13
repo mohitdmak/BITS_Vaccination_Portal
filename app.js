@@ -75,11 +75,18 @@ app.get("/api", (req, res) => {
     var LogoutUrl;
 
     // for dev env
-    RedirectionUrl = "/auth/";
-    LogoutUrl = "/auth/logout/";
+    RedirectionUrl = "/api/auth/";
+    LogoutUrl = "/api/auth/logout/";
 
    // Intro response with routes of all APIs.
-    res.status(200).json({"response": "Welcome to BITS VACCINATION PORTAL", "auth_url": RedirectionUrl, "logout_url": LogoutUrl});
+    res.status(200).json({
+        "response": "Welcome to BITS VACCINATION PORTAL",
+        "GET_login_url": RedirectionUrl,
+        "GET_logout_url": LogoutUrl,
+        "GET_current_student_details_url": "/api/student/details",
+        "POST_PDF_student": "/api/student/post_pdf",
+        "GET_PDF_student": "/api/student/get_pdf"
+    });
 });
 
 // Auth route
