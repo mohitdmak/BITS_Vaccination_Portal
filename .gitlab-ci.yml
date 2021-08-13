@@ -45,6 +45,7 @@ build-job:
     # Touching env files ignored for the gitlab runner 
     - touch config/mongo.env
     - touch config/mongo-express.env
+    - touch config/mongo-express2.env
     - docker-compose -f docker-compose.prod.yaml build
 
 
@@ -64,6 +65,7 @@ stage-job:
     # Touching env files ignored for the gitlab runner
     - touch config/mongo.env
     - touch config/mongo-express.env
+    - touch config/mongo-express2.env
     # Push to registry
     - docker-compose -f docker-compose.prod.yaml build
     - echo "Pushing Docker Images to Registry..."
