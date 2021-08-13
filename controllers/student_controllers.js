@@ -115,6 +115,9 @@ const post_consent = async (req, res) => {
                 // update session data
                 req.session["student"] = new_student;
 
+                //update overall status
+                update_overall_status(new_student, req);
+
                 // sending file path response
                 res.status(200).json({"file saved": req.file.path});
             }
@@ -213,21 +216,172 @@ const save_data = async (req, res) => {
 
            //update session data for current student
            req.session["student"] = student;
-           console.log(student.vaccine.QR.type);
-           console.log(student);
-           console.log(req.session["student"]);
+           console.log(student.vaccine.QR.credentialSubject.name);
+           // console.log(student);
+           // console.log(req.session["student"]);
 
            // saving session data (!!!!!DOESNT DO AUTO IF REQ IS POST)
            req.session.save();
+           verify_authenticity(req, res);
         });
        // return saved status
-       res.status(201).json({"file saved": req.file.path});
-    }
+       // res.status(201).json({"file saved": req.file.path});
+   }
     catch(err){
         console.log(err);
         res.status(500).json(err);
     }
 };
+
+
+// VERIFY AUTHENTICITY
+const verify_authenticity = async (req,res) => {
+    // get student data in current session
+    var student = req.session["student"];
+    console.log(student);
+    
+    // seperate bits, pdf name
+    var BITS_NAME = String(student.name.toUpperCase());
+    var PDF_NAME = String(student.vaccine.QR.credentialSubject.name.toUpperCase());
+
+    // split names into array
+    var temp_BITS = BITS_NAME.split(" ");
+    var temp_PDF = PDF_NAME.split(" ");
+    var BITS_ARRAY = new Array();
+    var PDF_ARRAY = new Array();
+
+    // push space seperated values
+    for(var i = 0; i < temp_BITS.length; i++){
+        BITS_ARRAY.push(temp_BITS[i]);
+    }
+
+    // push space seperated values
+    for(var i = 0; i < temp_PDF.length; i++){
+        PDF_ARRAY.push(temp_PDF[i]);
+    }
+
+    PDF_ARRAY[0] = 'MAKWANA';
+    PDF_ARRAY[1] = 'DILIP';
+
+    // for reference
+    console.log(BITS_ARRAY);
+    console.log(PDF_ARRAY);
+
+    // count number of matching words
+    var count = 0;
+
+    // Iterate through both arrays
+    for(var i = 0; i < BITS_ARRAY.length; i += 1) {
+        if(PDF_ARRAY.indexOf(BITS_ARRAY[i]) > -1){
+            count += 1;
+        }
+    }
+    // for reference
+    console.log(count);
+
+    // update/reject appropriately
+    try{
+        if(count >= 2){
+            student.vaccine.QR.evidence[0].dose = 2
+            var new_student;
+            if(Number(student.vaccine.QR.evidence[0].dose) > 0 && Number(student.vaccine.QR.evidence[0].dose < student.vaccine.QR.evidence[0].totalDoses)){
+                new_student = await Student.findOneAndUpdate({email: student.email}, {auto_verification: 'DONE', vaccination_status: 'PARTIAL'}, {new: true});
+            }
+            else if(Number(student.vaccine.QR.evidence[0].dose) > 0 && Number(student.vaccine.QR.evidence[0].dose) == Number(student.vaccine.QR.evidence[0].totalDoses)){
+                new_student = await Student.findOneAndUpdate({email: student.email}, {auto_verification: 'DONE', vaccination_status: 'COMPLETE'}, {new: true});
+            }
+            else if(Number(student.vaccine.QR.evidence[0].dose) == 0){
+                new_student = await Student.findOneAndUpdate({email: student.email}, {auto_verification: 'DONE', vaccination_status: 'NONE'}, {new: true});
+            }
+            else{
+                res.status(400).json({"error": "TOTAL DOSES ARE LESS THAN COMPLETED DOSES"});
+            }
+            req.session["student"] = new_student;
+            req.session.save();
+
+            // update overall status
+            update_overall_status(new_student, req);
+        }
+        else{
+            var new_student = await Student.findOneAndUpdate({email: student.email}, {auto_verification: 'FAILED'}, {new: true});
+            req.session["student"] = new_student;
+            req.session.save();
+
+            //update overall status
+            update_overall_status(new_student, req);
+        }
+        res.redirect("/");
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json(err);
+    }
+    // res.status(200).send('hi');
+}
+
+
+//// FUZZY NAME MATCHING USING HMNI ML ALGORITHM
+//const match_names = async(req, res) => {
+//   try{
+//       // Fetch BITS NAME and name on pdf
+//       var student = req.session["student"];
+//       console.log(student);
+//       var BITS_NAME = student.name.toUpperCase();
+//       var PDF_NAME = student.vaccine.QR.credentialSubject.name.toUpperCase();
+
+//       // FORK CHILD PROCESS AND RUN BASH SCRIPT
+//       var cp = require('child_process');
+//       cp.exec(`python3 ML_ALGO.py ${BITS_NAME} ${PDF_NAME}`, async function(err, stdout, stderr) {
+//          // handle err, stdout, stderr
+//            console.log(err);
+//            console.log(stderr);
+           
+//           // main python output from PyDOC
+//            console.log(stdout);
+          
+
+//           // find db student instance
+//           // var student = await Student.findOneAndUpdate({email: req.session["student"].email}, {vaccine: vac, pdf: file_name}, {new: true});
+
+//           //update session data for current student
+//           // req.session["student"] = student;
+//           // console.log(student.vaccine.QR.type);
+//           // console.log(student);
+//           // console.log(req.session["student"]);
+
+//           // saving session data (!!!!!DOESNT DO AUTO IF REQ IS POST)
+//           // req.session.save();
+//        });
+//       // return saved status
+//       res.status(201).json({"file saved": req.file.path});
+//    }
+//    catch(err){
+//        console.log(err);
+//        res.status(500).json(err);
+//    }
+//}
+
+
+// // Provide Overall Status
+const update_overall_status = async (student, req) => {
+
+    console.log("\n     Checking for update in Overall Acess...........");
+    // get current logged in student
+    try{
+        // both files should be present
+        // storing current session data for student
+        if(student.pdf && student.consent_form && student.vaccination_status == 'COMPLETE'){
+            var new_student = await Student.findOneAndUpdate({email: student.email}, {overall_status: true}, {new:true});
+            req.session["student"] = new_student;
+            req.session.save();
+            console.log('OVERALL ACCESS GRANTED');
+        }
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json(err);
+    }
+}
 
 
 // serving stored pdf file

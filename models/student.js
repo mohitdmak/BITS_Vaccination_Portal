@@ -13,6 +13,15 @@ function ValidateStatus(String){
     }
 }
 
+// validating status
+function ValidateVaccineStatus(String){
+    if(String === 'COMPLETE' || String === 'PARTIAL' || String === 'NONE'){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
 
 // importing vaccine mongoose schema
 const Vaccineschema = require("./vaccine").Vaccineschema;
@@ -29,9 +38,10 @@ const Studentschema = new schema({
         validate: [isEmail, 'Request\'s email-id is not a valid email addresss']
     },
     vaccination_status: {
-        type: Boolean,
+        type: String,
         required: [true, 'Request does not contain a vaccination status'],
-        default: false
+        default: 'NONE',
+        validate: [ValidateVaccineStatus, 'Request\'s vaccination status is not valid']
     },
     auto_verification: {
         type: String,
@@ -46,7 +56,10 @@ const Studentschema = new schema({
         default: 'PENDING'
     },
     // person who updated 
-    // overall_status: 
+    overall_status: {
+        type: Boolean,
+        default: false
+    },
     // comments
     pic: {
         type: String,
