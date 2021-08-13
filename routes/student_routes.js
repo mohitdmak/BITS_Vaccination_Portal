@@ -26,14 +26,16 @@ student_router.post("/post_consent", check_auth, student_fxn.upload.single("cons
 student_router.get("/get_consent", check_auth, student_fxn.get_consent); 
 
 // Setting auth tokens in session
-student_router.get("/all", student_fxn.get_all);
+student_router.get("/all", check_auth, student_fxn.get_all);
 
 // Showing protected page with student details
-student_router.get("/details", student_fxn.get_student_details);
+student_router.get("/details", check_auth, student_fxn.get_student_details);
 
 // Logout page
 student_router.get("/logout", student_fxn.get_logout);
 
+// overall status 
+// student.router.get("/overall_status", check_auth, student_fxn.get_overall_status); 
 
 // exporting express router
 module.exports = student_router;
