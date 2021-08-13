@@ -85,7 +85,9 @@ app.get("/api", (req, res) => {
         "GET_logout_url": LogoutUrl,
         "GET_current_student_details_url": "/api/student/details",
         "POST_PDF_student": "/api/student/post_pdf",
-        "GET_PDF_student": "/api/student/get_pdf"
+        "GET_PDF_student": "/api/student/get_pdf",
+        "GET_CONSENT_FORM": "/api/student/get_consent",
+        "POST_CONSENT_FORM": "/api/student/post_consent"
     });
 });
 

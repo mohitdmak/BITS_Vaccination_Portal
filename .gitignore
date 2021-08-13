@@ -1,6 +1,9 @@
 # CACHESSSSSS
 PyDIVOC/PyDIVOC/__pycache__
 
+# CONSENT FORMS UPLOADED BY STUDENTS
+media/consent/*.pdf
+
 # PDFS UPLOADED BY STUDENTS
 media/pdf/*.pdf
 

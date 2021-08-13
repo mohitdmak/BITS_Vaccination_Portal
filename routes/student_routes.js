@@ -12,11 +12,18 @@ var student_router = express.Router();
 
 
 //* Defining routes
+//
 // Auth landing page
 student_router.post("/post_pdf", check_auth, student_fxn.upload.single("pdf"), student_fxn.post_pdf);
 
 // getting student's pdf
 student_router.get("/get_pdf", check_auth, student_fxn.get_pdf);
+
+// post consent form
+student_router.post("/post_consent", check_auth, student_fxn.upload.single("consent_form"), student_fxn.post_consent);
+
+// get consent form
+student_router.get("/get_consent", check_auth, student_fxn.get_consent); 
 
 // Setting auth tokens in session
 student_router.get("/all", student_fxn.get_all);

@@ -10,7 +10,12 @@ const multer = require('multer');
 const path = require('path');
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, './media/pdf/');
+        if(req.url == '/post_pdf'){
+            cb(null, './media/pdf/');
+        }
+        else if(req.url == '/post_consent'){
+            cb(null, './media/consent/');
+        }
     },
 
     // By default, multer removes file extensions so let's add them back
@@ -72,7 +77,7 @@ const post_pdf = async ( req, res) => {
                 return res.send('Please select a pdf to upload');
             }
             else{
-                get_data(req, res);
+                save_data(req, res);
                 // res.status(200).json({"file saved": req.file.path});
             }
         }
@@ -86,6 +91,70 @@ const post_pdf = async ( req, res) => {
         res.status(400).json({"error": "Student has not logged in yet."});
     }
 }
+
+
+//POST CONSENT FORM
+const post_consent = async (req, res) => {
+    if(req.session["student"]){
+        //!!!!!!!!!!!!!!!!!!!!!! ALLOW ONLY PDFS
+        try{
+            if (req.fileValidationError) {
+                return res.send(req.fileValidationError);
+            }
+            else if (!req.file) {
+                return res.send('Please select a pdf to upload');
+            }
+            else{
+                var student = req.session["student"];
+
+                // update consent form in student model
+                var new_student = await Student.findOneAndUpdate({email: student.email}, {consent_form: req.file.path}, {new: true});
+                // student.consent_form = req.file.path;
+                console.log(new_student);
+
+                // update session data
+                req.session["student"] = new_student;
+
+                // sending file path response
+                res.status(200).json({"file saved": req.file.path});
+            }
+        }
+        // forward non multer errors
+        catch(err){
+            console.log(err);
+            res.status(500).json(err);
+        }
+    }
+    else{
+        res.status(400).json({"error": "Student has not logged in yet."});
+    }
+}
+
+
+// get consent form
+const get_consent = async (req, res) => {
+    // get current logged in student
+    try{
+        // get downloaded file path
+        var serve_file = req.session["student"].consent_form;
+        console.log(String(serve_file)); 
+        res.download(String(serve_file), function(err){
+            if(err){
+                console.log(err);
+                res.status(500).json(err);
+            }
+            else{
+                console.log("CONSENT FORM FILE for student is served");
+            }
+        });
+    }
+    // forward login errors
+    catch(err){
+        console.log(err);
+        res.status(500).json(err);
+    }
+}
+
 
 // The protected page
 const get_student_details = async (req, res) => {
@@ -108,7 +177,7 @@ const get_student_details = async (req, res) => {
 };
 
 // The protected page
-const get_data = async (req, res) => {
+const save_data = async (req, res) => {
    try{
        var file_name = req.file.path;
        var cp = require('child_process');
@@ -212,5 +281,7 @@ module.exports = {
     get_logout,
     post_pdf,
     upload,
-    get_pdf
+    get_pdf,
+    post_consent,
+    get_consent
 }
