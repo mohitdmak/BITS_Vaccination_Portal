@@ -203,7 +203,7 @@ const get_logout = (req, res) => {
     // removing tokens from session
     req.session.destroy();
 
-    res.status(200).json({"logout": "success"});
+    res.redirect("/");
 };
 
 const get_login = async (req, res) => {
