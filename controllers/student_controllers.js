@@ -10,10 +10,10 @@ const multer = require('multer');
 const path = require('path');
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        if(req.url == '/post_pdf'){
+        if(req.path == '/post_pdf'){
             cb(null, './media/pdf/');
         }
-        else if(req.url == '/post_consent'){
+        else if(req.path == '/post_consent'){
             cb(null, './media/consent/');
         }
     },
