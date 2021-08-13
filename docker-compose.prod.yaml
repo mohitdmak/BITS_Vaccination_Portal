@@ -22,7 +22,8 @@ services:
 
     # Set volumes
     volumes:
-      - ./client/:/app
+      - './client:/app'
+      - '/app/node_modules' 
 
     # Set ports config
     ports:
