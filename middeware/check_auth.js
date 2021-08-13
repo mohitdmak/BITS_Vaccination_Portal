@@ -1,5 +1,7 @@
 const check_auth = async (req, res, next) => {
     if(req.session["student"]){
+        console.log('FORWARDED FROM MIDDLEWARE');
+        console.log(req.url);
         next();
     }
     else{
