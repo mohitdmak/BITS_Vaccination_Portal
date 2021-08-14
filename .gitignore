@@ -1,5 +1,5 @@
 # CACHESSSSSS
-PyDIVOC/PyDIVOC/__pycache__
+PyDIVOC/PyDIVOC/__pycache__/*.pyc
 
 # CONSENT FORMS UPLOADED BY STUDENTS
 media/consent/*.pdf
