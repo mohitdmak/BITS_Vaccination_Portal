@@ -22,8 +22,8 @@ const Dashboard = (props) => {
 
     const [name, setName] = useState("Parth Sharma")
     const [pp, setPP] = useState("https://avatars.githubusercontent.com/u/45586386?v=4")
-    const [certificate, setCertificate] = useState(null)
-    const [consent, setConsent] = useState(null)
+    const [certificate, setCertificate] = useState(true)
+    const [consent, setConsent] = useState(true)
     const [status, setStatus] = useState(false)
     const [one, setOne] = useState(1)
 
@@ -49,10 +49,23 @@ const Dashboard = (props) => {
     
 
     // This will upload the file after having read it
-    const upload = (file) => {
-        fetch('https://vaccination.bits-dvm.org/api/student/pdf', { // Your POST endpoint
+    const upload = (data) => {
+        fetch('https://vaccination.bits-dvm.org/api/student/post_pdf', { // Your POST endpoint
             method: 'POST',
-            body: file // This is your file object
+            body: data // This is your file object
+        }).then(
+            response => response.json() // if the response is a JSON object
+        ).then(
+            success => console.log(success) // Handle the success response object
+        ).catch(
+            error => console.log(error) // Handle the error response object
+        );
+    };
+
+    const upload2 = (data) => {
+        fetch('https://vaccination.bits-dvm.org/api/student/post_consent', { // Your POST endpoint
+            method: 'POST',
+            body: data // This is your file object
         }).then(
             response => response.json() // if the response is a JSON object
         ).then(
@@ -66,8 +79,17 @@ const Dashboard = (props) => {
     const input2 = document.getElementById('fileinput2');
 
     // Event handler executed when a file is selected
-    const onSelectFile = () => upload(input.files[0]);
-    const onSelectFile2 = () => upload(input2.files[0]);
+    const onSelectFile = () => {
+        var data = new FormData()
+        data.append('pdf', input.files[0])
+        upload(data)
+    }
+
+    const onSelectFile2 = () => {
+        var data = new FormData()
+        data.append('consent_form', input2.files[0])
+        upload2(data)
+    }
     
     const apiRequest = () => {
         fetch('https://vaccination.bits-dvm.org/api/student/details/',
@@ -129,7 +151,11 @@ const Dashboard = (props) => {
                             color="white"
                             fontWeight="bold"
                             fontSize={["12px", "12px", "12px", "18px", "18px"]}
-                            onClick={() => window.open("https://vaccination.bits-dvm.org/api/auth/logout", "_parent")}
+                            onClick={
+                                () => {
+                                    window.open("https://vaccination.bits-dvm.org/api/auth/logout", "_parent")
+                                }
+                            }
                         >Logout
                         </Button> 
 
@@ -191,7 +217,7 @@ const Dashboard = (props) => {
                                 mb="-2px"
                                 fontSize={["14px", "14px", "14px", "22px", "22px"]}
                             >VACCINATION STATUS</Text>
-                            {status ? 
+                            {/* {status ? 
                                 <Heading 
                                     color="green"
                                     fontSize={["20px", "20px", "20px", "28px", "28px"]}
@@ -199,7 +225,11 @@ const Dashboard = (props) => {
                                 <Heading 
                                     color="red"
                                     fontSize={["20px", "20px", "20px", "28px", "28px"]}
-                                >NOT VACCINATED</Heading>}
+                                >NOT VACCINATED</Heading>} */}
+                            <Heading 
+                                    color="green"
+                                    fontSize={["20px", "20px", "20px", "28px", "28px"]}
+                                >{status}</Heading>
                                
                         </Flex>
                     </Box>
@@ -227,13 +257,17 @@ const Dashboard = (props) => {
                             ml="10px" 
                             mr="10px"
                             isDisabled={certificate ? false : true}
-                            onClick={() => window.open(certificate, "_blank")}
+                            onClick={() => window.open("https://vaccination.bits-dvm.org/api/student/get_pdf", "_blank")}
                         >View</Button>
                     </GridItem>
                     
                     <GridItem rowSpan={1} colSpan={3}>
                         <form>
-                            <input type="file" id="fileinput"/>
+                            <input 
+                                type="file" 
+                                accept="application/pdf" 
+                                id="fileinput"
+                            />
                             <Button 
                                 mt={["10px","Opx","10px","0px","0px"]}
                                 onClick={onSelectFile}
@@ -249,14 +283,14 @@ const Dashboard = (props) => {
                     <GridItem rowSpan={1} colSpan={1}>
                         <Button 
                         isDisabled={consent ? false : true}
-                        onClick={() => window.open(consent, "_blank")}
+                        onClick={() => window.open("https://vaccination.bits-dvm.org/api/student/get_consent", "_blank")}
                         ml="10px" mr="10px" mt="20px"
                         >View</Button>
                     </GridItem>
 
                     <GridItem rowSpan={1} colSpan={3} mt="20px">
                         <form>
-                            <input type="file" id="fileinput2" />
+                            <input type="file" accept="application/pdf" id="fileinput2" />
                             <Button 
                                 mt={["10px","Opx","10px","0px","0px"]}
                                 onClick={onSelectFile2}
