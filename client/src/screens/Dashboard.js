@@ -22,12 +22,22 @@ const Dashboard = (props) => {
     const [pp, setPP] = useState("https://avatars.githubusercontent.com/u/45586386?v=4")
     const [certificate, setCertificate] = useState(null)
     const [consent, setConsent] = useState(null)
+    const [status, setStatus] = useState(false)
+    const [one, setOne] = useState("pending")
 
+    function cleanOne(auto) {
+        if (auto === "PENDING") setOne("pending")
+        else if (auto === "CONFIRMED") setOne("done")
+        else setOne("no")
+    }
 
-    const campus = "BITS Pilani, Pilani Campus"
+    const campus = "Pilani Campus"
     const bits = "https://is5-ssl.mzstatic.com/image/thumb/Purple124/v4/b4/20/40/b420401e-c883-b363-03b5-34509d67c214/source/512x512bb.jpg"
     const dvm = "https://avatars.githubusercontent.com/u/14038814?s=200&v=4"
 
+    const done = "https://i.imgur.com/hMXnx8d.png"
+    const pending = "https://i.imgur.com/kHguvEu.png"
+    const no = "https://i.imgur.com/lETEPEq.png"
 
     useEffect(() => {
         apiRequest();
@@ -56,6 +66,8 @@ const Dashboard = (props) => {
                     if (res.data.consentForm){
                         setConsent(res.data.consentForm)
                     }
+                    setStatus(res.data.vaccination_status)
+                    setOne(cleanOne(res.data.auto_verification))
                 } else {
                     alert("ERROR RETRIEVING CONTENT.");
                 }
@@ -153,7 +165,7 @@ const Dashboard = (props) => {
                                 mb="-2px"
                                 fontSize={["14px", "14px", "14px", "22px", "22px"]}
                             >VACCINATION STATUS</Text>
-                            {certificate ? 
+                            {status ? 
                                 <Heading 
                                     color="green"
                                     fontSize={["20px", "20px", "20px", "28px", "28px"]}
@@ -162,6 +174,7 @@ const Dashboard = (props) => {
                                     color="red"
                                     fontSize={["20px", "20px", "20px", "28px", "28px"]}
                                 >NOT VACCINATED</Heading>}
+                               
                         </Flex>
                     </Box>
                 </Flex>
@@ -176,8 +189,9 @@ const Dashboard = (props) => {
                     width={["80vw", "80vw", "80vw", "1040px", "1040px"]}
                 >
                     {/* <Flex flexDir="row" m="10px" alignItems="center"> */}
-                    <GridItem rowSpan={1} colSpan={2}>
+                    <GridItem rowSpan={1} colSpan={2} display="flex" flexDir="row">
                         <Text fontWeight="bold">Latest Vaccine Certificate:</Text>
+                        <Image src={one} ml="10px" boxSize="30px" />
                     </GridItem>
                        
                     <GridItem rowSpan={1} colSpan={1}>
@@ -190,14 +204,17 @@ const Dashboard = (props) => {
                     </GridItem>
                     
                     <GridItem rowSpan={1} colSpan={3}>
-                        <form action="https://vaccination.bits-dvm.org/api/student/post_pdf" method="post">
-                            <input type="file" key="pdf" />
-                            <Button type="submit">Update</Button>
+                        <form action="https://vaccination.bits-dvm.org/api/student/pdf" method="post">
+                            <input type="file" name="pdf"/>
+                            <Button 
+                                mt={["10px","Opx","10px","0px","0px"]}
+                                type="submit">Update</Button>
                         </form>
                     </GridItem>
                     
-                    <GridItem rowSpan={1} colSpan={2} mt="10px">
+                    <GridItem rowSpan={1} colSpan={2} display="flex" flexDir="row">
                         <Text fontWeight="bold" mt="20px">Parent Consent Form:</Text>
+                        {/* <Image src={pending} ml="10px" mt="20px" boxSize="30px" /> */}
                     </GridItem>
 
                     <GridItem rowSpan={1} colSpan={1}>
@@ -209,21 +226,27 @@ const Dashboard = (props) => {
                     </GridItem>
 
                     <GridItem rowSpan={1} colSpan={3} mt="20px">
-                        <form action="https://vaccination.bits-dvm.org/api/student/post_consentForm" method="post">
-                            <input type="file" key="consentForm"  />
-                            <Button type="submit">Update</Button>
+                        <form action="https://vaccination.bits-dvm.org/api/student/post_consent" method="post">
+                            <input type="file" name="consent_form" />
+                            <Button 
+                                mt={["10px","Opx","10px","0px","0px"]}
+                                type="submit"
+                            >Update</Button>
                         </form>
                     </GridItem>
                     {/* </Flex> */}
                 </Grid>
 
                 <Flex 
-                 flexDir={["column","column","column","row","row"]}
-                alignItems="center" mt="100px">
+                    flexDir={["column","column","column","row","row"]}
+                    alignItems="center" 
+                    mt="80px"
+                    mb="50px"
+                >
                     An initiative by
                     <Image src={bits} ml="10px" mr="5px" mt="5px" height="80px" />
                     and
-                    <Image src={dvm} ml="20px" mr="20px" mt="10px" boxSize="70px" />
+                    <Image src={dvm} ml="20px" mr="20px" mt="10px"boxSize="70px" />
                 </Flex>
                 
             </Flex>   
