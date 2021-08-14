@@ -27,7 +27,7 @@ services:
 
     # Set ports config
     ports:
-      - 1380:80
+      - 80
 
   # Container to run mongo db in same docker network
   mongo_container:
@@ -59,29 +59,56 @@ services:
       - 27017
 
 
-  # Container to provide interface to running mongo container
-  mongo-express_container:
+# Container to provide admin interface to running mongo container
+  db-admin_container:
 
-    # default image
-    image: mongo-express
+    # Provide build context
+    build:
+      context: .
+      dockerfile: Dockerfile.db.admin
 
-    # Default name
-    container_name: MongoExpressContainer
-    
-    # environment configs
+    # Name for nginx to access
+    container_name: DbAdminContainer
+
+    # Supply env configs
     env_file:
-      - config/mongo-express2.env       
+      - config/DB_ADMIN_CONFIG.env
 
-    # Main mongo server needs to start first
+  # Dont start admin panel before db is running
     depends_on:
       - dev_container
 
-    # Restart always, since Mongo container needs time to be up
+  # Critical container service
     restart: always
 
-    # Linking host os here
+  # Dont expose port to local machine, keep secure https connection
     ports:
-      - 8080:8081
+      - 8081
+
+
+  # # Container to provide interface to running mongo container
+  # mongo-express_container:
+
+  #   # default image
+  #   image: mongo-express
+
+  #   # Default name
+  #   container_name: MongoExpressContainer
+    
+  #   # environment configs
+  #   env_file:
+  #     - config/mongo-express2.env       
+
+  #   # Main mongo server needs to start first
+  #   depends_on:
+  #     - dev_container
+
+  #   # Restart always, since Mongo container needs time to be up
+  #   restart: always
+
+  #   # Linking host os here
+  #   ports:
+  #     - 8080:8081
 
 
   # Container to run development environment

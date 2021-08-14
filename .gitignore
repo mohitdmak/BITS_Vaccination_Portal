@@ -1,6 +1,9 @@
 # CACHESSSSSS
 PyDIVOC/PyDIVOC/__pycache__/*.pyc
 
+# DB ADMIN CONFIGURATION
+config/DB_ADMIN_CONFIG.env
+
 # CONSENT FORMS UPLOADED BY STUDENTS
 media/consent/*.pdf
 
