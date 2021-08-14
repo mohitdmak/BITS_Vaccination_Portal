@@ -46,6 +46,7 @@ build-job:
     - touch config/mongo.env
     - touch config/mongo-express.env
     - touch config/mongo-express2.env
+    - touch config/DB_ADMIN_CONFIG.env
     - docker-compose -f docker-compose.prod.yaml build
 
 
@@ -66,6 +67,7 @@ stage-job:
     - touch config/mongo.env
     - touch config/mongo-express.env
     - touch config/mongo-express2.env
+    - touch config/DB_ADMIN_CONFIG.env
     # Push to registry
     - docker-compose -f docker-compose.prod.yaml build
     - echo "Pushing Docker Images to Registry..."
