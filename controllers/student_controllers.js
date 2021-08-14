@@ -196,9 +196,9 @@ const save_data = async (req, res) => {
                 res.status(500).json({"error": stderr});
             }
             else{
-               // main python output from PyDOC
+                // main python output from PyDOC
                 console.log(stdout);
-               // Using REGEX to replace escape sequences, due to baash output
+                // Using REGEX to replace escape sequences, due to baash output
                 var regedStr = stdout.replace(/\\n/g, "\\n")  
                    .replace(/\\'/g, "\\'")
                    .replace(/\\"/g, '\\"')
@@ -209,28 +209,28 @@ const save_data = async (req, res) => {
                    .replace(/\\f/g, "\\f");
 
                    // convert to json using regex
-                   var parsedStr = regedStr.replace(/\'/g, '"');
-                   console.log(parsedStr);
+                var parsedStr = regedStr.replace(/\'/g, '"');
+                console.log(parsedStr);
 
                    // create vaccine object and save
-                    var vaccine = new Vaccine({
-                        'QR': JSON.parse(parsedStr)
-                    });
-                   var vac = await vaccine.save();
+                var vaccine = new Vaccine({
+                    'QR': JSON.parse(parsedStr)
+                });
+                var vac = await vaccine.save();
 
                    // find db student instance
-                   var student = await Student.findOneAndUpdate({email: req.session["student"].email}, {vaccine: vac, pdf: file_name}, {new: true});
+                var student = await Student.findOneAndUpdate({email: req.session["student"].email}, {vaccine: vac, pdf: file_name}, {new: true});
 
                    //update session data for current student
-                   req.session["student"] = student;
-                   console.log(student.vaccine.QR.credentialSubject.name);
+                req.session["student"] = student;
+                console.log(student.vaccine.QR.credentialSubject.name);
                    // console.log(student);
                    // console.log(req.session["student"]);
 
                    // saving session data (!!!!!DOESNT DO AUTO IF REQ IS POST)
-                   req.session.save();
-                   verify_authenticity(req, res);
-        });
+                req.session.save();
+                verify_authenticity(req, res);
+        }});
        // return saved status
        // res.status(201).json({"file saved": req.file.path});
    }
