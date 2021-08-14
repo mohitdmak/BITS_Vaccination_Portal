@@ -188,41 +188,48 @@ const save_data = async (req, res) => {
           // handle err, stdout, stderr
             console.log(err);
             console.log(stderr);
-           
-           // main python output from PyDOC
-            console.log(stdout);
-           // Using REGEX to replace escape sequences, due to baash output
-            var regedStr = stdout.replace(/\\n/g, "\\n")  
-               .replace(/\\'/g, "\\'")
-               .replace(/\\"/g, '\\"')
-               .replace(/\\&/g, "\\&")
-               .replace(/\\r/g, "\\r")
-               .replace(/\\t/g, "\\t")
-               .replace(/\\b/g, "\\b")
-               .replace(/\\f/g, "\\f");
+            
+            if(err){
+                res.status(500).json({"error": err});
+            }
+            else if(stderr){
+                res.status(500).json({"error": stderr});
+            }
+            else{
+               // main python output from PyDOC
+                console.log(stdout);
+               // Using REGEX to replace escape sequences, due to baash output
+                var regedStr = stdout.replace(/\\n/g, "\\n")  
+                   .replace(/\\'/g, "\\'")
+                   .replace(/\\"/g, '\\"')
+                   .replace(/\\&/g, "\\&")
+                   .replace(/\\r/g, "\\r")
+                   .replace(/\\t/g, "\\t")
+                   .replace(/\\b/g, "\\b")
+                   .replace(/\\f/g, "\\f");
 
-           // convert to json using regex
-           var parsedStr = regedStr.replace(/\'/g, '"');
-           console.log(parsedStr);
+                   // convert to json using regex
+                   var parsedStr = regedStr.replace(/\'/g, '"');
+                   console.log(parsedStr);
 
-           // create vaccine object and save
-            var vaccine = new Vaccine({
-                'QR': JSON.parse(parsedStr)
-            });
-           var vac = await vaccine.save();
+                   // create vaccine object and save
+                    var vaccine = new Vaccine({
+                        'QR': JSON.parse(parsedStr)
+                    });
+                   var vac = await vaccine.save();
 
-           // find db student instance
-           var student = await Student.findOneAndUpdate({email: req.session["student"].email}, {vaccine: vac, pdf: file_name}, {new: true});
+                   // find db student instance
+                   var student = await Student.findOneAndUpdate({email: req.session["student"].email}, {vaccine: vac, pdf: file_name}, {new: true});
 
-           //update session data for current student
-           req.session["student"] = student;
-           console.log(student.vaccine.QR.credentialSubject.name);
-           // console.log(student);
-           // console.log(req.session["student"]);
+                   //update session data for current student
+                   req.session["student"] = student;
+                   console.log(student.vaccine.QR.credentialSubject.name);
+                   // console.log(student);
+                   // console.log(req.session["student"]);
 
-           // saving session data (!!!!!DOESNT DO AUTO IF REQ IS POST)
-           req.session.save();
-           verify_authenticity(req, res);
+                   // saving session data (!!!!!DOESNT DO AUTO IF REQ IS POST)
+                   req.session.save();
+                   verify_authenticity(req, res);
         });
        // return saved status
        // res.status(201).json({"file saved": req.file.path});
@@ -239,50 +246,58 @@ const verify_authenticity = async (req,res) => {
     // get student data in current session
     var student = req.session["student"];
     console.log(student);
-    
-    // seperate bits, pdf name
-    var BITS_NAME = String(student.name.toUpperCase());
-    var PDF_NAME = String(student.vaccine.QR.credentialSubject.name.toUpperCase());
 
-    // split names into array
-    var temp_BITS = BITS_NAME.split(" ");
-    var temp_PDF = PDF_NAME.split(" ");
-    var BITS_ARRAY = new Array();
-    var PDF_ARRAY = new Array();
-
-    // push space seperated values
-    for(var i = 0; i < temp_BITS.length; i++){
-        BITS_ARRAY.push(temp_BITS[i]);
-    }
-
-    // push space seperated values
-    for(var i = 0; i < temp_PDF.length; i++){
-        PDF_ARRAY.push(temp_PDF[i]);
-    }
-
-    PDF_ARRAY[0] = 'MAKWANA';
-    PDF_ARRAY[1] = 'DILIP';
-
-    // for reference
-    console.log(BITS_ARRAY);
-    console.log(PDF_ARRAY);
-
-    // count number of matching words
     var count = 0;
+    
+    try{
+        // seperate bits, pdf name
+        var BITS_NAME = String(student.name.toUpperCase());
+        var PDF_NAME = String(student.vaccine.QR.credentialSubject.name.toUpperCase());
 
-    // Iterate through both arrays
-    for(var i = 0; i < BITS_ARRAY.length; i += 1) {
-        if(PDF_ARRAY.indexOf(BITS_ARRAY[i]) > -1){
-            count += 1;
+        // split names into array
+        var temp_BITS = BITS_NAME.split(" ");
+        var temp_PDF = PDF_NAME.split(" ");
+        var BITS_ARRAY = new Array();
+        var PDF_ARRAY = new Array();
+
+        // push space seperated values
+        for(var i = 0; i < temp_BITS.length; i++){
+            BITS_ARRAY.push(temp_BITS[i]);
         }
+
+        // push space seperated values
+        for(var i = 0; i < temp_PDF.length; i++){
+            PDF_ARRAY.push(temp_PDF[i]);
+        }
+
+        // PDF_ARRAY[0] = 'MAKWANA';
+        // PDF_ARRAY[1] = 'DILIP';
+
+        // for reference
+        console.log(BITS_ARRAY);
+        console.log(PDF_ARRAY);
+
+        // count number of matching words
+        // var count = 0;
+
+        // Iterate through both arrays
+        for(var i = 0; i < BITS_ARRAY.length; i += 1) {
+            if(PDF_ARRAY.indexOf(BITS_ARRAY[i]) > -1){
+                count += 1;
+            }
+        }
+        // for reference
+        console.log(count);
     }
-    // for reference
-    console.log(count);
+    catch(err){
+        console.log(err);
+        res.status(500).json({"error": err});
+    }
 
     // update/reject appropriately
     try{
         if(count >= 2){
-            student.vaccine.QR.evidence[0].dose = 2
+            // student.vaccine.QR.evidence[0].dose = 2
             var new_student;
             if(Number(student.vaccine.QR.evidence[0].dose) > 0 && Number(student.vaccine.QR.evidence[0].dose < student.vaccine.QR.evidence[0].totalDoses)){
                 new_student = await Student.findOneAndUpdate({email: student.email}, {auto_verification: 'DONE', vaccination_status: 'PARTIAL'}, {new: true});
