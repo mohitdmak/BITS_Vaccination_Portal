@@ -17,15 +17,13 @@ import {
 } from "react-router-dom";
 
 
-
-
 const Dashboard = (props) => {
 
     const [name, setName] = useState("Parth Sharma")
     const [pp, setPP] = useState("https://avatars.githubusercontent.com/u/45586386?v=4")
-    const [certificate, setCertificate] = useState(true)
-    const [consent, setConsent] = useState(true)
-    const [status, setStatus] = useState(false)
+    const [certificate, setCertificate] = useState(false)
+    const [consent, setConsent] = useState(false)
+    const [status, setStatus] = useState("PARTIAL")
     const [one, setOne] = useState(1)
 
     function cleanOne(auto) {
@@ -46,8 +44,6 @@ const Dashboard = (props) => {
         apiRequest();
     }, []); 
 
-
-    
 
     // This will upload the file after having read it
     const upload = (data) => {
@@ -82,14 +78,26 @@ const Dashboard = (props) => {
     // Event handler executed when a file is selected
     const onSelectFile = () => {
         var data = new FormData()
-        data.append('pdf', input.files[0])
-        upload(data)
+        if(input) {
+            data.append('pdf', input.files[0])
+            upload(data)
+            alert("File successfully uploaded!")
+            window.location.reload();
+        } else {
+            alert("Please choose a valid file!")
+        }
     }
 
     const onSelectFile2 = () => {
         var data = new FormData()
-        data.append('consent_form', input2.files[0])
-        upload2(data)
+        if(input) {
+            data.append('consent_form', input2.files[0])
+            upload2(data)
+            alert("File successfully uploaded!")
+            window.location.reload();
+        } else {
+            alert("Please choose a valid file!")
+        }
     }
     
     const apiRequest = () => {
@@ -109,12 +117,6 @@ const Dashboard = (props) => {
                 if(res.data){
                     setName(res.data.name)
                     setPP(res.data.pic)
-                    // if (res.data.pdf){
-                    //     setCertificate(res.data.pdf)
-                    // }
-                    // if (res.data.consentForm){
-                    //     setConsent(res.data.consentForm)
-                    // }
                     setStatus(res.data.vaccination_status)
                     cleanOne(res.data.auto_verification)
                     if (res.data.pdf) setCertificate(true)
@@ -222,7 +224,7 @@ const Dashboard = (props) => {
                                 mb="-2px"
                                 fontSize={["14px", "14px", "14px", "22px", "22px"]}
                             >VACCINATION STATUS</Text>
-                            {/* {status ? 
+                            {(status === "NONE") ? 
                                 <Heading 
                                     color="red"
                                     fontSize={["20px", "20px", "20px", "28px", "28px"]}
@@ -232,12 +234,12 @@ const Dashboard = (props) => {
                                 <Heading 
                                     color="orange"
                                     fontSize={["20px", "20px", "20px", "28px", "28px"]}
-                                >NOT VACCINATED</Heading>} */}
-                            <Heading 
+                                >PARTIALLY VACCINATED</Heading> :
+                                <Heading 
                                     color="green"
                                     fontSize={["20px", "20px", "20px", "28px", "28px"]}
-                                >{status}</Heading>
-                               
+                                >FULLY VACCINATED</Heading>
+                                }</>}
                         </Flex>
                     </Box>
                 </Flex>
@@ -263,7 +265,7 @@ const Dashboard = (props) => {
                         <Button 
                             ml="10px" 
                             mr="10px"
-                            isDisabled={certificate ? false : true}
+                            isDisabled={!certificate}
                             onClick={() => window.open("https://vaccination.bits-dvm.org/api/student/get_pdf", "_blank")}
                         >View</Button>
                     </GridItem>
@@ -289,7 +291,7 @@ const Dashboard = (props) => {
 
                     <GridItem rowSpan={1} colSpan={1}>
                         <Button 
-                        isDisabled={consent ? false : true}
+                        isDisabled={!consent}
                         onClick={() => window.open("https://vaccination.bits-dvm.org/api/student/get_consent", "_blank")}
                         ml="10px" mr="10px" mt="20px"
                         >View</Button>
