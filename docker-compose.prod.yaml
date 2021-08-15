@@ -67,6 +67,9 @@ services:
       context: .
       dockerfile: Dockerfile.db.admin
 
+    # Push to registry hosting containers
+    image: mohitdmak/bits_vaccination_portal:db_admin
+
     # Name for nginx to access
     container_name: DbAdminContainer
 
@@ -75,8 +78,8 @@ services:
       - config/DB_ADMIN_CONFIG.env
 
   # Dont start admin panel before db is running
-    depends_on:
-      - dev_container
+  #  depends_on:
+  #    - dev_container
 
   # Critical container service
     restart: always
@@ -168,7 +171,7 @@ services:
 
     # Wait for web_api container to start first
     depends_on:
-      - redis_container
+      - db-admin_container
 
 
 
