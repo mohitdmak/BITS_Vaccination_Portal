@@ -25,6 +25,30 @@ const password = require("./config/mongo.js").MONGO_INITDB_ROOT_PASSWORD;
 // setting db uri
 const db_uri = `mongodb://MongoContainer:27017/Portal?authSource=admin`;
 
+// INSTALL ADMIN BRO DEPENDENCIES
+const AdminBro = require('admin-bro');
+const mongooseAdminBro = require('@admin-bro/mongoose');
+const expressAdminBro = require('@admin-bro/express');
+
+
+// Admin Bro and Models
+const Vaccine = require('./models/vaccine.js').Vaccine;
+const Student = require('./models/student.js');
+
+// ADMIN BRO ADAPTOR FOR MONGOOSE
+AdminBro.registerAdapter(mongooseAdminBro)
+const AdminBroOptions = {
+  resources: [Vaccine, Student],
+  rootPath: "/api/admin",
+}
+
+// ADMIN BRO ADAPTOR FOR STUDENT
+const adminBro = new AdminBro(AdminBroOptions)
+const router = expressAdminBro.buildRouter(adminBro)
+
+// USE ADMIN BRO ROUTER FOR EXPRESS
+app.use(adminBro.options.rootPath, router)
+
 
 // Open port for node app, once redis and mongodb is connected
 redisClient.on('connect', async function () {

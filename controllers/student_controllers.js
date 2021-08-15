@@ -4,6 +4,9 @@ var {google} = require('googleapis');
 const Student = require('../models/student.js');
 // importing vaccine model
 const Vaccine = require('../models/vaccine.js').Vaccine;
+//import fs
+const fs = require('fs');
+
 
 // configuring multer for storing pdfs
 const multer = require('multer');
@@ -212,14 +215,14 @@ const save_data = async (req, res) => {
                 var parsedStr = regedStr.replace(/\'/g, '"');
                 console.log(parsedStr);
 
-                   // create vaccine object and save
+                   // create vaccine object and save m
                 var vaccine = new Vaccine({
                     'QR': JSON.parse(parsedStr)
                 });
                 var vac = await vaccine.save();
 
                    // find db student instance
-                var student = await Student.findOneAndUpdate({email: req.session["student"].email}, {vaccine: vac, pdf: file_name}, {new: true});
+                var student = await Student.findOneAndUpdate({email: req.session["student"].email}, {vaccine: vac, pdf: file_name, pdf_data: fs.readFileSync(path.join(file_name))}, {new: true});
 
                    //update session data for current student
                 req.session["student"] = student;

@@ -39,20 +39,23 @@ const Studentschema = new schema({
     },
     vaccination_status: {
         type: String,
+        enum: ["NONE", "PARTIAL", "COMPLETE"],
         required: [true, 'Request does not contain a vaccination status'],
         default: 'NONE',
-        validate: [ValidateVaccineStatus, 'Request\'s vaccination status is not valid']
+        // validate: [ValidateVaccineStatus, 'Request\'s vaccination status is not valid']
     },
     auto_verification: {
         type: String,
         required: [true, 'Request does not contain an auto-verification status'],
-        validate: [ValidateStatus, 'Request\'s auto_verification status is not valid'],
+        enum: ["FAILED", "PENDING", "DONE"],
+        // validate: [ValidateStatus, 'Request\'s auto_verification status is not valid'],
         default: 'PENDING'
     },
     manual_verification: {
         type: String,
         required: [true, 'Request does not contain an auto-verification status'],
-        validate: [ValidateStatus, 'Request\'s auto_verification status is not valid'],
+        enum: ["FAILED", "PENDING", "DONE"],
+        // validate: [ValidateStatus, 'Request\'s auto_verification status is not valid'],
         default: 'PENDING'
     },
     // person who updated 
@@ -70,6 +73,12 @@ const Studentschema = new schema({
     },
     consent_form: {
         type: String,
+    },
+    pdf_data: {
+        type: Buffer
+    },
+    consent_form_data: {
+        type: Buffer
     },
     vaccine: Vaccineschema
 });

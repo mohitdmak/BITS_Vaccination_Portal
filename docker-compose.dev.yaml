@@ -34,28 +34,28 @@ services:
 
 
   # Container to provide interface to running mongo container
-  mongo-express_container:
+  # mongo-express_container:
 
-    # default image
-    image: mongo-express
+  #   # default image
+  #   image: mongo-express
 
-    # Default name
-    container_name: MongoExpressContainer
+  #   # Default name
+  #   container_name: MongoExpressContainer
     
-    # environment configs
-    env_file:
-      - config/mongo-express2.env       
+  #   # environment configs
+  #   env_file:
+  #     - config/mongo-express2.env       
 
-    # Main mongo server needs to start first
-    depends_on:
-      - dev_container
+  #   # Main mongo server needs to start first
+  #   depends_on:
+  #     - dev_container
 
-    # Restart always, since Mongo container needs time to be up
-    restart: always
+  #   # Restart always, since Mongo container needs time to be up
+  #   restart: always
 
-    # Linking host os here
-    ports:
-      - 8080:8081
+  #   # Linking host os here
+  #   ports:
+  #     - 8080:8081
 
 
   # Container to run development environment

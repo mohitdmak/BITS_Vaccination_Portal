@@ -9,6 +9,7 @@ import {
     Grid,
     Image,
     Button,
+    Spinner,
 } from '@chakra-ui/react'
 
 import {
@@ -20,15 +21,15 @@ const Dashboard = (props) => {
 
     const [name, setName] = useState("Parth Sharma")
     const [pp, setPP] = useState("https://avatars.githubusercontent.com/u/45586386?v=4")
-    const [certificate, setCertificate] = useState(null)
-    const [consent, setConsent] = useState(null)
-    const [status, setStatus] = useState(false)
-    const [one, setOne] = useState("pending")
+    const [certificate, setCertificate] = useState(false)
+    const [consent, setConsent] = useState(false)
+    const [status, setStatus] = useState("PARTIAL")
+    const [one, setOne] = useState(1)
 
     function cleanOne(auto) {
-        if (auto === "PENDING") setOne("pending")
-        else if (auto === "CONFIRMED") setOne("done")
-        else setOne("no")
+        if (auto === "PENDING") setOne(0)
+        else if (auto === "CONFIRMED") setOne(1)
+        else setOne(2)
     }
 
     const campus = "Pilani Campus"
@@ -42,6 +43,62 @@ const Dashboard = (props) => {
     useEffect(() => {
         apiRequest();
     }, []); 
+
+
+    // This will upload the file after having read it
+    const upload = (data) => {
+        fetch('https://vaccination.bits-dvm.org/api/student/post_pdf', { // Your POST endpoint
+            method: 'POST',
+            body: data // This is your file object
+        }).then(
+            response => response.json() // if the response is a JSON object
+        ).then(
+            success => console.log(success) // Handle the success response object
+        ).catch(
+            error => console.log(error) // Handle the error response object
+        );
+    };
+
+    const upload2 = (data) => {
+        fetch('https://vaccination.bits-dvm.org/api/student/post_consent', { // Your POST endpoint
+            method: 'POST',
+            body: data // This is your file object
+        }).then(
+            response => response.json() // if the response is a JSON object
+        ).then(
+            success => console.log(success) // Handle the success response object
+        ).catch(
+            error => console.log(error) // Handle the error response object
+        );
+    };
+
+    const input = document.getElementById('fileinput');
+    const input2 = document.getElementById('fileinput2');
+
+    // Event handler executed when a file is selected
+    const onSelectFile = () => {
+        var data = new FormData()
+        if(input) {
+            data.append('pdf', input.files[0])
+            upload(data)
+            alert("File successfully uploaded!")
+            window.location.reload();
+        } else {
+            alert("Please choose a valid file!")
+        }
+    }
+
+    const onSelectFile2 = () => {
+        var data = new FormData()
+        if(input) {
+            data.append('consent_form', input2.files[0])
+            upload2(data)
+            alert("File successfully uploaded!")
+            window.location.reload();
+        } else {
+            alert("Please choose a valid file!")
+        }
+    }
     
     const apiRequest = () => {
         fetch('https://vaccination.bits-dvm.org/api/student/details/',
@@ -60,14 +117,10 @@ const Dashboard = (props) => {
                 if(res.data){
                     setName(res.data.name)
                     setPP(res.data.pic)
-                    if (res.data.pdf){
-                        setCertificate(res.data.pdf)
-                    }
-                    if (res.data.consentForm){
-                        setConsent(res.data.consentForm)
-                    }
                     setStatus(res.data.vaccination_status)
-                    setOne(cleanOne(res.data.auto_verification))
+                    cleanOne(res.data.auto_verification)
+                    if (res.data.pdf) setCertificate(true)
+                    if (res.data.consent_form) setConsent(true)
                 } else {
                     alert("ERROR RETRIEVING CONTENT.");
                 }
@@ -75,6 +128,8 @@ const Dashboard = (props) => {
     }
 
     return (
+        <>{name ? 
+      
         <>
             <Flex 
                 flexDir="column"
@@ -103,7 +158,11 @@ const Dashboard = (props) => {
                             color="white"
                             fontWeight="bold"
                             fontSize={["12px", "12px", "12px", "18px", "18px"]}
-                            onClick={() => window.open("https://vaccination.bits-dvm.org/api/auth/logout", "_parent")}
+                            onClick={
+                                () => {
+                                    window.open("https://vaccination.bits-dvm.org/api/auth/logout", "_parent")
+                                }
+                            }
                         >Logout
                         </Button> 
 
@@ -165,16 +224,22 @@ const Dashboard = (props) => {
                                 mb="-2px"
                                 fontSize={["14px", "14px", "14px", "22px", "22px"]}
                             >VACCINATION STATUS</Text>
-                            {status ? 
-                                <Heading 
-                                    color="green"
-                                    fontSize={["20px", "20px", "20px", "28px", "28px"]}
-                                >FULLY VACCINATED</Heading> : 
+                            {(status === "NONE") ? 
                                 <Heading 
                                     color="red"
                                     fontSize={["20px", "20px", "20px", "28px", "28px"]}
-                                >NOT VACCINATED</Heading>}
-                               
+                                >NOT VACCINATED</Heading> : 
+                            <> 
+                            {(status === "PARTIAL") ? 
+                                <Heading 
+                                    color="orange"
+                                    fontSize={["20px", "20px", "20px", "28px", "28px"]}
+                                >PARTIALLY VACCINATED</Heading> :
+                                <Heading 
+                                    color="green"
+                                    fontSize={["20px", "20px", "20px", "28px", "28px"]}
+                                >FULLY VACCINATED</Heading>
+                                }</>}
                         </Flex>
                     </Box>
                 </Flex>
@@ -191,24 +256,31 @@ const Dashboard = (props) => {
                     {/* <Flex flexDir="row" m="10px" alignItems="center"> */}
                     <GridItem rowSpan={1} colSpan={2} display="flex" flexDir="row">
                         <Text fontWeight="bold">Latest Vaccine Certificate:</Text>
-                        <Image src={one} ml="10px" boxSize="30px" />
+                        {(one === 1) ? <Image src={done} ml="10px" boxSize="30px" /> : null}
+                        {(one === 0) ? <Image src={pending} ml="10px" boxSize="30px" />: null}
+                        {(one === 2) ? <Image src={no} ml="10px" boxSize="30px" /> : null}
                     </GridItem>
                        
                     <GridItem rowSpan={1} colSpan={1}>
                         <Button 
                             ml="10px" 
                             mr="10px"
-                            isDisabled={certificate ? false : true}
-                            onClick={() => window.open(certificate, "_blank")}
+                            isDisabled={!certificate}
+                            onClick={() => window.open("https://vaccination.bits-dvm.org/api/student/get_pdf", "_blank")}
                         >View</Button>
                     </GridItem>
                     
                     <GridItem rowSpan={1} colSpan={3}>
-                        <form action="https://vaccination.bits-dvm.org/api/student/pdf" method="post">
-                            <input type="file" name="pdf"/>
+                        <form>
+                            <input 
+                                type="file" 
+                                accept="application/pdf" 
+                                id="fileinput"
+                            />
                             <Button 
                                 mt={["10px","Opx","10px","0px","0px"]}
-                                type="submit">Update</Button>
+                                onClick={onSelectFile}
+                                >Update</Button>
                         </form>
                     </GridItem>
                     
@@ -219,18 +291,18 @@ const Dashboard = (props) => {
 
                     <GridItem rowSpan={1} colSpan={1}>
                         <Button 
-                        isDisabled={consent ? false : true}
-                        onClick={() => window.open(consent, "_blank")}
+                        isDisabled={!consent}
+                        onClick={() => window.open("https://vaccination.bits-dvm.org/api/student/get_consent", "_blank")}
                         ml="10px" mr="10px" mt="20px"
                         >View</Button>
                     </GridItem>
 
                     <GridItem rowSpan={1} colSpan={3} mt="20px">
-                        <form action="https://vaccination.bits-dvm.org/api/student/post_consent" method="post">
-                            <input type="file" name="consent_form" />
+                        <form>
+                            <input type="file" accept="application/pdf" id="fileinput2" />
                             <Button 
                                 mt={["10px","Opx","10px","0px","0px"]}
-                                type="submit"
+                                onClick={onSelectFile2}
                             >Update</Button>
                         </form>
                     </GridItem>
@@ -251,7 +323,8 @@ const Dashboard = (props) => {
                 
             </Flex>   
            
-        </>
+        </>: <Flex flexDir="row" alignItems="center" justifyContent="center">
+        <Spinner /></Flex>}</>
     )
 }
 
