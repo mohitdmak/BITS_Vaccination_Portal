@@ -21,6 +21,9 @@ COPY . .
 # Exposing running port for nginx
 EXPOSE 3000
 
+# Expose admin port
+EXPOSE 3310
+
 RUN apt-get update && \
     apt-get install -y \
         python3 \

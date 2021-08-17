@@ -32,6 +32,7 @@ var { getOAuthClient } = require("./auth_controllers");
 
 let upload = multer(
     { storage: storage,
+      // limits: {fileSize: 1 * 1000},
       fileFilter: function (req, file, cb) {
           if(file.mimetype !== 'application/pdf') {
               return cb(null, false)
@@ -87,7 +88,7 @@ const post_pdf = async ( req, res) => {
         // forward non multer errors
         catch(err){
             console.log(err);
-            res.status(500).json(err);
+            res.status(500).json({"error": err});
         }
     }
     else{
@@ -128,7 +129,7 @@ const post_consent = async (req, res) => {
         // forward non multer errors
         catch(err){
             console.log(err);
-            res.status(500).json(err);
+            res.status(500).json({"error": err});
         }
     }
     else{
@@ -147,7 +148,7 @@ const get_consent = async (req, res) => {
         res.download(String(serve_file), function(err){
             if(err){
                 console.log(err);
-                res.status(500).json(err);
+                res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
             }
             else{
                 console.log("CONSENT FORM FILE for student is served");
@@ -157,7 +158,7 @@ const get_consent = async (req, res) => {
     // forward login errors
     catch(err){
         console.log(err);
-        res.status(500).json(err);
+        res.status(500).json({"error": err});
     }
 }
 
@@ -174,7 +175,7 @@ const get_student_details = async (req, res) => {
         catch(err){
             // send error report
             console.log(err);
-            res.status(500).json(err);
+            res.status(500).json({"error": err});
         }
     }
     else{
@@ -192,11 +193,10 @@ const save_data = async (req, res) => {
             console.log(err);
             console.log(stderr);
             
-            if(err){
-                res.status(500).json({"error": err});
-            }
-            else if(stderr){
-                res.status(500).json({"error": stderr});
+            if(err || stderr){
+                res.status(500).json({"error": "FILE IS NOT A VALID CERTIFICATE"});
+                var student = await Student.findOneAndUpdate({email: req.session["student"].email}, {vaccine: vac, pdf: file_name, pdf_data: fs.readFileSync(path.join(file_name)), vaccination_status: "NONE", auto_verification: "FAILED"}, {new: true});
+                console.log(student);
             }
             else{
                 // main python output from PyDOC
@@ -239,7 +239,7 @@ const save_data = async (req, res) => {
    }
     catch(err){
         console.log(err);
-        res.status(500).json(err);
+        res.status(500).json({"error": err});
     }
 };
 
@@ -332,7 +332,7 @@ const verify_authenticity = async (req,res) => {
     }
     catch(err){
         console.log(err);
-        res.status(500).json(err);
+        res.status(500).json({"error": err});
     }
     // res.status(200).send('hi');
 }
@@ -383,7 +383,7 @@ const verify_authenticity = async (req,res) => {
 // // Provide Overall Status
 const update_overall_status = async (student, req) => {
 
-    console.log("\n     Checking for update in Overall Acess...........");
+    console.log("\n     Checking for update in Overall Access...........");
     // get current logged in student
     try{
         // both files should be present
@@ -397,7 +397,7 @@ const update_overall_status = async (student, req) => {
     }
     catch(err){
         console.log(err);
-        res.status(500).json(err);
+        res.status(500).json({"error": err});
     }
 }
 
@@ -412,7 +412,7 @@ const get_pdf = async (req, res) => {
         res.download(String(serve_file), function(err){
             if(err){
                 console.log(err);
-                res.status(500).json(err);
+                res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
             }
             else{
                 console.log("Pdf FILE for student is served");
@@ -422,7 +422,7 @@ const get_pdf = async (req, res) => {
     // forward login errors
     catch(err){
         console.log(err);
-        res.status(500).json(err);
+        res.status(500).json({"error": err});
     }
 }
 
@@ -434,7 +434,7 @@ const get_all = async (req, res) => {
         res.status(200).json(students);
     }catch(err){
         console.log(err);
-        res.status(500).json(err);
+        res.status(500).json({"error": err});
     }
 };
 

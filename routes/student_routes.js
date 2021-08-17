@@ -26,7 +26,7 @@ student_router.post("/post_consent", check_auth, student_fxn.upload.single("cons
 student_router.get("/get_consent", check_auth, student_fxn.get_consent); 
 
 // Setting auth tokens in session
-student_router.get("/all", check_auth, student_fxn.get_all);
+// student_router.get("/all", check_auth, student_fxn.get_all);
 
 // Showing protected page with student details
 student_router.get("/details", check_auth, student_fxn.get_student_details);
