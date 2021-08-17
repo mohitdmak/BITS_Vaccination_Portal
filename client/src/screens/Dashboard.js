@@ -19,11 +19,11 @@ import {
 
 const Dashboard = (props) => {
 
-    const [name, setName] = useState("Parth Sharma")
-    const [pp, setPP] = useState("https://avatars.githubusercontent.com/u/45586386?v=4")
+    const [name, setName] = useState("")
+    const [pp, setPP] = useState("")
     const [certificate, setCertificate] = useState(false)
     const [consent, setConsent] = useState(false)
-    const [status, setStatus] = useState("PARTIAL")
+    const [status, setStatus] = useState("NONE")
     const [one, setOne] = useState(1)
 
     function cleanOne(auto) {
@@ -36,9 +36,9 @@ const Dashboard = (props) => {
     const bits = "https://is5-ssl.mzstatic.com/image/thumb/Purple124/v4/b4/20/40/b420401e-c883-b363-03b5-34509d67c214/source/512x512bb.jpg"
     const dvm = "https://avatars.githubusercontent.com/u/14038814?s=200&v=4"
 
-    const done = "https://i.imgur.com/hMXnx8d.png"
-    const pending = "https://i.imgur.com/kHguvEu.png"
-    const no = "https://i.imgur.com/lETEPEq.png"
+    const done = "https://i.imgur.com/nzWA3lo.png"
+    const pending = "https://i.imgur.com/wBu34AZ.png"
+    const no = "https://i.imgur.com/RiobXwU.png"
 
     useEffect(() => {
         apiRequest();
@@ -51,11 +51,21 @@ const Dashboard = (props) => {
             method: 'POST',
             body: data // This is your file object
         }).then(
-            response => response.json() // if the response is a JSON object
+            response => {
+                if (response.ok) { 
+                    return response.json();
+                }
+                return Promise.reject(response);
+            }
         ).then(
-            success => console.log(success) // Handle the success response object
+            success => { 
+                apiRequest();
+                alert("File successfully uploaded!") 
+            }
         ).catch(
-            error => console.log(error) // Handle the error response object
+            error => {
+                alert("Your file was not successfully uploaded due to error: "+error)
+            }
         );
     };
 
@@ -64,11 +74,21 @@ const Dashboard = (props) => {
             method: 'POST',
             body: data // This is your file object
         }).then(
-            response => response.json() // if the response is a JSON object
+            response => {
+                if (response.ok) { 
+                    return response.json();
+                }
+                return Promise.reject(response);
+            }
         ).then(
-            success => console.log(success) // Handle the success response object
+            success => { 
+                apiRequest();
+                alert("File successfully uploaded!") 
+            }
         ).catch(
-            error => console.log(error) // Handle the error response object
+            error => {
+                alert("Your file was not successfully uploaded due to error: "+error)
+            }
         );
     };
 
@@ -78,11 +98,15 @@ const Dashboard = (props) => {
     // Event handler executed when a file is selected
     const onSelectFile = () => {
         var data = new FormData()
-        if(input) {
-            data.append('pdf', input.files[0])
-            upload(data)
-            alert("File successfully uploaded!")
-            window.location.reload();
+        console.log(input)
+        console.log(input.files[0])
+        if(input.files[0]) {
+            if ((input.files[0].size/1000000) <=1) {
+                data.append('pdf', input.files[0])
+                upload(data)
+            } else {
+                alert("File size is abnormally large.")
+            }
         } else {
             alert("Please choose a valid file!")
         }
@@ -90,11 +114,13 @@ const Dashboard = (props) => {
 
     const onSelectFile2 = () => {
         var data = new FormData()
-        if(input) {
-            data.append('consent_form', input2.files[0])
-            upload2(data)
-            alert("File successfully uploaded!")
-            window.location.reload();
+        if(input2.files[0]) {
+            if ((input2.files[0].size/1000000) <= 3) {
+                data.append('consent_form', input2.files[0])
+                upload2(data)
+            } else {
+                alert("File size is abnormally large.")
+            }
         } else {
             alert("Please choose a valid file!")
         }
@@ -255,7 +281,7 @@ const Dashboard = (props) => {
                 >
                     {/* <Flex flexDir="row" m="10px" alignItems="center"> */}
                     <GridItem rowSpan={1} colSpan={2} display="flex" flexDir="row">
-                        <Text fontWeight="bold">Latest Vaccine Certificate:</Text>
+                        <Text fontWeight="bold">Latest Vaccine Certificate (PDF):</Text>
                         {(one === 1) ? <Image src={done} ml="10px" boxSize="30px" /> : null}
                         {(one === 0) ? <Image src={pending} ml="10px" boxSize="30px" />: null}
                         {(one === 2) ? <Image src={no} ml="10px" boxSize="30px" /> : null}
@@ -274,18 +300,21 @@ const Dashboard = (props) => {
                         <form>
                             <input 
                                 type="file" 
+                                disabled={(status === "COMPLETE")}
                                 accept="application/pdf" 
                                 id="fileinput"
                             />
                             <Button 
                                 mt={["10px","Opx","10px","0px","0px"]}
                                 onClick={onSelectFile}
+                                isDisabled={(status === "COMPLETE")}
                                 >Update</Button>
                         </form>
                     </GridItem>
+
                     
                     <GridItem rowSpan={1} colSpan={2} display="flex" flexDir="row">
-                        <Text fontWeight="bold" mt="20px">Parent Consent Form:</Text>
+                        <Text fontWeight="bold" mt="20px">Parent Consent Form (PDF):</Text>
                         {/* <Image src={pending} ml="10px" mt="20px" boxSize="30px" /> */}
                     </GridItem>
 
