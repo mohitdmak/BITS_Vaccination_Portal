@@ -71,7 +71,7 @@ const set_tokens = async (req, res) => {
             var user = await oauth2.userinfo.get();
         }
         catch(err){
-            res.status(500).json(err);
+            res.status(500).json({"error": err});
         }
 
         // set student data in session
@@ -108,13 +108,13 @@ const set_session_data = async (user, req, res) => {
             }
             catch(err){
                 console.log(err);
-                res.status(500).json(err);
+                res.status(500).json({"error": err});
             }
           }
         }
     catch(err){
         console.log(err);
-        res.status(500).json(err);
+        res.status(500).json({"error": err});
     }
 }
 
@@ -176,7 +176,7 @@ const get_data = async (req, res) => {
 
         }catch(err){
             console.log(err);
-            res.status(500).json(err);
+            res.status(500).json({"error": err});
         }
     }
     else{
@@ -194,7 +194,7 @@ const get_auth_url = (req, res) => {
         res.redirect(url);
     }catch(err){
         console.log(err);
-        res.status(500).json(err);
+        res.status(500).json({"error": err});
     }
 };
 
@@ -224,7 +224,6 @@ const get_login = async (req, res) => {
         set_session_data(user, req, res);
     }
     else{
-        console.log(req.query.access_token);
         res.status(400).json({"error": "no access token found"});
     }
 };

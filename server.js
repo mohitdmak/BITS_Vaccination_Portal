@@ -26,29 +26,35 @@ const password = require("./config/mongo.js").MONGO_INITDB_ROOT_PASSWORD;
 const db_uri = `mongodb://MongoContainer:27017/Portal?authSource=admin`;
 
 // INSTALL ADMIN BRO DEPENDENCIES
-const AdminBro = require('admin-bro');
-const mongooseAdminBro = require('@admin-bro/mongoose');
-const expressAdminBro = require('@admin-bro/express');
+// const AdminBro = require('admin-bro');
+// const mongooseAdminBro = require('@admin-bro/mongoose');
+// const expressAdminBro = require('@admin-bro/express');
 
 
 // Admin Bro and Models
-const Vaccine = require('./models/vaccine.js').Vaccine;
-const Student = require('./models/student.js');
+// const Vaccine = require('./models/vaccine.js').Vaccine;
+// const Student = require('./models/student.js');
 
+// // import forest admin
+// const forest = require('forest-express-mongoose');
+
+// !!!!!!! ADMIN BRO CONFIGS (NOT IN USE CURRENTLY)
 // ADMIN BRO ADAPTOR FOR MONGOOSE
-AdminBro.registerAdapter(mongooseAdminBro)
-const AdminBroOptions = {
-  resources: [Vaccine, Student],
-  rootPath: "/api/admin",
-}
+// AdminBro.registerAdapter(mongooseAdminBro)
+// const AdminBroOptions = {
+//   resources: [Vaccine, Student],
+//   rootPath: "/api/admin",
+// }
 
-// ADMIN BRO ADAPTOR FOR STUDENT
-const adminBro = new AdminBro(AdminBroOptions)
-const router = expressAdminBro.buildRouter(adminBro)
+// // ADMIN BRO ADAPTOR FOR STUDENT
+// const adminBro = new AdminBro(AdminBroOptions)
+// const router = expressAdminBro.buildRouter(adminBro)
 
-// USE ADMIN BRO ROUTER FOR EXPRESS
-app.use(adminBro.options.rootPath, router)
+// // USE ADMIN BRO ROUTER FOR EXPRESS
+// app.use(adminBro.options.rootPath, router)
 
+// mongoose connection
+var db_connection;
 
 // Open port for node app, once redis and mongodb is connected
 redisClient.on('connect', async function () {
@@ -56,7 +62,7 @@ redisClient.on('connect', async function () {
     
     try{
         //* Wait for connection to db
-        await mongoose.connect(db_uri);
+        db_connection = await mongoose.connect(db_uri);
         console.log("\n     Connection to Mongodb Instance established.\n");
 
         //* Opening port for express app.
@@ -80,3 +86,6 @@ redisClient.on('connect', async function () {
         console.log(err);
     }}
 );
+
+// export mongoose connection for configuration in app.js forest admin
+module.exports = db_connection;
