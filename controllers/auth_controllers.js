@@ -60,7 +60,7 @@ const set_tokens = async (req, res) => {
       if(!err) {
         oauth2Client.setCredentials(tokens);
         session["tokens"]=tokens;
-        console.log(tokens);
+        console.log("	TOKENS SET IN SESSION");
 
         // getting student details
         var oauth2 = google.oauth2({
@@ -133,7 +133,7 @@ const get_user_details = async (req, res) => {
         });
         try{
             var user = await oauth2.userinfo.get();
-            console.log(user.data);
+            console.log("	USER DATA PROVIDED");
             res.status(200).json({"user":user.data, "session": req.session});
         }catch(err){
             console.log(err);

@@ -167,7 +167,7 @@ services:
 
     # Using nginx config defined in folder
     volumes:
-      - ./nginx:/etc/nginx/conf.d
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
 
     # Wait for web_api container to start first
     depends_on:

@@ -22,6 +22,7 @@ const post_students = async ( req, res) => {
         var students = await Student.find(filters).skip((page - 1) * page_limit).limit(page_limit);
         var total_pages = students.length;
         // var students = students.skip(page * page_limit).limit(page_limit);
+	console.log("	ADMIN PROVIDED STUDENTS LIST");
         res.status(200).json({
             "total_pages": total_pages,
             "data": students
@@ -40,9 +41,10 @@ const get_student = async (req, res) => {
 
     // get id no
     const id = req.body._id;
-    console.log(id);
+    //console.log(id);
     try{
         var student = await Student.findById(id);
+	console.log("	ADMIN PROVIDED STUDENT DETAIL");
         res.status(200).json(student);
     }
     catch(err){
@@ -60,9 +62,10 @@ const update_student = async (req, res) => {
     const id = req.body._id;
     try{
         var updates = req.body.updates;
-        console.log(updates);
+        //console.log(updates);
         var student = await Student.findOneAndUpdate({_id: id}, updates, {new: true});
-        console.log(student);
+        //console.log(student);
+	console.log("	ADMIN UPDATED STUDENT STATUS");
         res.status(200).json(student);
     }
     catch(err){
