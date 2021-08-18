@@ -176,7 +176,17 @@ const get_student_details = async (req, res) => {
             // serve student details
             const student = req.session["student"];
             console.log("STUDENT DETAILS PROVIDED");
-            res.status(200).json(student);
+            res.status(200).json({
+                "_id": student._id,
+                "name": student.name,
+                "email": student.email,
+                "vaccination_status": student.vaccination_status,
+                "auto_verification": student.auto_verification,
+                "manual_verification": student.manual_verification,
+                "overall_status": student.overall_status,
+                "pdf": student.pdf,
+                "consent_form": student.consent_form
+            });
         }
         catch(err){
             // send error report

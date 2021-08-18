@@ -19,10 +19,34 @@ const post_students = async ( req, res) => {
 
     try{
         // return list of students
-        var students = await Student.find(filters).skip((page - 1) * page_limit).limit(page_limit);
-        var total_pages = students.length;
-        // var students = students.skip(page * page_limit).limit(page_limit);
-	console.log("	ADMIN PROVIDED STUDENTS LIST");
+        var students = await Student.find(filters);
+        var total_pages;
+        // set total pages
+        if(students.length % page_limit === 0){
+            total_pages = students.length / page_limit;
+        }
+        else{
+            total_pages = (students.length / page_limit) + 1;
+        }
+
+        // update pagination
+        var students = await Student.find(filters).skip(page * page_limit).limit(page_limit);
+
+        // edit all entries for student
+        students.forEach(function(student, index, theArray){
+            theArray[index] = {
+                "_id": student._id,
+                "name": student.name,
+                "email": student.email,
+                "vaccination_status": student.vaccination_status,
+                "auto_verification": student.auto_verification,
+                "manual_verification": student.manual_verification,
+                "overall_status": student.overall_status,
+                "pdf": student.pdf,
+                "consent_form": student.consent_form
+            }
+        });
+        console.log("	ADMIN PROVIDED STUDENTS LIST");
         res.status(200).json({
             "total_pages": total_pages,
             "data": students
@@ -44,10 +68,20 @@ const get_student = async (req, res) => {
     //console.log(id);
     try{
         var student = await Student.findById(id);
-	console.log(" STUDENT DETAIL SENT IS : ");
-	console.log(student);
-	console.log("	ADMIN PROVIDED STUDENT DETAIL");
-        res.status(200).json(student);
+        console.log(" STUDENT DETAIL SENT IS : ");
+        console.log(student);
+        console.log("	ADMIN PROVIDED STUDENT DETAIL");
+        res.status(200).json({
+                "_id": student._id,
+                "name": student.name,
+                "email": student.email,
+                "vaccination_status": student.vaccination_status,
+                "auto_verification": student.auto_verification,
+                "manual_verification": student.manual_verification,
+                "overall_status": student.overall_status,
+                "pdf": student.pdf,
+                "consent_form": student.consent_form
+            });
     }
     catch(err){
         console.log(err);
@@ -62,17 +96,21 @@ const update_student = async (req, res) => {
 
     // get  id no
     const id = req.body._id;
-    console.log(" REQ ID PROVIDED IS : ");
-    console.log(id);
     try{
         var updates = req.body.updates;
-	console.log(" UPDATE FIELDS PROVIDED IS : ");
-        console.log(updates);
         var student = await Student.findOneAndUpdate({_id: id}, updates, {new: true});
-	console.log(" STUDENT POST UPDATION SENT IS : ");
-        console.log(student);
-	console.log("	ADMIN UPDATED STUDENT STATUS");
-        res.status(200).json(student);
+        console.log("	ADMIN UPDATED STUDENT STATUS");
+        res.status(200).json({
+                "_id": student._id,
+                "name": student.name,
+                "email": student.email,
+                "vaccination_status": student.vaccination_status,
+                "auto_verification": student.auto_verification,
+                "manual_verification": student.manual_verification,
+                "overall_status": student.overall_status,
+                "pdf": student.pdf,
+                "consent_form": student.consent_form
+            });
     }
     catch(err){
         console.log(err);
@@ -89,7 +127,7 @@ const get_pdf = async (req, res) => {
     try{
         // get downloaded file path
 	var id = req.body._id;
-	var student = Student.findById(id);
+	var student = await Student.findById(id);
 	if(student.pdf){
 		var serve_file = student.pdf;
 		console.log("\n		Serving PDF file at : ");
@@ -124,7 +162,7 @@ const get_consent = async (req, res) => {
     try{
         // get downloaded file path
 	var id = req.body._id;
-	var student = Student.findById(id);
+	var student = await Student.findById(id);
 	if(student.consent_form){
 		var serve_file = student.consent_form;
 		console.log("\n		Serving PDF file at : ");
