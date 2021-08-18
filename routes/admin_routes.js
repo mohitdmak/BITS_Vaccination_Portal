@@ -17,7 +17,7 @@ var admin_router = express.Router();
 admin_router.post("/students", check_auth, admin_fxn.post_students);
 
 // getting student's pdf
-admin_router.get("/student", check_auth, admin_fxn.get_student);
+admin_router.post("/student", check_auth, admin_fxn.get_student);
 
 // post consent form
 admin_router.post("/update", check_auth, admin_fxn.update_student);

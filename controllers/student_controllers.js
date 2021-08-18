@@ -443,6 +443,7 @@ const get_pdf = async (req, res) => {
             }
             else{
                 console.log("File served .");
+            }
         });
     }
     // forward login errors
