@@ -4,6 +4,33 @@ version: "3.3"
 services:
 
   # Container to run frontend
+  admin_client_container:
+
+    # Passing build context
+    build:
+      context: ./admin_client
+      dockerfile: Dockerfile
+
+    # Syncing with dockerhub stored image
+    image: mohitdmak/bits_vaccination_portal:admin_client
+
+    # setting container name
+    container_name: AdminClientContainer
+
+    # Critical container
+    restart: always
+
+    # Set volumes
+    volumes:
+      - './admin_client:/app'
+      - '/app/node_modules' 
+
+    # Set ports config
+    ports:
+      - 80
+
+
+  # Container to run frontend
   client_container:
 
     # Passing build context
@@ -28,6 +55,7 @@ services:
     # Set ports config
     ports:
       - 80
+
 
   # Container to run mongo db in same docker network
   mongo_container:
@@ -172,7 +200,6 @@ services:
     # Wait for web_api container to start first
     depends_on:
       - db-admin_container
-
 
 
   # Container to proxy requests on port 80 of AWS to web api running in port 3000 in container
