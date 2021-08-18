@@ -414,11 +414,11 @@ const update_overall_status = async (student, req, res) => {
             req.session["student"] = new_student;
             req.session.save();
             console.log("Overall Access grant updated .");
-            res.redirect("/");
+            res.status(201).json({"success": "OVERALL ACCESS GRANTED"});
         }
         else{
             console.log("Not all fields are proper .");
-            res.redirect("/");
+            res.status(201).json({"success": "OVERALL ACCESS NOT GRANTED"});
         }
     }
     catch(err){
@@ -443,6 +443,7 @@ const get_pdf = async (req, res) => {
             }
             else{
                 console.log("File served .");
+	    }
         });
     }
     // forward login errors
