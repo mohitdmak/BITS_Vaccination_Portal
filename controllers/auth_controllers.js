@@ -102,9 +102,20 @@ const set_session_data = async (user, req, res) => {
 
             // saving to database
             try{
+                const ADMIN_ACCESS = ['f20200048@pilani.bits-pilani.ac.in', 'f20201229@pilani.bits-pilani.ac.in'];
                 var new_student = await student.save();
                 req.session["student"] = new_student;
-                res.redirect('/');
+                if(req.query.page == 'admin'){
+                    if(ADMIN_ACCESS.indexOf(req.session["student"].email) > -1){
+                        res.redirect('/api/admin/dashboard');
+                    }
+                    else{
+                        res.status(401).json({"error": "YOU ARE DENIED ACCESS TO THE ADMIN PAGE"});
+                    }
+                }
+                else{
+                    res.status(201).redirect("/");
+                }
             }
             catch(err){
                 console.log(err);
