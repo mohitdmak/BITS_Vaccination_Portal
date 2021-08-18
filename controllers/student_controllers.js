@@ -114,7 +114,8 @@ const post_consent = async (req, res) => {
                 // update consent form in student model
                 var new_student = await Student.findOneAndUpdate({email: student.email}, {consent_form: req.file.path}, {new: true});
                 // student.consent_form = req.file.path;
-                console.log(new_student);
+                console.log("		CONSENT FORM UPDATED : ");
+		console.log(new_student);
 
                 // update session data
                 req.session["student"] = new_student;
@@ -144,15 +145,16 @@ const get_consent = async (req, res) => {
     try{
         // get downloaded file path
         var serve_file = req.session["student"].consent_form;
-        console.log(String(serve_file)); 
+        console.log("		CONSENT FORM SERVING AT : ");
+	console.log(String(serve_file)); 
         res.download(String(serve_file), function(err){
             if(err){
                 console.log(err);
                 res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
             }
-            else{
-                console.log("CONSENT FORM FILE for student is served");
-            }
+            //else{
+            //    console.log("CONSENT FORM FILE for student is served");
+            //}
         });
     }
     // forward login errors
@@ -169,7 +171,7 @@ const get_student_details = async (req, res) => {
         try{
             // serve student details
             const student = req.session["student"];
-            console.log("Student details provided");
+            console.log("	STUDENT DETAILS PROVIDED");
             res.status(200).json(student);
         }
         catch(err){
@@ -179,7 +181,7 @@ const get_student_details = async (req, res) => {
         }
     }
     else{
-        res.status(401).json({"error":"No student is logged in currently"});
+        res.status(401).json({"error":"NO STUDENT IS LOGGED IN CURRENTLY"});
     }
 };
 
@@ -190,17 +192,20 @@ const save_data = async (req, res) => {
        var cp = require('child_process');
        cp.exec(`cd PyDIVOC &&  python3 solve.py ${file_name}`, async function(err, stdout, stderr) {
           // handle err, stdout, stderr
-            console.log(err);
-            console.log(stderr);
+            //console.log(err);
+            //console.log(stderr);
             
             if(err || stderr){
+		console.log(err);
+		console.log(stderr);
                 res.status(500).json({"error": "FILE IS NOT A VALID CERTIFICATE"});
                 var student = await Student.findOneAndUpdate({email: req.session["student"].email}, {vaccine: vac, pdf: file_name, pdf_data: fs.readFileSync(path.join(file_name)), vaccination_status: "NONE", auto_verification: "FAILED"}, {new: true});
-                console.log(student);
+                console.log("		INVALID FILE UPLOAD UPDATED : ");
+		console.log(student);
             }
             else{
                 // main python output from PyDOC
-                console.log(stdout);
+                console.log("		VERIFIED VIA PYDIVOC QR SCAN : ");
                 // Using REGEX to replace escape sequences, due to baash output
                 var regedStr = stdout.replace(/\\n/g, "\\n")  
                    .replace(/\\'/g, "\\'")
@@ -213,7 +218,7 @@ const save_data = async (req, res) => {
 
                    // convert to json using regex
                 var parsedStr = regedStr.replace(/\'/g, '"');
-                console.log(parsedStr);
+                //console.log(parsedStr);
 
                    // create vaccine object and save m
                 var vaccine = new Vaccine({
@@ -226,8 +231,8 @@ const save_data = async (req, res) => {
 
                    //update session data for current student
                 req.session["student"] = student;
-                console.log(student.vaccine.QR.credentialSubject.name);
-                   // console.log(student);
+                console.log("		NEW QR INFO UPDATED : ");
+		console.log(student);
                    // console.log(req.session["student"]);
 
                    // saving session data (!!!!!DOESNT DO AUTO IF REQ IS POST)
@@ -248,7 +253,7 @@ const save_data = async (req, res) => {
 const verify_authenticity = async (req,res) => {
     // get student data in current session
     var student = req.session["student"];
-    console.log(student);
+    //console.log(student);
 
     var count = 0;
     
@@ -277,7 +282,9 @@ const verify_authenticity = async (req,res) => {
         // PDF_ARRAY[1] = 'DILIP';
 
         // for reference
-        console.log(BITS_ARRAY);
+        console.log("	NAME FROM BITS INFO : ");
+	console.log(BITS_ARRAY);
+	console.log("	NAME FROM QR INFO : ");
         console.log(PDF_ARRAY);
 
         // count number of matching words
@@ -290,7 +297,8 @@ const verify_authenticity = async (req,res) => {
             }
         }
         // for reference
-        console.log(count);
+        console.log("	NO OF NAMES MATCHING : ");
+	console.log(count);
     }
     catch(err){
         console.log(err);
@@ -316,6 +324,7 @@ const verify_authenticity = async (req,res) => {
             }
             req.session["student"] = new_student;
             req.session.save();
+            console.log("	VACC STATUS UPDATED");
 
             // update overall status
             update_overall_status(new_student, req);
@@ -324,6 +333,7 @@ const verify_authenticity = async (req,res) => {
             var new_student = await Student.findOneAndUpdate({email: student.email}, {auto_verification: 'FAILED'}, {new: true});
             req.session["student"] = new_student;
             req.session.save();
+	    console.log("	AUTO VER FAILED UDPATED");
 
             //update overall status
             update_overall_status(new_student, req);
@@ -392,7 +402,7 @@ const update_overall_status = async (student, req) => {
             var new_student = await Student.findOneAndUpdate({email: student.email}, {overall_status: true}, {new:true});
             req.session["student"] = new_student;
             req.session.save();
-            console.log('OVERALL ACCESS GRANTED');
+            console.log('	OVERALL ACCESS GRANTED');
         }
     }
     catch(err){
@@ -408,14 +418,12 @@ const get_pdf = async (req, res) => {
     try{
         // get downloaded file path
         var serve_file = req.session["student"].pdf;
-        console.log(String(serve_file)); 
+        console.log("		GET PDF FILE SERVED : ");
+	console.log(String(serve_file)); 
         res.download(String(serve_file), function(err){
             if(err){
                 console.log(err);
                 res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
-            }
-            else{
-                console.log("Pdf FILE for student is served");
             }
         });
     }
