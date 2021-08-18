@@ -74,6 +74,7 @@ const post_pdf = async ( req, res) => {
 
         //!!!!!!!!!!!!!!!!!!!!!! ALLOW ONLY PDFS
         try{
+            console.log("\n    Checking validity of post_pdf file . . .");
             if (req.fileValidationError) {
                 return res.send(req.fileValidationError);
             }
@@ -81,6 +82,7 @@ const post_pdf = async ( req, res) => {
                 return res.send('Please select a pdf to upload');
             }
             else{
+                console.log("FILE : PROPER PDF");
                 save_data(req, res);
                 // res.status(200).json({"file saved": req.file.path});
             }
@@ -92,6 +94,7 @@ const post_pdf = async ( req, res) => {
         }
     }
     else{
+        console.log("Post_pdf accessed without logging in");
         res.status(400).json({"error": "Student has not logged in yet."});
     }
 }
@@ -102,6 +105,7 @@ const post_consent = async (req, res) => {
     if(req.session["student"]){
         //!!!!!!!!!!!!!!!!!!!!!! ALLOW ONLY PDFS
         try{
+            console.log("\n    Checking validity of post_consent file . . .");
             if (req.fileValidationError) {
                 return res.send(req.fileValidationError);
             }
@@ -109,22 +113,22 @@ const post_consent = async (req, res) => {
                 return res.send('Please select a pdf to upload');
             }
             else{
+                console.log("FILE : PROPER PDF");
                 var student = req.session["student"];
-
                 // update consent form in student model
                 var new_student = await Student.findOneAndUpdate({email: student.email}, {consent_form: req.file.path}, {new: true});
                 // student.consent_form = req.file.path;
-                console.log("		CONSENT FORM UPDATED : ");
-		console.log(new_student);
+                console.log("Consent Form Updated : ");
+                console.log(new_student);
 
                 // update session data
                 req.session["student"] = new_student;
 
                 //update overall status
-                update_overall_status(new_student, req);
+                update_overall_status(new_student, req, res);
 
                 // sending file path response
-                res.status(200).json({"file saved": req.file.path});
+                // res.status(200).json({"file saved": req.file.path});
             }
         }
         // forward non multer errors
@@ -145,8 +149,8 @@ const get_consent = async (req, res) => {
     try{
         // get downloaded file path
         var serve_file = req.session["student"].consent_form;
-        console.log("		CONSENT FORM SERVING AT : ");
-	console.log(String(serve_file)); 
+        console.log("\n		Serving Consent form at : ");
+        console.log(String(serve_file)); 
         res.download(String(serve_file), function(err){
             if(err){
                 console.log(err);
@@ -171,7 +175,7 @@ const get_student_details = async (req, res) => {
         try{
             // serve student details
             const student = req.session["student"];
-            console.log("	STUDENT DETAILS PROVIDED");
+            console.log("STUDENT DETAILS PROVIDED");
             res.status(200).json(student);
         }
         catch(err){
@@ -188,6 +192,7 @@ const get_student_details = async (req, res) => {
 // The protected page
 const save_data = async (req, res) => {
    try{
+       console.log("Accessing QR data from file . . .");
        var file_name = req.file.path;
        var cp = require('child_process');
        cp.exec(`cd PyDIVOC &&  python3 solve.py ${file_name}`, async function(err, stdout, stderr) {
@@ -196,16 +201,19 @@ const save_data = async (req, res) => {
             //console.log(stderr);
             
             if(err || stderr){
-		console.log(err);
-		console.log(stderr);
+                console.log(err);
+                console.log(stderr);
                 res.status(500).json({"error": "FILE IS NOT A VALID CERTIFICATE"});
+
+                // update student
+                console.log("File is INVALID .");
                 var student = await Student.findOneAndUpdate({email: req.session["student"].email}, {vaccine: vac, pdf: file_name, pdf_data: fs.readFileSync(path.join(file_name)), vaccination_status: "NONE", auto_verification: "FAILED"}, {new: true});
-                console.log("		INVALID FILE UPLOAD UPDATED : ");
-		console.log(student);
+                console.log("INVALID FILE FOR QR CODE UPDATED : ");
+                console.log(student);
             }
             else{
                 // main python output from PyDOC
-                console.log("		VERIFIED VIA PYDIVOC QR SCAN : ");
+                console.log("Updating student and vaccine models . . . ");
                 // Using REGEX to replace escape sequences, due to baash output
                 var regedStr = stdout.replace(/\\n/g, "\\n")  
                    .replace(/\\'/g, "\\'")
@@ -231,8 +239,8 @@ const save_data = async (req, res) => {
 
                    //update session data for current student
                 req.session["student"] = student;
-                console.log("		NEW QR INFO UPDATED : ");
-		console.log(student);
+                console.log("Student updated with new qr info : ");
+                console.log(student);
                    // console.log(req.session["student"]);
 
                    // saving session data (!!!!!DOESNT DO AUTO IF REQ IS POST)
@@ -251,10 +259,10 @@ const save_data = async (req, res) => {
 
 // VERIFY AUTHENTICITY
 const verify_authenticity = async (req,res) => {
+    console.log("Verifying authenticity of uploaded qr . . .");
     // get student data in current session
     var student = req.session["student"];
     //console.log(student);
-
     var count = 0;
     
     try{
@@ -283,8 +291,8 @@ const verify_authenticity = async (req,res) => {
 
         // for reference
         console.log("	NAME FROM BITS INFO : ");
-	console.log(BITS_ARRAY);
-	console.log("	NAME FROM QR INFO : ");
+        console.log(BITS_ARRAY);
+        console.log("	NAME FROM QR INFO : ");
         console.log(PDF_ARRAY);
 
         // count number of matching words
@@ -298,7 +306,7 @@ const verify_authenticity = async (req,res) => {
         }
         // for reference
         console.log("	NO OF NAMES MATCHING : ");
-	console.log(count);
+        console.log(count);
     }
     catch(err){
         console.log(err);
@@ -308,6 +316,7 @@ const verify_authenticity = async (req,res) => {
     // update/reject appropriately
     try{
         if(count >= 2){
+            console.log("Enough names matched, checking doses . . .");
             // student.vaccine.QR.evidence[0].dose = 2
             var new_student;
             if(Number(student.vaccine.QR.evidence[0].dose) > 0 && Number(student.vaccine.QR.evidence[0].dose < student.vaccine.QR.evidence[0].totalDoses)){
@@ -324,21 +333,21 @@ const verify_authenticity = async (req,res) => {
             }
             req.session["student"] = new_student;
             req.session.save();
-            console.log("	VACC STATUS UPDATED");
+            console.log("Vaccination and auto verification status updated .");
 
             // update overall status
-            update_overall_status(new_student, req);
+            update_overall_status(new_student, req, res);
         }
         else{
+            console.log("Enough names are not matched");
             var new_student = await Student.findOneAndUpdate({email: student.email}, {auto_verification: 'FAILED'}, {new: true});
             req.session["student"] = new_student;
             req.session.save();
-	    console.log("	AUTO VER FAILED UDPATED");
+            console.log("Auto verification failed updated .");
 
             //update overall status
-            update_overall_status(new_student, req);
+            update_overall_status(new_student, req, res);
         }
-        res.redirect("/");
     }
     catch(err){
         console.log(err);
@@ -391,18 +400,25 @@ const verify_authenticity = async (req,res) => {
 
 
 // // Provide Overall Status
-const update_overall_status = async (student, req) => {
+const update_overall_status = async (student, req, res) => {
 
-    console.log("\n     Checking for update in Overall Access...........");
+    console.log("     Checking for update in Overall Access...........");
     // get current logged in student
     try{
+        console.log("Checking for required fields . . .");
         // both files should be present
         // storing current session data for student
         if(student.pdf && student.consent_form && student.vaccination_status == 'COMPLETE'){
+            console.log("All fields proper, updating student model and session cache . . .");
             var new_student = await Student.findOneAndUpdate({email: student.email}, {overall_status: true}, {new:true});
             req.session["student"] = new_student;
             req.session.save();
-            console.log('	OVERALL ACCESS GRANTED');
+            console.log("Overall Access grant updated .");
+            res.redirect("/");
+        }
+        else{
+            console.log("Not all fields are proper .");
+            res.redirect("/");
         }
     }
     catch(err){
@@ -418,13 +434,15 @@ const get_pdf = async (req, res) => {
     try{
         // get downloaded file path
         var serve_file = req.session["student"].pdf;
-        console.log("		GET PDF FILE SERVED : ");
-	console.log(String(serve_file)); 
+        console.log("\n		Serving PDF file at : ");
+        console.log(String(serve_file)); 
         res.download(String(serve_file), function(err){
             if(err){
                 console.log(err);
                 res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
             }
+            else{
+                console.log("File served .");
         });
     }
     // forward login errors
@@ -449,7 +467,6 @@ const get_all = async (req, res) => {
 const get_logout = (req, res) => {
     // removing tokens from session
     req.session.destroy();
-
     res.status(200).json({"logout": "success"});
 };
 
