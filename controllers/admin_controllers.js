@@ -26,11 +26,11 @@ const post_students = async ( req, res) => {
             total_pages = students.length / page_limit;
         }
         else{
-            total_pages = (students.length / page_limit) + 1;
+            total_pages = Math.floor(students.length / page_limit) + 1;
         }
 
         // update pagination
-        var students = await Student.find(filters).skip(page * page_limit).limit(page_limit);
+        var students = await Student.find(filters).skip((page-1) * page_limit).limit(page_limit);
 
         // edit all entries for student
         students.forEach(function(student, index, theArray){
