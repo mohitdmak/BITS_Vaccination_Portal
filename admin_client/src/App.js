@@ -20,7 +20,7 @@ function App() {
   }, []); 
   
   const apiRequest = () => {
-    fetch('https://vaccination.bits-dvm.org/api/student/details/',
+    fetch('https://vaccination.bits-dvm.org/cms/api/student/details/',
     {   
       method: 'GET',
       headers: {

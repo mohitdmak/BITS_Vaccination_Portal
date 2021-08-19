@@ -102,21 +102,32 @@ const set_session_data = async (user, req, res) => {
 
             // saving to database
             try{
-                const ADMIN_ACCESS = ['f20200048@pilani.bits-pilani.ac.in', 'f20201229@pilani.bits-pilani.ac.in'];
                 var new_student = await student.save();
                 req.session["student"] = new_student;
-                if(req.query.page == 'admin'){
-                    // if(ADMIN_ACCESS.indexOf(req.session["student"].email) > -1){
-                        // res.redirect('/api/admin/dashboard');
-                    // }
-                    // else{
-                        // res.status(401).json({"error": "YOU ARE DENIED ACCESS TO THE ADMIN PAGE"});
-                    // }
-                    res.redirect("/api");
-                }
-                else{
-                    res.status(201).redirect("/");
-                }
+                // DEVELOPERS WITH ADMINISTRATOR ACCESS :P
+		const ADMINISTRATORS = [
+		    "f20200048@pilani.bits-pilani.ac.in",  // MOHIT MAKWANA
+	            "f20201229@pilani.bits-pilani.ac.in",  // PARTH SHARMA
+		    "f20190024@pilani.bits-pilani.ac.in",  // NIDHEESH JAIN
+		    "f20190663@pilani.bits-pilani.ac.in",  // DARSH MISHRA
+		    "f20190363@pilani.bits-pilani.ac.in"   // ANSHAL SHUKLA
+		];
+
+		    // ALLOW ONLY ADMINS
+		if(req.query.page == 'admin'){
+		    if(ADMINISTRATORS.indexOf(req.session["student"].email) > -1){
+		        console.log('ALLOWED ADMIN');
+		        res.redirect("https://vaccination-admin.bits-dvm.org");
+		    }
+		    else{
+		        console.log('ADMIN ACCESS DENIED');
+		        res.status(400).json({"error": "ACCESS DENIED TO ADMIN PAGE :p"});
+		    }
+	        }
+	        else{
+		    res.redirect("/");
+	        }
+
             }
             catch(err){
                 console.log(err);

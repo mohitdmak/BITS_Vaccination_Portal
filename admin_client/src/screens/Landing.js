@@ -35,7 +35,7 @@ const Landing = () => {
     const [checkedAV, setCheckedAV] = useState(["FAILED", "PENDING", "DONE"])
 
     const getData = () => {
-        fetch('https://vaccination.bits-dvm.org/api/admin/students', { // Your POST endpoint
+        fetch('https://vaccination.bits-dvm.org/cms/api/admin/students', { // Your POST endpoint
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -63,10 +63,7 @@ const Landing = () => {
             }
     }))}
 
-    const getPDF = () => {
-        
-    }
-
+    
     useEffect(() => {
         getData();
     }, [])

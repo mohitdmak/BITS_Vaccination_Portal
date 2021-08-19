@@ -24,7 +24,7 @@ const Student = () => {
     const [value2, setValue2] = React.useState("")
     
     const getData = (idparam) => {
-        fetch('https://vaccination.bits-dvm.org/api/admin/student', { // Your POST endpoint
+        fetch('https://vaccination.bits-dvm.org/cms/api/admin/student', { // Your POST endpoint
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ const Student = () => {
     }
 
     const postData = () => {
-        fetch('https://vaccination.bits-dvm.org/api/admin/update', { // Your POST endpoint
+        fetch('https://vaccination.bits-dvm.org/cms/api/admin/update', { // Your POST endpoint
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -76,6 +76,52 @@ const Student = () => {
             }
         }))
     }
+
+    const getPDF = () => {
+        fetch('https://vaccination.bits-dvm.org/cms/api/admin/get_pdf', { // Your POST endpoint
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "_id" : id,
+            })
+        }).then(response => 
+            response.json().then(data => ({
+                data: data,
+                status: response.status
+            })
+        ).then(res => {
+            if(res.data){
+                console.log(res.data)
+            } else {
+                alert("ERROR RETRIEVING CONTENT.");
+            }
+    }))}
+
+
+    const getConsent = () => {
+        fetch('https://vaccination.bits-dvm.org/cms/api/admin/get_consent', { // Your POST endpoint
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "_id" : id,
+            })
+        }).then(response => 
+            response.json().then(data => ({
+                data: data,
+                status: response.status
+            })
+        ).then(res => {
+            if(res.data){
+                console.log(res.data)
+            } else {
+                alert("ERROR RETRIEVING CONTENT.");
+            }
+    }))}
+
 
     useEffect(() => {
         getData(id)
@@ -129,15 +175,13 @@ const Student = () => {
 
            <Flex flexDir="row" width="50vw" padding="10px" justifyContent="space-between" alignItems="center">
                <Text>Certificate PDF</Text>
-               <Link to={ student.pdf }>
-                <Button isDisabled={!student.pdf}>View PDF</Button>
-               </Link>
+                <Button onClick={getPDF} isDisabled={!student.pdf}>View PDF</Button>
            </Flex>
 
            <Flex flexDir="row" width="50vw" padding="10px" justifyContent="space-between" alignItems="center">
                <Text>Consent Form PDF</Text>
                <Link to={ student.consent_form }>
-                <Button isDisabled={!student.consent_form}>View PDF</Button>
+                <Button onClick={getConsent} isDisabled={!student.consent_form}>View PDF</Button>
                </Link>
            </Flex>
 

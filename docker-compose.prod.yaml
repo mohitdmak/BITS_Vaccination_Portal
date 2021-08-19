@@ -27,7 +27,7 @@ services:
 
     # Set ports config
     ports:
-      - 80
+      - 1400:80
 
 
   # Container to run frontend

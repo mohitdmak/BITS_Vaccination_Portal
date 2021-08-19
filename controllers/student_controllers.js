@@ -178,6 +178,7 @@ const get_student_details = async (req, res) => {
             console.log("STUDENT DETAILS PROVIDED");
             res.status(200).json({
                 "_id": student._id,
+		"pic": student.pic,
                 "name": student.name,
                 "email": student.email,
                 "vaccination_status": student.vaccination_status,

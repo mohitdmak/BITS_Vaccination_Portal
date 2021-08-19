@@ -36,6 +36,7 @@ const post_students = async ( req, res) => {
         students.forEach(function(student, index, theArray){
             theArray[index] = {
                 "_id": student._id,
+		"pic": student.pic,
                 "name": student.name,
                 "email": student.email,
                 "vaccination_status": student.vaccination_status,
@@ -73,6 +74,7 @@ const get_student = async (req, res) => {
         console.log("	ADMIN PROVIDED STUDENT DETAIL");
         res.status(200).json({
                 "_id": student._id,
+		"pic": student.pic,
                 "name": student.name,
                 "email": student.email,
                 "vaccination_status": student.vaccination_status,
@@ -102,6 +104,7 @@ const update_student = async (req, res) => {
         console.log("	ADMIN UPDATED STUDENT STATUS");
         res.status(200).json({
                 "_id": student._id,
+		"pic": student.pic,
                 "name": student.name,
                 "email": student.email,
                 "vaccination_status": student.vaccination_status,

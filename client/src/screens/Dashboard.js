@@ -1,5 +1,4 @@
 import { React, useState, useEffect} from 'react'
-
 import {
     Flex,
     Box,
@@ -21,18 +20,25 @@ const Dashboard = (props) => {
 
     const [name, setName] = useState("")
     const [pp, setPP] = useState("")
+    const [campus, setCampus] = useState("")
     const [certificate, setCertificate] = useState(false)
     const [consent, setConsent] = useState(false)
     const [status, setStatus] = useState("NONE")
     const [one, setOne] = useState(1)
 
-    function cleanOne(auto) {
-        if (auto === "PENDING") setOne(0)
-        else if (auto === "CONFIRMED") setOne(1)
+    function verifiedStatusCalc (auto, manual) {
+        if (manual !== "PENDING") return manual;
+        else if (auto === "FAILED") return manual;
+        else return auto;
+    }
+
+    function cleanOne(auto, manual) {
+        const verifiedStatus = verifiedStatusCalc(auto, manual);
+        if (verifiedStatus === "PENDING") setOne(0)
+        else if (verifiedStatus === "DONE") setOne(1)
         else setOne(2)
     }
 
-    const campus = "Pilani Campus"
     const bits = "https://is5-ssl.mzstatic.com/image/thumb/Purple124/v4/b4/20/40/b420401e-c883-b363-03b5-34509d67c214/source/512x512bb.jpg"
     const dvm = "https://avatars.githubusercontent.com/u/14038814?s=200&v=4"
 
@@ -63,8 +69,8 @@ const Dashboard = (props) => {
                 alert("File successfully uploaded!") 
             }
         ).catch(
-            error => {
-                alert("Your file was not successfully uploaded due to error: "+error)
+            err => {
+                alert("Your file was not successfully uploaded due to error: " + err?.error)
             }
         );
     };
@@ -86,8 +92,8 @@ const Dashboard = (props) => {
                 alert("File successfully uploaded!") 
             }
         ).catch(
-            error => {
-                alert("Your file was not successfully uploaded due to error: "+error)
+            err => {
+                alert("Your file was not successfully uploaded due to error: "+err?.error)
             }
         );
     };
@@ -125,6 +131,12 @@ const Dashboard = (props) => {
             alert("Please choose a valid file!")
         }
     }
+
+    const campusCalc = (email) => {
+        if (email.includes("@goa")) return "Goa Campus";
+        if (email.includes("@hyderabad")) return "Hyderabad Campus";
+        if (email.includes("@pilani")) return "Pilani Campus";
+    }
     
     const apiRequest = () => {
         fetch('https://vaccination.bits-dvm.org/api/student/details/',
@@ -143,8 +155,9 @@ const Dashboard = (props) => {
                 if(res.data){
                     setName(res.data.name)
                     setPP(res.data.pic)
+                    setCampus(campusCalc(res.data.email))
                     setStatus(res.data.vaccination_status)
-                    cleanOne(res.data.auto_verification)
+                    cleanOne(res.data.auto_verification, res.data.manual_verification)
                     if (res.data.pdf) setCertificate(true)
                     if (res.data.consent_form) setConsent(true)
                 } else {
@@ -345,9 +358,9 @@ const Dashboard = (props) => {
                     mb="50px"
                 >
                     An initiative by
-                    <Image src={bits} ml="10px" mr="5px" mt="5px" height="80px" />
+                    <Image src={dvm} ml="10px" mr="5px" mt="5px" height="80px" />
                     and
-                    <Image src={dvm} ml="20px" mr="20px" mt="10px"boxSize="70px" />
+                    <Image src={bits} ml="20px" mr="20px" mt="10px"boxSize="70px" />
                 </Flex>
                 
             </Flex>   

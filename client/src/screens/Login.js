@@ -21,6 +21,7 @@ const Login = (props) => {
                 <Button 
                     onClick={() => window.open("https://vaccination.bits-dvm.org/api/auth", "_parent")}
                 >Login with BITS Mail</Button>
+                <Text mt="20px">Made with ❤️ by DVM</Text>
             </Flex>
         </Flex>
         </>
