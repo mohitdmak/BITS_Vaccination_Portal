@@ -24,10 +24,11 @@ const Student = () => {
     const [value2, setValue2] = React.useState("")
     
     const getData = (idparam) => {
-        fetch('https://vaccination.bits-dvm.org/cms/api/admin/student', { // Your POST endpoint
+        fetch('https://vaccination.bits-dvm.org/api/admin/student', { // Your POST endpoint
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+		'credentials': 'include'
             },
             body: JSON.stringify({
                 "_id" : idparam
@@ -50,10 +51,11 @@ const Student = () => {
     }
 
     const postData = () => {
-        fetch('https://vaccination.bits-dvm.org/cms/api/admin/update', { // Your POST endpoint
+        fetch('https://vaccination.bits-dvm.org/api/admin/update', { // Your POST endpoint
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+		'credentials': 'include'
             },
             body: JSON.stringify({
                 "_id" : id,
@@ -78,10 +80,11 @@ const Student = () => {
     }
 
     const getPDF = () => {
-        fetch('https://vaccination.bits-dvm.org/cms/api/admin/get_pdf', { // Your POST endpoint
+        fetch('https://vaccination.bits-dvm.org/api/admin/get_pdf', { // Your POST endpoint
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+		'credentials': 'include'
             },
             body: JSON.stringify({
                 "_id" : id,
@@ -101,10 +104,11 @@ const Student = () => {
 
 
     const getConsent = () => {
-        fetch('https://vaccination.bits-dvm.org/cms/api/admin/get_consent', { // Your POST endpoint
+        fetch('https://vaccination.bits-dvm.org/api/admin/get_consent', { // Your POST endpoint
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+		'credentials': 'include'
             },
             body: JSON.stringify({
                 "_id" : id,

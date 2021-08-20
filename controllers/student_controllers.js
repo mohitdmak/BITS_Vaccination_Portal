@@ -172,6 +172,8 @@ const get_consent = async (req, res) => {
 // The protected page
 const get_student_details = async (req, res) => {
     if(req.session["student"]){
+	console.log("entered if cond");
+	console.log(req.session["student"]);
         try{
             // serve student details
             const student = req.session["student"];
@@ -196,6 +198,7 @@ const get_student_details = async (req, res) => {
         }
     }
     else{
+	console.log('didnt error if');
         res.status(401).json({"error":"NO STUDENT IS LOGGED IN CURRENTLY"});
     }
 };

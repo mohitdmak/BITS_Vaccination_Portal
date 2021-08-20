@@ -20,11 +20,12 @@ function App() {
   }, []); 
   
   const apiRequest = () => {
-    fetch('https://vaccination.bits-dvm.org/cms/api/student/details/',
+    fetch('https://vaccination.bits-dvm.org/api/student/details/',
     {   
       method: 'GET',
       headers: {
           'Content-Type': 'application/json',
+	  'credentials': 'include'
     }
     }).then(response => 
     response.json().then(data => ({
