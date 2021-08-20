@@ -45,6 +45,11 @@ function App() {
     <Router>
       <>
         <Switch>
+
+	  <Route path="/student/:id">
+              <Student />
+          </Route>
+
           <Route path="/login">
             <Login />
           </Route>
@@ -57,13 +62,10 @@ function App() {
             {isLoggedIn ? <Landing /> : <Login />}
           </Route>
 
-          <Route path="*">
+	  <Route path="*">
             <Redirect to="/" />
           </Route>
 
-          <Route path="/student/:id">
-              <Student />
-          </Route>
         </Switch>
       </>
     </Router>

@@ -14,26 +14,26 @@ var admin_router = express.Router();
 //* Defining routes
 //
 // Auth landing page
-admin_router.post("/students",  admin_fxn.post_students);
+admin_router.post("/students", check_admin_auth,  admin_fxn.post_students);
 
 // getting student's pdf
-admin_router.post("/student", admin_fxn.get_student);
+admin_router.post("/student", check_admin_auth, admin_fxn.get_student);
 
 // post consent form
-admin_router.post("/update",  admin_fxn.update_student);
+admin_router.post("/update", check_admin_auth,  admin_fxn.update_student);
 
 // get consent form
-admin_router.post("/get_consent",  admin_fxn.get_consent); 
+admin_router.post("/get_consent", check_admin_auth,  admin_fxn.get_consent);
 
 // Setting auth tokens in session
-admin_router.post("/get_pdf",  admin_fxn.get_pdf);
+admin_router.post("/get_pdf", check_admin_auth,  admin_fxn.get_pdf);
 
 // Showing protected page with student details
-admin_router.post("/login", check_admin_auth, admin_fxn.post_login);
+admin_router.post("/login", admin_fxn.post_login);
 
 // alt endpt
-admin_router.post("/details", admin_fxn.post_details);
-// protected page
+admin_router.post("/details", check_admin_auth, admin_fxn.post_details);
+
 // Logout page
 // admin_router.get("/logout", admin_fxn.get_logout);
 

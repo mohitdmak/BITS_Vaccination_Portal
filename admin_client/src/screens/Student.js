@@ -70,7 +70,7 @@ const Student = () => {
         ).then(res => {
             if(res.data){
                 alert("Successfully updated student data.")
-                window.location.reload()
+                //window.location.reload()
             } else {
                 alert("ERROR POSTING DATA.");
             }
