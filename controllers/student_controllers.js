@@ -169,6 +169,40 @@ const get_consent = async (req, res) => {
 }
 
 
+// post extra data
+const post_extra_data = async (req, res) => {
+
+    try{
+        console.log("POST EXTRA DATA CALLED . . .");
+        // check student logged in session data
+        if(req.session["student"]){
+            // get post data
+            var updates = req.body;
+
+            console.log(updates);
+            // update student
+            var new_student = await Student.findOneAndUpdate({email: req.session["student"].email}, updates, {new:true});
+
+            // update session data for student
+            req.session["student"] = new_student;
+
+            // save called explicitly for post req
+            req.session.save();
+
+            // send new json
+            res.status(201).json(new_student);
+        }
+        else{
+            console.log("Post Extra data accessed without logged in status");
+            res.status(400).json({"error": "You must be logged in first to post your extra data"});
+        }
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({"error": err});
+    }
+}
+
 // The protected page
 const get_student_details = async (req, res) => {
     if(req.session["student"]){
@@ -178,18 +212,20 @@ const get_student_details = async (req, res) => {
             // serve student details
             const student = req.session["student"];
             console.log("STUDENT DETAILS PROVIDED");
-            res.status(200).json({
-                "_id": student._id,
-		"pic": student.pic,
-                "name": student.name,
-                "email": student.email,
-                "vaccination_status": student.vaccination_status,
-                "auto_verification": student.auto_verification,
-                "manual_verification": student.manual_verification,
-                "overall_status": student.overall_status,
-                "pdf": student.pdf,
-                "consent_form": student.consent_form
-            });
+            // res.status(200).json({
+            //     "_id": student._id,
+		// "pic": student.pic,
+            //     "name": student.name,
+            //     "email": student.email,
+            //     "vaccination_status": student.vaccination_status,
+            //     "auto_verification": student.auto_verification,
+            //     "manual_verification": student.manual_verification,
+            //     "overall_status": student.overall_status,
+            //     "pdf": student.pdf,
+            //     "consent_form": student.consent_form
+            // });
+
+            res.status(200).json(student);
         }
         catch(err){
             // send error report
@@ -501,5 +537,6 @@ module.exports = {
     get_pdf,
     post_consent,
     get_consent,
-    post_details
+    post_details,
+    post_extra_data
 }

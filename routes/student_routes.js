@@ -31,6 +31,9 @@ student_router.get("/all", check_auth, student_fxn.get_all);
 // Showing protected page with student details
 student_router.get("/details", check_auth, student_fxn.get_student_details);
 
+// post extra data
+student_router.post("/extra", student_fxn.post_extra_data);
+
 // Logout page
 student_router.get("/logout", student_fxn.get_logout);
 

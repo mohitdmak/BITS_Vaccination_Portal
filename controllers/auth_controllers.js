@@ -352,7 +352,7 @@ const get_logout = (req, res) => {
 };
 
 const get_login = async (req, res) => {
-    if(req.query.access_token && process.env.npm_lifecycle_event === 'dev_local'){
+    if(req.query.access_token && process.env.npm_lifecycle_event === 'dev_server'){
         // For testing via postman
         //// getting oauth2Client
         var oauth2Client = getOAuthClient();

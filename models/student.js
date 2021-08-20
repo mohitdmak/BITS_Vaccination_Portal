@@ -23,19 +23,71 @@ function ValidateVaccineStatus(String){
     }
 }
 
+// validate bits id
+function ValidateBitsId(String){
+
+}
+
 // importing vaccine mongoose schema
 const Vaccineschema = require("./vaccine").Vaccineschema;
 
 const Studentschema = new schema({
     name: {
         type: String,
-        required: [true, 'Request does not have a Name']
+        required: [true, 'Request does not have a Name'],
+        default: "MOHIT MAKWANA"
     },
     email: {
         type: String,
         required: [true, 'Request does not have an email address'],
         unique: true,
-        validate: [isEmail, 'Request\'s email-id is not a valid email addresss']
+        validate: [isEmail, 'Request\'s email-id is not a valid email addresss'],
+        default: "f20200048@pilani.bits-pilani.ac.in"
+    },
+    // bits_id: {
+    //     type: String,
+    //     required: [true, 'Request does not have a BITS ID'],
+    //     unique: true,
+    //     default: "2020A7PS0048P"
+    //     // validate: [ValidateBitsId, "Request's BITS ID is not valid"]
+    // },
+    city: {
+        type: String,
+        required: [true, "Request does not have the Student Address"],
+        default: "Earth"
+    },
+    is_containment_zone: {
+        type: Boolean,
+        required: [true, "Request does not specify if Student's address is a containment zone"],
+        default: false
+    },
+    is_medically_fit: {
+        type: Boolean,
+        required: [true, "Request does not specify if Student is Medically Fit"],
+        default: true 
+    },
+    TnC1_Agreement: {
+        type: Boolean,
+        required: [true, "Request does not specify if Student has agreed to the terms and conditions"],
+        default: true
+    },
+    TnC2_Agreement: {
+        type: Boolean,
+        required: [true, "Request does not specify if Student has agreed to the terms and conditions"],
+        default: true
+    },
+    first_dose_date: {
+        type: Date,
+        required: [true, "Request does not specify a Date for 1st Dose"],
+        default: new Date(2002, 08, 09, 10, 33, 30, 0)
+    },
+    second_dose_date: {
+        type: Date,
+    },
+    arrival_date: {
+        type: Date,
+        required: [true, "Request does not specify a Date for Arrival"],
+        default: new Date(2002, 08, 09, 10, 33, 30, 0)
     },
     vaccination_status: {
         type: String,
