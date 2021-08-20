@@ -13,31 +13,45 @@ import Student from './screens/Student'
 
 
 function App() {
-  const [isLoggedIn, setLogin] = useState(false)
+  const [isLoggedIn, setLogin] = useState(localStorage.getItem('jwt') ? true : false)
 
   useEffect(() => {
     apiRequest();
-  }, []); 
-  
+  }, []);
+
   const apiRequest = () => {
     fetch('https://vaccination.bits-dvm.org/api/admin/details/',
-    {   
-      method: 'POST',
-      headers: {
+      {
+        method: 'POST',
+        headers: {
           'Content-Type': 'application/json',
-    }
-    }).then(response => 
-    response.json().then(data => ({
-        data: {},
-        status: response.status
-    })).then(res => 
-    {
-      if(res.data.error){
-          setLogin(false)
-      } else {
-          setLogin(true)
+          'Authorization': 'Bearer ' + localStorage.getItem('jwt')
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          setLogin(true);
+          return response.json();
+        }
+        return Promise.reject(response);
       }
-    }))
+      )
+      .then(data => {
+        console.log(data);
+      })
+      .catch((response) => {
+        setLogin(false);
+        try {
+        console.log(response.status, response.statusText);
+        // 3. get error messages, if any
+        response.json().then((json) => {
+          console.log(json);
+        })
+      } catch (e) {
+        console.log(response);
+        console.log(e);
+      }
+      });
   }
 
 
@@ -46,23 +60,19 @@ function App() {
       <>
         <Switch>
 
-	  <Route path="/student/:id">
-              <Student />
-          </Route>
-
-          <Route path="/login">
-            <Login />
+          <Route path="/student/:id">
+            <Student />
           </Route>
 
           <Route path="/dashboard">
-            {isLoggedIn ? <Landing /> :  <Redirect to="/login" />}
+            {localStorage.getItem('jwt') ? <Landing /> : <Redirect to="/" />}
           </Route>
 
           <Route path="/">
-            {isLoggedIn ? <Landing /> : <Login />}
+            {localStorage.getItem('jwt') ? <Landing /> : <Login />}
           </Route>
 
-	  <Route path="*">
+          <Route path="*">
             <Redirect to="/" />
           </Route>
 
@@ -71,5 +81,5 @@ function App() {
     </Router>
   );
 }
-  
+
 export default App;

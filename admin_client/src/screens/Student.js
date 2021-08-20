@@ -28,6 +28,7 @@ const Student = () => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': "Bearer " + localStorage.getItem('jwt')
             },
             body: JSON.stringify({
                 "_id" : idparam
@@ -54,6 +55,7 @@ const Student = () => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': "Bearer " + localStorage.getItem('jwt')
             },
             body: JSON.stringify({
                 "_id" : id,
@@ -70,7 +72,7 @@ const Student = () => {
         ).then(res => {
             if(res.data){
                 alert("Successfully updated student data.")
-                //window.location.reload()
+                // window.location.reload()
             } else {
                 alert("ERROR POSTING DATA.");
             }
@@ -82,6 +84,7 @@ const Student = () => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': "Bearer " + localStorage.getItem('jwt')
             },
             body: JSON.stringify({
                 "_id" : id,
@@ -105,6 +108,7 @@ const Student = () => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': "Bearer " + localStorage.getItem('jwt')
             },
             body: JSON.stringify({
                 "_id" : id,

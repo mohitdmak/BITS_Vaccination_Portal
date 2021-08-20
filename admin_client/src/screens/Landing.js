@@ -39,6 +39,7 @@ const Landing = () => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': "Bearer " + localStorage.getItem('jwt')
             },
             body: JSON.stringify({
                 "page" : page,
