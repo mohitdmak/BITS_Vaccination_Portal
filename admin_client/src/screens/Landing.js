@@ -39,7 +39,6 @@ const Landing = () => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-		'credentials': 'include'
             },
             body: JSON.stringify({
                 "page" : page,
@@ -227,7 +226,7 @@ const Landing = () => {
                             <Text color="grey" fontWeight="bold">{ student.manual_verification }</Text>
                         </Td>
 
-                        <Link to={"/"+student._id}>
+                        <Link to={"/student/"+student._id}>
                             <Button mt="15px">View More</Button>
                         </Link>
                     </Tr>

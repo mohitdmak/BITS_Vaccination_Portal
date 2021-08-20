@@ -486,6 +486,11 @@ const get_logout = (req, res) => {
 };
 
 
+//alt details
+const post_details = (req, res) => {
+    console.log("ALT ADMIN DETAILS CALLED");
+    res.status(200).json({"success": "admin is allowed"});
+}
 
 module.exports = {
     get_all,
@@ -495,5 +500,6 @@ module.exports = {
     upload,
     get_pdf,
     post_consent,
-    get_consent
+    get_consent,
+    post_details
 }

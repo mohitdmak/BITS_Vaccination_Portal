@@ -209,6 +209,11 @@ const get_consent = async (req, res) => {
     }
 }
 
+//alt details
+const post_details = (req, res) => {
+    console.log("ALT ADMIN DETAILS CALLED");
+    res.status(200).json({"success": "admin is allowed"});
+}
 
 module.exports = {
     update_student,
@@ -216,5 +221,6 @@ module.exports = {
     post_students,
     get_pdf,
     get_consent,
-    post_login
+    post_login,
+    post_details
 }

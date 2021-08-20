@@ -28,7 +28,6 @@ const Student = () => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-		'credentials': 'include'
             },
             body: JSON.stringify({
                 "_id" : idparam
@@ -55,7 +54,6 @@ const Student = () => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-		'credentials': 'include'
             },
             body: JSON.stringify({
                 "_id" : id,
@@ -84,7 +82,6 @@ const Student = () => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-		'credentials': 'include'
             },
             body: JSON.stringify({
                 "_id" : id,
@@ -108,7 +105,6 @@ const Student = () => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-		'credentials': 'include'
             },
             body: JSON.stringify({
                 "_id" : id,

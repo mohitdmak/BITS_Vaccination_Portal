@@ -20,16 +20,15 @@ function App() {
   }, []); 
   
   const apiRequest = () => {
-    fetch('https://vaccination.bits-dvm.org/api/student/details/',
+    fetch('https://vaccination.bits-dvm.org/api/admin/details/',
     {   
-      method: 'GET',
+      method: 'POST',
       headers: {
           'Content-Type': 'application/json',
-	  'credentials': 'include'
     }
     }).then(response => 
     response.json().then(data => ({
-        data: data,
+        data: {},
         status: response.status
     })).then(res => 
     {
@@ -62,7 +61,7 @@ function App() {
             <Redirect to="/" />
           </Route>
 
-          <Route path="/:id">
+          <Route path="/student/:id">
               <Student />
           </Route>
         </Switch>

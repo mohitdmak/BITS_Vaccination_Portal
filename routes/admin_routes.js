@@ -31,6 +31,8 @@ admin_router.post("/get_pdf",  admin_fxn.get_pdf);
 // Showing protected page with student details
 admin_router.post("/login", check_admin_auth, admin_fxn.post_login);
 
+// alt endpt
+admin_router.post("/details", admin_fxn.post_details);
 // protected page
 // Logout page
 // admin_router.get("/logout", admin_fxn.get_logout);
