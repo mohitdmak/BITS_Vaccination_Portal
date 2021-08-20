@@ -17,7 +17,7 @@ auth_router.get("/", auth_fxn.get_auth_url);
 auth_router.get("/oauthCallback", auth_fxn.set_tokens);
 
 // admin
-auth_router.get("/AdminoauthCallback", auth_fxn.set_tokens_admin);
+// auth_router.get("/AdminoauthCallback", auth_fxn.set_tokens_admin);
 
 // Showing protected page with user details
 auth_router.get("/details", auth_fxn.get_user_details);

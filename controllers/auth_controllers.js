@@ -8,14 +8,14 @@ var Student = require("../models/student");
 
 
 // Setting appropriate callback url
-var AdminRedirectionUrl;
+// var AdminRedirectionUrl;
 var RedirectionUrl;
 if(process.env.npm_lifecycle_event === 'dev_local'){
     RedirectionUrl = "http://localhost:1370/api/auth/oauthCallback";
 }
 else if(process.env.npm_lifecycle_event === 'dev_server'){
     RedirectionUrl = "https://vaccination.bits-dvm.org/api/auth/oauthCallback";
-    AdminRedirectionUrl = "https://vaccination.bits-dvm.org/api/auth/AdminoauthCallback";
+    // AdminRedirectionUrl = "https://vaccination.bits-dvm.org/api/auth/AdminoauthCallback";
 }
 
 // Oauth2 client raw
@@ -27,30 +27,30 @@ function getOAuthClient () {
 }
 
 // Oauth2 client with api credentials
-function AdmingetOAuthClient () {
-    return new OAuth2(ClientId ,  ClientSecret, AdminRedirectionUrl);
-}
+// function AdmingetOAuthClient () {
+//     return new OAuth2(ClientId ,  ClientSecret, AdminRedirectionUrl);
+// }
 
 // Obtaining auth url by specifying scopes
-function AdmingetAuthUrl () {
+// function AdmingetAuthUrl () {
 
-    var oauth2Client = AdmingetOAuthClient();
+//     var oauth2Client = AdmingetOAuthClient();
 
-    // generate a url that asks permissions for email and profile scopes
-    var scopes = [
-      'https://www.googleapis.com/auth/userinfo.email',
-      'https://www.googleapis.com/auth/userinfo.profile'
-    ];
-    var url = oauth2Client.generateAuthUrl({
-        access_type: 'offline',
-        scope: scopes, // If you only need one scope you can pass it as string
+//     // generate a url that asks permissions for email and profile scopes
+//     var scopes = [
+//       'https://www.googleapis.com/auth/userinfo.email',
+//       'https://www.googleapis.com/auth/userinfo.profile'
+//     ];
+//     var url = oauth2Client.generateAuthUrl({
+//         access_type: 'offline',
+//         scope: scopes, // If you only need one scope you can pass it as string
 
-        // We ensure that only emails of BITS Pilani (Pilani Campus) are validated
-        hd: 'pilani.bits-pilani.ac.in'
-    });
+//         // We ensure that only emails of BITS Pilani (Pilani Campus) are validated
+//         hd: 'pilani.bits-pilani.ac.in'
+//     });
 
-    return url;
-}
+//     return url;
+// }
 
 
 // Obtaining auth url by specifying scopes
@@ -110,40 +110,40 @@ const set_tokens = async (req, res) => {
     });
 };
 // Obtaining token from Oauth2 client and setting it in sessions dict
-const set_tokens_admin = async (req, res) => {
+// const set_tokens_admin = async (req, res) => {
 
-    // setting new details in oauth2Client
-    var oauth2Client = AdmingetOAuthClient();
-    var session = req.session;
-    var code = req.query.code;
+//     // setting new details in oauth2Client
+//     var oauth2Client = AdmingetOAuthClient();
+//     var session = req.session;
+//     var code = req.query.code;
 
-    // embedding tokens in session and oauth2Client
-    oauth2Client.getToken(code, async function(err, tokens) {
+//     // embedding tokens in session and oauth2Client
+//     oauth2Client.getToken(code, async function(err, tokens) {
 
-      // Now tokens contains an access_token and an optional refresh_token. Save them.
-      if(!err) {
-        oauth2Client.setCredentials(tokens);
-        session["tokens"]=tokens;
-        console.log("	TOKENS SET IN SESSION");
+//       // Now tokens contains an access_token and an optional refresh_token. Save them.
+//       if(!err) {
+//         oauth2Client.setCredentials(tokens);
+//         session["tokens"]=tokens;
+//         console.log("	TOKENS SET IN SESSION");
 
-        // getting student details
-        var oauth2 = google.oauth2({
-            auth: oauth2Client,
-            version: 'v2'
-        });
-        try{
-            var user = await oauth2.userinfo.get();
-        }
-        catch(err){
-            res.status(500).json({"error": err});
-        }
+//         // getting student details
+//         var oauth2 = google.oauth2({
+//             auth: oauth2Client,
+//             version: 'v2'
+//         });
+//         try{
+//             var user = await oauth2.userinfo.get();
+//         }
+//         catch(err){
+//             res.status(500).json({"error": err});
+//         }
 
-        // set student data in session
-        set_session_data_admin(user, req, res);
+//         // set student data in session
+//         set_session_data_admin(user, req, res);
         
-      }
-    });
-};
+//       }
+//     });
+// };
 
 
 // non admin
@@ -185,77 +185,77 @@ const set_session_data = async (user, req, res) => {
 
 
 // set session data of student
-const set_session_data_admin = async (user, req, res) => {
-    try{
-        var student = await Student.find({email: user.data.email});
-        if(student.length){
-            req.session["student"] = student[0];
-	    // DEVELOPERS WITH ADMINISTRATOR ACCESS :P
-	    const ADMINISTRATORS = [
-	        "f20200048@pilani.bits-pilani.ac.in",  // MOHIT MAKWANA
-	        "f20201229@pilani.bits-pilani.ac.in",  // PARTH SHARMA
-	        "f20190024@pilani.bits-pilani.ac.in",  // NIDHEESH JAIN
-	        "f20190663@pilani.bits-pilani.ac.in",  // DARSH MISHRA
-	        "f20190363@pilani.bits-pilani.ac.in"   // ANSHAL SHUKLA
-	    ];
+// const set_session_data_admin = async (user, req, res) => {
+//     try{
+//         var student = await Student.find({email: user.data.email});
+//         if(student.length){
+//             req.session["student"] = student[0];
+// 	    // DEVELOPERS WITH ADMINISTRATOR ACCESS :P
+// 	    const ADMINISTRATORS = [
+// 	        "f20200048@pilani.bits-pilani.ac.in",  // MOHIT MAKWANA
+// 	        "f20201229@pilani.bits-pilani.ac.in",  // PARTH SHARMA
+// 	        "f20190024@pilani.bits-pilani.ac.in",  // NIDHEESH JAIN
+// 	        "f20190663@pilani.bits-pilani.ac.in",  // DARSH MISHRA
+// 	        "f20190363@pilani.bits-pilani.ac.in"   // ANSHAL SHUKLA
+// 	    ];
 
-	    console.log(req.query);
-	    // ALLOW ONLY ADMINS
-	    if(ADMINISTRATORS.indexOf(req.session["student"].email) > -1){
-		console.log('ALLOWED ADMIN');
-		res.redirect("https://vaccination-admin.bits-dvm.org");
-	    }
-	    else{
-		console.log('ADMIN ACCESS DENIED');
-		res.status(400).json({"error": "ACCESS DENIED TO ADMIN PAGE :p"});
-	    }
-        }
-        else{
-            // creating student model
-            var student = new Student({
-                "name" : user.data.name,
-                "email" : user.data.email,
-                "pic" : user.data.picture
-            });
+// 	    console.log(req.query);
+// 	    // ALLOW ONLY ADMINS
+// 	    if(ADMINISTRATORS.indexOf(req.session["student"].email) > -1){
+// 		console.log('ALLOWED ADMIN');
+// 		res.redirect("https://vaccination-admin.bits-dvm.org");
+// 	    }
+// 	    else{
+// 		console.log('ADMIN ACCESS DENIED');
+// 		res.status(400).json({"error": "ACCESS DENIED TO ADMIN PAGE :p"});
+// 	    }
+//         }
+//         else{
+//             // creating student model
+//             var student = new Student({
+//                 "name" : user.data.name,
+//                 "email" : user.data.email,
+//                 "pic" : user.data.picture
+//             });
 
-            // Save student data in current session
-            // req.session["student"] = student;
+//             // Save student data in current session
+//             // req.session["student"] = student;
 
-            // saving to database
-            try{
-                var new_student = await student.save();
-                req.session["student"] = new_student;
-                // DEVELOPERS WITH ADMINISTRATOR ACCESS :P
-		const ADMINISTRATORS = [
-		    "f20200048@pilani.bits-pilani.ac.in",  // MOHIT MAKWANA
-	            "f20201229@pilani.bits-pilani.ac.in",  // PARTH SHARMA
-		    "f20190024@pilani.bits-pilani.ac.in",  // NIDHEESH JAIN
-		    "f20190663@pilani.bits-pilani.ac.in",  // DARSH MISHRA
-		    "f20190363@pilani.bits-pilani.ac.in"   // ANSHAL SHUKLA
-		];
+//             // saving to database
+//             try{
+//                 var new_student = await student.save();
+//                 req.session["student"] = new_student;
+//                 // DEVELOPERS WITH ADMINISTRATOR ACCESS :P
+// 		const ADMINISTRATORS = [
+// 		    "f20200048@pilani.bits-pilani.ac.in",  // MOHIT MAKWANA
+// 	            "f20201229@pilani.bits-pilani.ac.in",  // PARTH SHARMA
+// 		    "f20190024@pilani.bits-pilani.ac.in",  // NIDHEESH JAIN
+// 		    "f20190663@pilani.bits-pilani.ac.in",  // DARSH MISHRA
+// 		    "f20190363@pilani.bits-pilani.ac.in"   // ANSHAL SHUKLA
+// 		];
 
-		    // ALLOW ONLY ADMINS
-		console.log(req.query);
-		if(ADMINISTRATORS.indexOf(req.session["student"].email) > -1){
-		    console.log('ALLOWED ADMIN');
-		    res.redirect("https://vaccination-admin.bits-dvm.org");
-		}
-		else{
-		    console.log('ADMIN ACCESS DENIED');
-		    res.status(400).json({"error": "ACCESS DENIED TO ADMIN PAGE :p"});
-		}
-            }
-            catch(err){
-                console.log(err);
-                res.status(500).json({"error": err});
-            }
-          }
-        }
-    catch(err){
-        console.log(err);
-        res.status(500).json({"error": err});
-    }
-}
+// 		    // ALLOW ONLY ADMINS
+// 		console.log(req.query);
+// 		if(ADMINISTRATORS.indexOf(req.session["student"].email) > -1){
+// 		    console.log('ALLOWED ADMIN');
+// 		    res.redirect("https://vaccination-admin.bits-dvm.org");
+// 		}
+// 		else{
+// 		    console.log('ADMIN ACCESS DENIED');
+// 		    res.status(400).json({"error": "ACCESS DENIED TO ADMIN PAGE :p"});
+// 		}
+//             }
+//             catch(err){
+//                 console.log(err);
+//                 res.status(500).json({"error": err});
+//             }
+//           }
+//         }
+//     catch(err){
+//         console.log(err);
+//         res.status(500).json({"error": err});
+//     }
+// }
 
 // The protected page
 const get_user_details = async (req, res) => {
@@ -378,7 +378,7 @@ module.exports = {
     get_user_details,
     get_auth_url,
     set_tokens,
-    set_tokens_admin,
+    // set_tokens_admin,
     get_logout,
     getOAuthClient,
     get_data,

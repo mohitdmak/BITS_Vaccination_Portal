@@ -5,9 +5,26 @@ const Student = require('../models/student.js');
 // importing vaccine model
 const Vaccine = require('../models/vaccine.js').Vaccine;
 
+//password configs
+const password = require('../config/admin.js').password;
+const username = require('../config/admin.js').username;
+const hashed = require('../config/admin.js').hashed;
+
 
 // set pagination limit
 const page_limit = 50;
+
+//login
+const post_login = async(req, res) => {
+    const {client_username, client_password} = req.body;
+    if(client_username == username && client_password === password){
+        res.status(201).json({"jwt": hashed});
+    }
+    else{
+        console.log("WRONG ADMIN PASSWORD OR USERNAME");
+        res.status(400).json({"error": "ADMIN PASSWORD OR USERNAME IS INCORRECT"});
+    }
+}
 
 // Handler for POST REQs submitting pdfs
 const post_students = async ( req, res) => {
@@ -198,5 +215,6 @@ module.exports = {
     get_student,
     post_students,
     get_pdf,
-    get_consent
+    get_consent,
+    post_login
 }
