@@ -34,15 +34,13 @@ const Vaccineschema = require("./vaccine").Vaccineschema;
 const Studentschema = new schema({
     name: {
         type: String,
-        required: [true, 'Request does not have a Name'],
-        default: "MOHIT MAKWANA"
+        required: [true, 'Request does not have a Name']
     },
     email: {
         type: String,
         required: [true, 'Request does not have an email address'],
         unique: true,
-        validate: [isEmail, 'Request\'s email-id is not a valid email addresss'],
-        default: "f20200048@pilani.bits-pilani.ac.in"
+        validate: [isEmail, 'Request\'s email-id is not a valid email addresss']
     },
     // bits_id: {
     //     type: String,
@@ -76,13 +74,10 @@ const Studentschema = new schema({
         required: [true, "Request does not specify if Student has agreed to the terms and conditions"],
         default: true
     },
-    first_dose_date: {
+    latest_dose_date: {
         type: Date,
         required: [true, "Request does not specify a Date for 1st Dose"],
         default: new Date(2002, 08, 09, 10, 33, 30, 0)
-    },
-    second_dose_date: {
-        type: Date,
     },
     arrival_date: {
         type: Date,
@@ -91,7 +86,6 @@ const Studentschema = new schema({
     },
     vaccination_status: {
         type: String,
-        //enum: ["NONE", "PARTIAL", "COMPLETE"],
         required: [true, 'Request does not contain a vaccination status'],
         default: 'NONE',
         validate: [ValidateVaccineStatus, 'Request\'s vaccination status is not valid']
@@ -99,14 +93,12 @@ const Studentschema = new schema({
     auto_verification: {
         type: String,
         required: [true, 'Request does not contain an auto-verification status'],
-        //enum: ["FAILED", "PENDING", "DONE"],
         validate: [ValidateStatus, 'Request\'s auto_verification status is not valid'],
         default: 'PENDING'
     },
     manual_verification: {
         type: String,
         required: [true, 'Request does not contain an auto-verification status'],
-        //enum: ["FAILED", "PENDING", "DONE"],
         validate: [ValidateStatus, 'Request\'s auto_verification status is not valid'],
         default: 'PENDING'
     },
@@ -126,12 +118,12 @@ const Studentschema = new schema({
     consent_form: {
         type: String,
     },
-    pdf_data: {
-        type: Buffer
-    },
-    consent_form_data: {
-        type: Buffer
-    },
+    // pdf_data: {
+    //     type: Buffer
+    // },
+    // consent_form_data: {
+    //     type: Buffer
+    // },
     vaccine: Vaccineschema
 });
 
