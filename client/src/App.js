@@ -5,14 +5,15 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link,
   Redirect
 } from "react-router-dom";
 
-import { Heading } from '@chakra-ui/react'
+
+// import { Heading } from '@chakra-ui/react'
 
 import Dashboard from './screens/Dashboard.js'
 import Login from './screens/Login.js'
+import Devs from './screens/Devs.js'
 
 
 // /api/student/details
@@ -56,12 +57,16 @@ const apiRequest = () => {
         <Route path="/dashboard">
           {isLoggedIn ? <Dashboard /> :  <Redirect to="/login" />}
         </Route>
-        <Route path="/">
+        <Route exact path="/">
           {isLoggedIn ? <Dashboard /> : <Login />}
+        </Route>
+        <Route path="/devs">
+          <Devs />
         </Route>
         <Route path="*">
           <Redirect to="/" />
         </Route>
+       
       </Switch>
       </>
     </Router>
