@@ -53,13 +53,14 @@ const post_students = async ( req, res) => {
         students.forEach(function(student, index, theArray){
             theArray[index] = {
                 "_id": student._id,
-		"pic": student.pic,
+                "pic": student.pic,
                 "name": student.name,
                 "email": student.email,
                 "vaccination_status": student.vaccination_status,
                 "auto_verification": student.auto_verification,
                 "manual_verification": student.manual_verification,
                 "overall_status": student.overall_status,
+                "arrival_date": student.arrival_date,
                 "pdf": student.pdf,
                 "consent_form": student.consent_form
             }
@@ -90,17 +91,20 @@ const get_student = async (req, res) => {
         console.log(student);
         console.log("	ADMIN PROVIDED STUDENT DETAIL");
         res.status(200).json({
-                "_id": student._id,
-		"pic": student.pic,
-                "name": student.name,
-                "email": student.email,
-                "vaccination_status": student.vaccination_status,
-                "auto_verification": student.auto_verification,
-                "manual_verification": student.manual_verification,
-                "overall_status": student.overall_status,
-                "pdf": student.pdf,
-                "consent_form": student.consent_form
-            });
+            "_id": student._id,
+            "pic": student.pic,
+            "name": student.name,
+            "email": student.email,
+            "vaccination_status": student.vaccination_status,
+            "auto_verification": student.auto_verification,
+            "manual_verification": student.manual_verification,
+            "overall_status": student.overall_status,
+            "city": student.city,
+            "arrival_date": student.arrival_date,
+            "is_containment_zone": student.is_containment_zone,
+            "pdf": student.pdf,
+            "consent_form": student.consent_form
+        });
     }
     catch(err){
         console.log(err);
@@ -119,18 +123,24 @@ const update_student = async (req, res) => {
         var updates = req.body.updates;
         var student = await Student.findOneAndUpdate({_id: id}, updates, {new: true});
         console.log("	ADMIN UPDATED STUDENT STATUS");
+        console.log("Verifying overall status . . .");
+        if(student.pdf && student.consent_form && student.vaccination_status == 'COMPLETE'){
+            console.log("All fields proper, updating student model and session cache . . .");
+            var new_student = await Student.findOneAndUpdate({email: student.email}, {overall_status: true}, {new:true});
+            console.log("Overall Access grant updated .");
+        }
         res.status(200).json({
-                "_id": student._id,
-		"pic": student.pic,
-                "name": student.name,
-                "email": student.email,
-                "vaccination_status": student.vaccination_status,
-                "auto_verification": student.auto_verification,
-                "manual_verification": student.manual_verification,
-                "overall_status": student.overall_status,
-                "pdf": student.pdf,
-                "consent_form": student.consent_form
-            });
+            "_id": student._id,
+            "pic": student.pic,
+            "name": student.name,
+            "email": student.email,
+            "vaccination_status": student.vaccination_status,
+            "auto_verification": student.auto_verification,
+            "manual_verification": student.manual_verification,
+            "overall_status": student.overall_status,
+            "pdf": student.pdf,
+            "consent_form": student.consent_form
+        });
     }
     catch(err){
         console.log(err);
