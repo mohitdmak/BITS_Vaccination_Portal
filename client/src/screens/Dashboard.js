@@ -76,27 +76,24 @@ const Dashboard = (props) => {
         fetch('https://vaccination.bits-dvm.org/api/student/post_pdf', { // Your POST endpoint
             method: 'POST',
             body: data // This is your file object
-        }).then(
-            response => {
-                if (response.ok) {
-                    return response.json();
+        }).then(response => 
+                response.json().then(data => ({
+                    data: data,
+                    status: response.status
+                })
+            ).then(res => {
+                if(res.data){
+                    apiRequest();
+                    alert("File successfully uploaded!")
+                } else if (res.error){
+                    alert(res.error);
+                } else if (res.err){
+                    alert(res.err);
+                } else {
+                    alert("fallback")
                 }
-                return Promise.reject(response);
-            }
-        ).then(
-            success => {
-                apiRequest();
-                alert("File successfully uploaded!")
-            }
-        ).catch(
-            err => {
-                console.log(err)
-                console.log(err.error)
-                console.log(err.err)
-                alert("Your file was not successfully uploaded due to error: " + err.error)
-            }
-        );
-    };
+        }))
+    }
 
     const upload2 = (data) => {
         fetch('https://vaccination.bits-dvm.org/api/student/post_consent', { // Your POST endpoint
