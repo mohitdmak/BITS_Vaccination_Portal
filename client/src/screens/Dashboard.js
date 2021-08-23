@@ -70,30 +70,32 @@ const Dashboard = (props) => {
         apiRequest();
     }, []);
 
-
     // This will upload the file after having read it
     const upload = (data) => {
         fetch('https://vaccination.bits-dvm.org/api/student/post_pdf', { // Your POST endpoint
             method: 'POST',
             body: data // This is your file object
-        }).then(response => 
-                response.json().then(data => ({
-                    data: data,
-                    status: response.status
-                })
-            ).then(res => {
-                if(res.data){
-                    apiRequest();
-                    alert("File successfully uploaded!")
-                } else if (res.error){
-                    alert(res.error);
-                } else if (res.err){
-                    alert(res.err);
-                } else {
-                    alert("fallback")
+        }).then(
+            response => {
+                if (response.ok) {
+                    return response.json();
                 }
-        }))
-    }
+                return Promise.reject(response);
+            }
+        ).then(
+            success => {
+                apiRequest();
+                alert("File successfully uploaded!")
+            }
+        ).catch(
+            err => {
+                return err.json().then(errormsg => {
+                    alert("Your PDF was not accepted due to the following error: " + errormsg?.error)
+                })
+                
+            }
+        );
+    };
 
     const upload2 = (data) => {
         fetch('https://vaccination.bits-dvm.org/api/student/post_consent', { // Your POST endpoint
@@ -113,10 +115,9 @@ const Dashboard = (props) => {
             }
         ).catch(
             err => {
-                console.log(err)
-                console.log(err.error)
-                console.log(err.err)
-                alert("Your file was not successfully uploaded due to error: " + err?.error)
+                return err.json().then(errormsg => {
+                    alert("Your PDF was not accepted due to the following error: " + errormsg?.error)
+                })
             }
         );
     };
@@ -496,7 +497,7 @@ const Dashboard = (props) => {
                             "I agree with the conditions mentioned above. Any violation of the agreement may lead to disciplinary action. " */}
                             <>
                                 <Checkbox
-                                    isChecked={allChecked}
+                                    isChecked={checkedItems}
                                     isIndeterminate={isIndeterminate}
                                     onChange={(e) => setCheckedItems([e.target.checked, e.target.checked, e.target.checked])}
                                     size={["lg"]}
@@ -562,7 +563,7 @@ const Dashboard = (props) => {
                         mb="50px"
                     >
                         An initiative by
-                        <Image src={dvm} ml="10px" mr="5px" mt="5px" height="80px" />
+                        <Image src={dvm} ml="10px" mr="10px" mt="5px" height="80px" />
                         and
                         <Image src={bits} ml="20px" mr="20px" mt="10px" boxSize="70px" />
                     </Flex>
