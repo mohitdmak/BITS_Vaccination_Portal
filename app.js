@@ -62,6 +62,63 @@ app.use(Session({
 }));
 
 
+//* CONFIGURE FOREST ADMIN
+// const Vaccine = require('./models/vaccine.js').Vaccine;
+// const Student = require('./models/student.js');
+
+// Import FOREST Module and db connection server
+// const db_connection = require('./server.js');
+// const forest = require('forest-express-mongoose');
+
+ //allow cors for forest admin backend
+//app.use('^(?!forest/?$).*', cors());
+
+// //function to load forest configs
+//async function load_forest(){
+//    //* CONFIGURE FOREST ADMIN
+//    const Vaccine = require('./models/vaccine.js').Vaccine;
+//    const Student = require('./models/student.js');
+
+//    // Import FOREST Module and db connection server
+//    const db_connection = require('./server.js');
+//    const forest = require('forest-express-mongoose');
+
+//    try{
+//        const forest_conf = await forest.init({
+//            envSecret: process.env.FOREST_ENV_SECRET,
+//            authSecret: process.env.FOREST_AUTH_SECRET,
+//            objectMapping: Student,
+//            connections: { default: db_connection }
+//        });
+//        // FOREST ADMIN configurations
+//        app.use(forest_conf);
+//        console.log("FOREST CONFIGURED");
+//    }
+//    catch(err){
+//        console.log(err);
+//    }
+//}
+
+//// load forest admin
+//load_forest();
+     
+//// FOREST ADMIN configurations
+// app.use(forest_conf);
+
+
+var multer = require('multer');
+app.use(function (err, req, res, next){
+    console.log('\nfdsg\n');
+    if(err instanceof multer.MulterError){
+        console.log(err);
+        return res.status(418).send(err.code);
+    }
+    else{
+        console.log('\ngg');
+        next();
+    }
+});
+
 //* ROUTES :
 
 // Home route
@@ -98,6 +155,10 @@ app.use("/api/auth", auth_routes);
 // Student Route
 const student_routes = require("./routes/student_routes.js");
 app.use("/api/student", student_routes);
+
+// Admin Route
+const admin_routes = require("./routes/admin_routes.js");
+app.use("/api/admin", admin_routes);
 
 
  // exporting express app and redis client

@@ -20,15 +20,23 @@
   },
   "homepage": "https://github.com/mohitdmak/Gsmaster#readme",
   "dependencies": {
+    "@admin-bro/express": "^3.1.0",
+    "@admin-bro/mongoose": "^1.1.0",
+    "admin-bro": "^4.0.1",
+    "bcryptjs": "^2.4.3",
     "connect-redis": "^6.0.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
+    "forest-express-mongoose": "^8.1.2",
+    "fs": "^0.0.1-security",
     "googleapis": "^82.0.0",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.13.4",
     "multer": "^1.4.3",
     "path": "^0.12.7",
     "redis": "^3.1.2",
+    "tslib": "^2.3.1",
     "validator": "^13.6.0"
   }
 }

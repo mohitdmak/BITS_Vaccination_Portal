@@ -2,8 +2,42 @@ version: "3.3"
 
 # Docker containers in the network
 services:
+  
+  # strapi:
+  #   image: strapi/strapi
+  #   environment:
+  #     DATABASE_CLIENT: mongo
+  #     DATABASE_NAME: Portal
+  #     DATABASE_HOST: MongoContainer
+  #     DATABASE_PORT: 27017
+  #     # DATABASE_USERNAME: VACC_PORTAL
+  #     # DATABASE_PASSWORD: lgocoronagol
+  #   volumes:
+  #     - ./:/srv/app
+  #   ports:
+  #     - '1337:1337'
+  #   depends_on:
+  #     - mongo_container
 
-  # Container to run mongo db in same docker network
+  # app:
+  #   build:
+  #     context: ./TRIAL_THREE
+  #     dockerfile: Dockerfile
+  #     # network: host
+  #   container_name: trial_three
+  #   environment:
+  #     - APPLICATION_PORT=${APPLICATION_PORT}
+  #     - APPLICATION_URL=${APPLICATION_URL}
+  #     - DATABASE_URL=${DATABASE_URL}
+  #     - DATABASE_SSL=${DATABASE_SSL}
+  #     - FOREST_AUTH_SECRET=${FOREST_AUTH_SECRET}
+  #     - FOREST_ENV_SECRET=${FOREST_ENV_SECRET}
+  #   ports:
+  #     - "${APPLICATION_PORT}:${APPLICATION_PORT}"
+  #   volumes:
+  #     - ./TRIAL_THREE/:/usr/src/app
+
+  # # Container to run mongo db in same docker network
   mongo_container:
 
     # Passing build context
@@ -30,7 +64,7 @@ services:
 
     # Setting ports config
     ports:
-      - 27017
+      - 27017:27017
 
 
   # Container to provide interface to running mongo container
@@ -40,15 +74,15 @@ services:
     image: mongo-express
 
     # Default name
-    container_name: MongoExpressContainer
+    container_name: DbAdminContainer
     
     # environment configs
     env_file:
-      - config/mongo-express2.env       
+      - config/DB_ADMIN_CONFIG.env       
 
     # Main mongo server needs to start first
-    depends_on:
-      - dev_container
+    # depends_on:
+    #   - dev_container
 
     # Restart always, since Mongo container needs time to be up
     restart: always
@@ -82,6 +116,7 @@ services:
     # Binding port 3000 with host os.
     ports:
       - 3000
+      # - 3310:3310
 
     # Ensuring Db Container has been started before main app are ready
     depends_on:
@@ -111,7 +146,7 @@ services:
 
     # Using nginx config defined in folder
     volumes:
-      - ./nginx:/etc/nginx/conf.d
+      - ./nginx/nginx_test.conf:/etc/nginx/conf.d/nginx.conf
 
     # Wait for web_api container to start first
     depends_on:

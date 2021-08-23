@@ -1,5 +1,6 @@
 # CACHESSSSSS
 PyDIVOC/PyDIVOC/__pycache__/*.pyc
+config/admin.js
 
 # DB ADMIN CONFIGURATION
 config/DB_ADMIN_CONFIG.env
