@@ -175,7 +175,7 @@ const set_session_data = async (user, req, res) => {
             }
             else{
                 console.log("\n    Email disallowed during load testing . . .");
-                res.status(400).json({"error": "Sorry, but you are not allowed to log in during load testing :("});
+                res.redirect("/");
             }
         }
         else{
@@ -205,7 +205,7 @@ const set_session_data = async (user, req, res) => {
             }
             else{
                 console.log("\n    Email disallowed during load testing . . .");
-                res.status(400).json({"error": "Sorry, but you are not allowed to log in during load testing :("});
+                res.redirect("/");
             }
           }
     }
