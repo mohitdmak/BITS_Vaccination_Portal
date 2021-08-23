@@ -34,6 +34,15 @@ const post_students = async ( req, res) => {
     // iterate through json to get filter specs
     var filters = req.body.filters;
 
+    // parse filters
+    console.log("Deleting null filters . . .");
+    for(var key in filters){
+        if(filters[key] == null){
+            console.log(key);
+            delete filters[key];
+        }
+    }
+
     try{
         // return list of students
         var students = await Student.find(filters);

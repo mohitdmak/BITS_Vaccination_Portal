@@ -17,6 +17,7 @@ import {
     RadioGroup,
     Stack,
     Radio,
+    Input,
     Checkbox,
     CheckboxGroup
 } from '@chakra-ui/react'
@@ -38,8 +39,15 @@ const Landing = () => {
     const [checkedMV, setCheckedMV] = useState(["FAILED", "PENDING", "DONE"])
     const [checkedAV, setCheckedAV] = useState(["FAILED", "PENDING", "DONE"])
 
+    const [searchName, setSearchName] = useState(null);
+    const [searchEmail, setSearchEmail] = useState(null);
+    const [batch, setBatch] = useState(["2020", "2019", "2018"]);
+
     const [startDate, setStartDate] = useState(new Date("2021/09/01"));
     const [endDate, setEndDate] = useState(new Date("2021/09/25"));
+
+    const handleNameChange = (event) => setSearchName(event.target.value)
+    const handleEmailChange = (event) => setSearchEmail(event.target.value)
 
     const getData = () => {
         fetch('https://vaccination.bits-dvm.org/api/admin/students', {
@@ -51,6 +59,8 @@ const Landing = () => {
             body: JSON.stringify({
                 "page" : page,
                 "filters" : {
+                    "name" : cleanSearchString(searchName),
+                    "email" : cleanSearchString(searchEmail),
                     "auto_verification" : checkedAV,
                     "manual_verification" : checkedMV,
                     "vaccination_status" : checkedVS,
@@ -58,7 +68,8 @@ const Landing = () => {
                 "between" : {
                     "start" : startDate,
                     "end" : endDate
-                }
+                },
+                "batch" : batch
             })
         }).then(response => 
             response.json().then(data => ({
@@ -84,6 +95,11 @@ const Landing = () => {
             setPage(page - 1);
             getData();
         }
+    }
+
+    const cleanSearchString = (searchString) => {
+        if (searchString === "") return null;
+        else return searchString;
     }
 
     const nextPage = () => {
@@ -205,6 +221,21 @@ const Landing = () => {
                             {/* <Text>{checkedMV}</Text> */}
                             </CheckboxGroup>
                     </Flex>
+
+                    <Flex flexDir="column" padding="10px">
+                        <Text fontWeight="bold">Batch</Text>
+                        <CheckboxGroup 
+                        onChange={setBatch}
+                        value={batch}>
+                            <Stack direction="row" flexWrap="wrap">
+                                <Checkbox value="2020">2020</Checkbox>
+                                <Checkbox value="2019">2019</Checkbox>
+                                <Checkbox value="2018">2018</Checkbox>
+                            </Stack>
+                            </CheckboxGroup>
+                    </Flex>
+
+                    
                     
                     <Flex flexDir="column" padding="10px">
                         <Text fontWeight="bold">Start Date</Text>
@@ -225,11 +256,31 @@ const Landing = () => {
                             minDate={startDate}
                         />
                     </Flex>
-                </Flex>
-                <Flex alignItems="center" justifyContent="center">
+
+                    <Flex flexDir="column" padding="10px">
+                        <Text mt="5px" fontWeight="bold">Search by Name</Text>
+                        <Input
+                            value={searchName}
+                            onChange={handleNameChange}
+                            placeholder="Enter name here"
+                            size="md"
+                        />
+                    </Flex>
+
+                    <Flex flexDir="column" padding="10px">
+                        <Text mt="5px" fontWeight="bold">Search by Email</Text>
+                        <Input
+                            value={searchEmail}
+                            onChange={handleEmailChange}
+                            placeholder="f20XXABCD@bits-pilani.ac.in"
+                            size="md"
+                        />
+                    </Flex>
+
                     <Button width="200px" m="20px" onClick={getData} colorScheme="blue">Filter</Button>
                 </Flex>
-                
+
+
             </Flex>
             
         
