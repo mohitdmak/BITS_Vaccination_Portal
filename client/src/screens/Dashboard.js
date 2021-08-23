@@ -30,7 +30,7 @@ import { parseISO } from 'date-fns'
 
 const Dashboard = (props) => {
 
-    const [name, setName] = useState("a")
+    const [name, setName] = useState("")
     const [pp, setPP] = useState("")
     const [campus, setCampus] = useState("")
     const [certificate, setCertificate] = useState(false)
@@ -90,6 +90,9 @@ const Dashboard = (props) => {
             }
         ).catch(
             err => {
+                console.log(err)
+                console.log(err.error)
+                console.log(err.err)
                 alert("Your file was not successfully uploaded due to error: " + err.error)
             }
         );
@@ -113,6 +116,9 @@ const Dashboard = (props) => {
             }
         ).catch(
             err => {
+                console.log(err)
+                console.log(err.error)
+                console.log(err.err)
                 alert("Your file was not successfully uploaded due to error: " + err?.error)
             }
         );
