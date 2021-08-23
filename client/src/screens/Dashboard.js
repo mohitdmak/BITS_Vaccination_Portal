@@ -124,7 +124,7 @@ const Dashboard = (props) => {
             {
                 "city": city,
                 "is_containment_zone": isContainment,
-                "id_medically_fit": checkedItems[0], // should be is_medically_fit
+                "is_medically_fit": checkedItems[0], // should be is_medically_fit
                 "TnC1_Agreement": checkedItems[1],
                 "TnC2_Agreement": checkedItems[2],
                 "arrival_date": arrival,
@@ -135,7 +135,7 @@ const Dashboard = (props) => {
             body: JSON.stringify({
                 "city": city,
                 "is_containment_zone": isContainment,
-                "id_medically_fit": checkedItems[0], // should be is_medically_fit
+                "is_medically_fit": checkedItems[0], // should be is_medically_fit
                 "TnC1_Agreement": checkedItems[1],
                 "TnC2_Agreement": checkedItems[2],
                 "arrival_date": arrival,
@@ -240,7 +240,7 @@ const Dashboard = (props) => {
                     setCity(res.city || "")
                     setArrival(res.arrival_date ? parseISO(res.arrival_date) : new Date())
                     setIsContainment(res.is_containment_zone || false)
-                    setCheckedItems([res.id_medically_fit || false, res.TnC1_Agreement || false, res.TnC2_Agreement || false])
+                    setCheckedItems([res.is_medically_fit || false, res.TnC1_Agreement || false, res.TnC2_Agreement || false])
                 } else {
                     alert("ERROR RETRIEVING CONTENT.");
                 }
@@ -542,7 +542,7 @@ const Dashboard = (props) => {
                             mt="60px"
                             width={["100%", "100%", "100%", "200px", "200px"]}
                             height={["50px", "50px", "50px", "60px", "60px"]}
-                            bg="#00B894"
+                            bg="blue"
                             color="white"
                             fontSize={["14px", "14px", "14px", "22px", "22px"]}
                             fontWeight="bold"

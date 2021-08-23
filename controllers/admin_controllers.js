@@ -67,6 +67,8 @@ const post_students = async ( req, res) => {
                         "manual_verification": student.manual_verification,
                         "overall_status": student.overall_status,
                         "arrival_date": student.arrival_date,
+                        "city": student.city,
+                        "is_containment_zone": student.is_containment_zone, 
                         "pdf": student.pdf,
                         "consent_form": student.consent_form
                     }
@@ -87,6 +89,8 @@ const post_students = async ( req, res) => {
                     "manual_verification": student.manual_verification,
                     "overall_status": student.overall_status,
                     "arrival_date": student.arrival_date,
+                    "city": student.city,
+                    "is_containment_zone": student.is_containment_zone, 
                     "pdf": student.pdf,
                     "consent_form": student.consent_form
                 }

@@ -20,9 +20,13 @@ import {
     Checkbox,
     CheckboxGroup
 } from '@chakra-ui/react'
+
 import {
     Link
   } from "react-router-dom";
+
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css";
 
 const Landing = () => {
 
@@ -34,8 +38,11 @@ const Landing = () => {
     const [checkedMV, setCheckedMV] = useState(["FAILED", "PENDING", "DONE"])
     const [checkedAV, setCheckedAV] = useState(["FAILED", "PENDING", "DONE"])
 
+    const [startDate, setStartDate] = useState(new Date("2021/09/01"));
+    const [endDate, setEndDate] = useState(new Date("2021/09/25"));
+
     const getData = () => {
-        fetch('https://vaccination.bits-dvm.org/api/admin/students', { // Your POST endpoint
+        fetch('https://vaccination.bits-dvm.org/api/admin/students', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -47,6 +54,10 @@ const Landing = () => {
                     "auto_verification" : checkedAV,
                     "manual_verification" : checkedMV,
                     "vaccination_status" : checkedVS,
+                },
+                "between" : {
+                    "start" : startDate,
+                    "end" : endDate
                 }
             })
         }).then(response => 
@@ -64,7 +75,6 @@ const Landing = () => {
             }
     }))}
 
-    
     useEffect(() => {
         getData();
     }, [])
@@ -83,8 +93,45 @@ const Landing = () => {
         }
     }
 
+    // date cleaner function
+    const cleanDate = (dateTime) => {
+        // ISO: 2002-08-09T10:33:30.000Z
+
+        const date = dateTime.substring(0, 10)
+        const time = dateTime.substring(11, 16)
+
+        const month = date.substring(5,7)
+        const year = date.substring(0,4)
+        const day = date.substring(8,10)
+
+        const months = [
+            ["January", "01"],
+            ["Feburary", "02"],
+            ["March", "03"],
+            ["April", "04"],
+            ["May", "05"],
+            ["June", "06"],
+            ["July", "07"],
+            ["August", "08"],
+            ["September", "09"],
+            ["October", "10"],
+            ["November", "11"],
+            ["December", "12"],
+        ]
+
+        let monthName = "";
+        for (let i = 0; i < 12; i++) {
+            if (month === months[i][1]) monthName = months[i][0]
+        }
+
+        return (time+" | "+day+" "+monthName+", "+year)
+    }
+
+
+
     return (
         <>
+        
         { table ? 
         <> 
         <Flex 
@@ -110,9 +157,87 @@ const Landing = () => {
                     color="#141B41"
                 >BITS Vaccine Portal Admin</Heading>
 
-                <Flex flexDir="row">
+                
+            </Flex>
+
+        <Flex flexDir="column" width="90vw" flexWrap="wrap" alignItems="center" justifyContent="center">
+            
+            <Flex flexDir="column" width="80vw" bg="#F5F5F5" padding="10px" position="sticky" borderRadius="20px" flexWrap="wrap">
+                <Flex flexDir="row" flexWrap="wrap" justifyContent="space-between">
+                    <Flex flexDir="column" padding="10px">
+                        <Text fontWeight="bold">Vaccination Status</Text>
+                        <CheckboxGroup
+                            onChange={setCheckedVS}
+                            value={checkedVS}>
+                            <Stack direction="row" flexWrap="wrap">
+                                <Checkbox value="NONE">None</Checkbox>
+                                <Checkbox value="PARTIAL">Partial</Checkbox>
+                                <Checkbox value="COMPLETE">Complete</Checkbox>
+                            </Stack>
+                            {/* <Text>{checkedVS}</Text> */}
+                        </CheckboxGroup>
+                    </Flex>
+
+                    <Flex flexDir="column" padding="10px">
+                        <Text fontWeight="bold">Auto Verification</Text>
+                        <CheckboxGroup
+                        onChange={setCheckedAV}
+                        value={checkedAV}>
+                            <Stack direction="row" flexWrap="wrap">
+                                <Checkbox value="FAILED">Failed</Checkbox>
+                                <Checkbox value="PENDING">Pending</Checkbox>
+                                <Checkbox value="DONE">Done</Checkbox>
+                            </Stack>
+                            {/* <Text>{checkedAV}</Text> */}
+                            </CheckboxGroup>
+                    </Flex>
+
+                    <Flex flexDir="column" padding="10px">
+                        <Text fontWeight="bold">Manual Verification</Text>
+                        <CheckboxGroup 
+                        onChange={setCheckedMV}
+                        value={checkedMV}>
+                            <Stack direction="row" flexWrap="wrap">
+                                <Checkbox value="FAILED">Failed</Checkbox>
+                                <Checkbox value="PENDING">Pending</Checkbox>
+                                <Checkbox value="DONE">Done</Checkbox>
+                            </Stack>
+                            {/* <Text>{checkedMV}</Text> */}
+                            </CheckboxGroup>
+                    </Flex>
+                    
+                    <Flex flexDir="column" padding="10px">
+                        <Text fontWeight="bold">Start Date</Text>
+                        <DatePicker
+                            selected={startDate}
+                            onChange={(date) => setStartDate(date)}
+                            selectsStart
+                            startDate={startDate}
+                            endDate={endDate}
+                        />
+                        <Text mt="5px" fontWeight="bold">End Date</Text>
+                        <DatePicker
+                            selected={endDate}
+                            onChange={(date) => setEndDate(date)}
+                            selectsEnd
+                            startDate={startDate}
+                            endDate={endDate}
+                            minDate={startDate}
+                        />
+                    </Flex>
+                </Flex>
+                <Flex alignItems="center" justifyContent="center">
+                    <Button width="200px" m="20px" onClick={getData} colorScheme="blue">Filter</Button>
+                </Flex>
+                
+            </Flex>
+            
+        
+
+            <Flex flexDir="row" m="20px">
                     <Button 
                         size="sm"
+                        variant="outline"
                         colorScheme="blue"
                         onClick={previousPage}
                         width="80px"
@@ -120,74 +245,27 @@ const Landing = () => {
                     <Text 
                         mr="10px"
                         ml="10px"
-                        fontSize="24px"
+                        fontSize="20px"
                         fontWeight="bold"
                     >{ page } of { total_pages }</Text>
                     <Button
                         colorScheme="blue"
                         onClick={nextPage}
+                        variant="outline"
                         width="80px"
                         size="sm"
                     >Next</Button>
                 </Flex>
-            </Flex>
-
-        <Flex flexDir="row" width="90vw" flexWrap="wrap" >
-            <Flex flexDir="column" width="20vw" bg="#F5F5F5" padding="10px" borderRadius="20px">
-                <Flex flexDir="column" padding="10px">
-                    <Text fontWeight="bold">Vaccination Status</Text>
-                    <CheckboxGroup
-                        onChange={setCheckedVS}
-                        value={checkedVS}>
-                        <Stack direction="row" flexWrap="wrap">
-                            <Checkbox value="NONE">None</Checkbox>
-                            <Checkbox value="PARTIAL">Partial</Checkbox>
-                            <Checkbox value="COMPLETE">Complete</Checkbox>
-                        </Stack>
-                        {/* <Text>{checkedVS}</Text> */}
-                    </CheckboxGroup>
-                </Flex>
-
-                <Flex flexDir="column" padding="10px">
-                    <Text fontWeight="bold">Auto Verification</Text>
-                    <CheckboxGroup
-                    onChange={setCheckedAV}
-                    value={checkedAV}>
-                        <Stack direction="row" flexWrap="wrap">
-                            <Checkbox value="FAILED">Failed</Checkbox>
-                            <Checkbox value="PENDING">Pending</Checkbox>
-                            <Checkbox value="DONE">Done</Checkbox>
-                        </Stack>
-                        {/* <Text>{checkedAV}</Text> */}
-                        </CheckboxGroup>
-                </Flex>
-
-                <Flex flexDir="column" padding="10px">
-                    <Text fontWeight="bold">Manual Verification</Text>
-                    <CheckboxGroup 
-                    onChange={setCheckedMV}
-                    value={checkedMV}>
-                        <Stack direction="row" flexWrap="wrap">
-                            <Checkbox value="FAILED">Failed</Checkbox>
-                            <Checkbox value="PENDING">Pending</Checkbox>
-                            <Checkbox value="DONE">Done</Checkbox>
-                        </Stack>
-                        {/* <Text>{checkedMV}</Text> */}
-                        </CheckboxGroup>
-                </Flex>
-                <Button mt="10px" onClick={getData} colorScheme="blue">Filter</Button>
-            </Flex>
-        
             
-
+            
             { table ?  
+            <Box width="90%" overflowX="scroll">
             <Table 
                 variant="simple" 
-                size="md" 
-                width="70vw" 
+                size="sm" 
+                width="80vw" 
                 mb="50px" 
                 mt="20px"
-                overflow="scroll"
             >
                 <TableCaption>BITS Students' Vaccination Status</TableCaption>
 
@@ -199,6 +277,9 @@ const Landing = () => {
                         <Th>VACCINATION STATUS</Th>
                         <Th>AUTO VERIFICATION</Th>
                         <Th>MANUAL VERIFICATION</Th>
+                        <Th>REPORTING DATE</Th>
+                        <Th>CITY</Th>
+                        <Th>CONTAINMENT ZONE</Th>
                         <Th>VIEW MORE</Th>
                     </Tr>
                 </Thead>
@@ -211,24 +292,46 @@ const Landing = () => {
                             <Text color="green" fontWeight="bold">Verified</Text> :
                             <Text color="red" fontWeight="bold">Unverified</Text> }
                         </Td>
+
                         <Td>
                             <Text color="black" fontWeight="bold">{ student.name }</Text>
                         </Td>
+
                         <Td>
                             <Text color="grey" fontWeight="bold">{ student.email }</Text>
                         </Td>
+
                         <Td>
                             <Text color="grey" fontWeight="bold">{ student.vaccination_status }</Text>
                         </Td>
+                        
                         <Td>
                             <Text color="grey" fontWeight="bold">{ student.auto_verification }</Text>
                         </Td>
+
                         <Td>
                             <Text color="grey" fontWeight="bold">{ student.manual_verification }</Text>
                         </Td>
 
+                        <Td>
+                            <Text color="grey" fontWeight="bold">{ cleanDate(student.arrival_date) }</Text>
+                        </Td>
+
+                        <Td>
+                            <Text color="grey" fontWeight="bold">{ student.city }</Text>
+                        </Td>
+
+                        { student.is_containment_zone ? 
+                        <Td>
+                            <Text color="red" fontWeight="bold">YES</Text>
+                        </Td> :
+                        <Td>
+                            <Text color="green" fontWeight="bold">NO</Text>
+                        </Td>}
+                        
+
                         <Link to={"/student/"+student._id}>
-                            <Button mt="15px">View More</Button>
+                            <Button size="sm" mt="10px">View More</Button>
                         </Link>
                     </Tr>
                     ))}
@@ -242,10 +345,13 @@ const Landing = () => {
                         <Th>VACCINATION STATUS</Th>
                         <Th>AUTO VERIFICATION</Th>
                         <Th>MANUAL VERIFICATION</Th>
+                        <Th>REPORTING DATE</Th>
+                        <Th>CITY</Th>
+                        <Th>CONTAINMENT ZONE</Th>
                         <Th>VIEW MORE</Th>
                     </Tr>
                 </Tfoot>
-            </Table>
+            </Table></Box>
          : <Spinner />}
          </Flex>
         </Flex>

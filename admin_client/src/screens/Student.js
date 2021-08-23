@@ -102,6 +102,40 @@ const Student = () => {
             }
     }))}
 
+    // date cleaner function
+    const cleanDate = (dateTime) => {
+        // 2002-08-09T10:33:30.000Z
+
+        const date = dateTime.substring(0, 10)
+        const time = dateTime.substring(11, 16)
+        
+        const month = date.substring(5,7)
+        const year = date.substring(0,4)
+        const day = date.substring(8,10)
+
+        const months = [
+            ["January", "01"],
+            ["Feburary", "02"],
+            ["March", "03"],
+            ["April", "04"],
+            ["May", "05"],
+            ["June", "06"],
+            ["July", "07"],
+            ["August", "08"],
+            ["September", "09"],
+            ["October", "10"],
+            ["November", "11"],
+            ["December", "12"],
+        ]
+
+        let monthName = "";
+        for (let i = 0; i < 12; i++) {
+            if (month === months[i][1]) monthName = months[i][0]
+        }
+
+        return (time+" | "+day+" "+monthName+", "+year)
+    }
+
 
     const getConsent = () => {
         fetch('https://vaccination.bits-dvm.org/api/admin/get_consent', { // Your POST endpoint
@@ -217,6 +251,21 @@ const Student = () => {
                         <Radio value="3">Done</Radio>
                     </Stack>
                 </RadioGroup>
+           </Flex>
+
+           <Flex flexDir="row" width="50vw" padding="10px" justifyContent="space-between" alignItems="center">
+               <Text>City</Text>
+               <Text>{ student.city }</Text>
+           </Flex>
+
+           <Flex flexDir="row" width="50vw" padding="10px" justifyContent="space-between" alignItems="center">
+               <Text>Containment Zone</Text>
+               { student.is_containment_zone ? <Text color="green">Yes</Text> : <Text color="red">No</Text> }
+           </Flex>
+
+           <Flex flexDir="row" width="50vw" padding="10px" justifyContent="space-between" alignItems="center">
+               <Text>Arrival Date</Text>
+               <Text>{ cleanDate(student.arrival_date) }</Text>
            </Flex>
 
            <Flex flexDir="row" width="50vw" padding="20px" justifyContent="center" alignItems="center">
