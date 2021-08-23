@@ -287,6 +287,7 @@ const save_data = async (req, res) => {
                    // find db student instance
                 var student = await Student.findOneAndUpdate({email: req.session["student"].email}, {
                     vaccine: vac, 
+		    pdf: file_name,
                     pdf_data: fs.readFileSync(path.join(file_name)),
                     latest_dose_date: vac.QR.evidence[0].date
                     }, {new: true}

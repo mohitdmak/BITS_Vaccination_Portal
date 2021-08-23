@@ -67,9 +67,9 @@ const post_students = async ( req, res) => {
         var batch = req.body.batch;
 
         // edit entries by batch
-        if(batch != undefined){
+        if(batch.length){
             students.forEach(function(student, index, theArray){
-                if(String(student.email.substr(1, 4)) != batch){
+                if(batch.indexOf(String(student.email.substr(1, 4))) < 0){
                     console.log(student.email.substr(1, 4));
                     theArray.splice(index, 1);
                 }
