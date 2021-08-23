@@ -49,9 +49,23 @@ const post_students = async ( req, res) => {
         // update pagination
         var students = await Student.find(filters).skip((page-1) * page_limit).limit(page_limit);
         console.log(students);
+
         // get filter dates
         var beggining = Date.parse(req.body.between.start);
         var ending = Date.parse(req.body.between.end);
+
+        // get batchwise filter
+        var batch = req.body.batch;
+
+        // edit entries by batch
+        if(batch != undefined){
+            students.forEach(function(student, index, theArray){
+                if(String(student.email.substr(1, 4)) != batch){
+                    console.log(student.email.substr(1, 4));
+                    theArray.splice(index, 1);
+                }
+            });
+        }
 
         // edit all entries for student
         students.forEach(function(student, index, theArray){
