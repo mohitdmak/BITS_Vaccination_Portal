@@ -152,7 +152,7 @@ const set_session_data = async (user, req, res) => {
         var student = await Student.find({email: user.data.email});
         if(student.length){
             req.session["student"] = student[0];
-	    res.redirect("/");
+            res.redirect("/");
         }
         else{
             // creating student model
@@ -327,16 +327,16 @@ const get_data = async (req, res) => {
 // landing page
 const get_auth_url = (req, res) => {
     try{
-	if(req.query.page == 'admin'){
-	    var url = AdmingetAuthUrl();
-	    console.log(url);
-	    res.redirect(url);
-	}
-	else{
-	    var url = getAuthUrl();
-            // res.status(200).json({"authentication_url": url});
+        if(req.query.page == 'admin'){
+            var url = AdmingetAuthUrl();
+            console.log(url);
             res.redirect(url);
-	}
+        }
+        else{
+            var url = getAuthUrl();
+                // res.status(200).json({"authentication_url": url});
+                res.redirect(url);
+        }
     }catch(err){
         console.log(err);
         res.status(500).json({"error": err});

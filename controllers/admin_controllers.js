@@ -48,21 +48,48 @@ const post_students = async ( req, res) => {
 
         // update pagination
         var students = await Student.find(filters).skip((page-1) * page_limit).limit(page_limit);
+        console.log(students);
+        // get filter dates
+        var beggining = Date.parse(req.body.between.start);
+        var ending = Date.parse(req.body.between.end);
 
         // edit all entries for student
         students.forEach(function(student, index, theArray){
-            theArray[index] = {
-                "_id": student._id,
-                "pic": student.pic,
-                "name": student.name,
-                "email": student.email,
-                "vaccination_status": student.vaccination_status,
-                "auto_verification": student.auto_verification,
-                "manual_verification": student.manual_verification,
-                "overall_status": student.overall_status,
-                "arrival_date": student.arrival_date,
-                "pdf": student.pdf,
-                "consent_form": student.consent_form
+            if((beggining != undefined && ending != undefined)){
+                if( beggining <= Date.parse(student.arrival_date) && Date.parse(student.arrival_date) <= ending){
+                    theArray[index] = {
+                        "_id": student._id,
+                        "pic": student.pic,
+                        "name": student.name,
+                        "email": student.email,
+                        "vaccination_status": student.vaccination_status,
+                        "auto_verification": student.auto_verification,
+                        "manual_verification": student.manual_verification,
+                        "overall_status": student.overall_status,
+                        "arrival_date": student.arrival_date,
+                        "pdf": student.pdf,
+                        "consent_form": student.consent_form
+                    }
+                }
+                else{
+                    console.log("removed, not in time range");
+                    theArray.splice(index, 1);
+                }
+            }
+            else{
+                theArray[index] = {
+                    "_id": student._id,
+                    "pic": student.pic,
+                    "name": student.name,
+                    "email": student.email,
+                    "vaccination_status": student.vaccination_status,
+                    "auto_verification": student.auto_verification,
+                    "manual_verification": student.manual_verification,
+                    "overall_status": student.overall_status,
+                    "arrival_date": student.arrival_date,
+                    "pdf": student.pdf,
+                    "consent_form": student.consent_form
+                }
             }
         });
         console.log("	ADMIN PROVIDED STUDENTS LIST");
@@ -156,26 +183,26 @@ const get_pdf = async (req, res) => {
     // get current logged in student
     try{
         // get downloaded file path
-	var id = req.body._id;
-	var student = await Student.findById(id);
-	if(student.pdf){
-		var serve_file = student.pdf;
-		console.log("\n		Serving PDF file at : ");
-		console.log(String(serve_file)); 
-		res.download(String(serve_file), function(err){
-		    if(err){
-			console.log(err);
-			res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
-		    }
-		    else{
-			console.log("File served .");
-		    }
-        });
-	}
-	else{
-		console.log("NO PDF FILE FOUND FOR STUDENT REQUESTED BY ADMIN");
-		res.status(400).json({"error": "NO FILE FOUND ON SERVER"});
-	}
+        var id = req.body._id;
+        var student = await Student.findById(id);
+        if(student.pdf){
+            var serve_file = student.pdf;
+            console.log("\n		Serving PDF file at : ");
+            console.log(String(serve_file)); 
+            res.download(String(serve_file), function(err){
+                if(err){
+                    console.log(err);
+                    res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
+                }
+                else{
+                    console.log("File served .");
+                }
+            });
+        }
+        else{
+            console.log("NO PDF FILE FOUND FOR STUDENT REQUESTED BY ADMIN");
+            res.status(400).json({"error": "NO FILE FOUND ON SERVER"});
+        }
     }
     // forward login errors
     catch(err){
@@ -191,28 +218,28 @@ const get_consent = async (req, res) => {
     // get current logged in student
     try{
         // get downloaded file path
-	var id = req.body._id;
-	var student = await Student.findById(id);
-	if(student.consent_form){
-		var serve_file = student.consent_form;
-		console.log("\n		Serving PDF file at : ");
-		console.log(String(serve_file)); 
-		res.download(String(serve_file), function(err){
-		    if(err){
-			console.log(err);
-			res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
-		    }
-		    else{
-			console.log("File served .");
-		    }
-        });
-	}
-	else{
-		console.log("NO PDF FILE FOUND FOR STUDENT REQUESTED BY ADMIN");
-		res.status(400).json({"error": "NO FILE FOUND ON SERVER"});
-	}
-    }
-    // forward login errors
+        var id = req.body._id;
+        var student = await Student.findById(id);
+        if(student.consent_form){
+            var serve_file = student.consent_form;
+            console.log("\n		Serving PDF file at : ");
+            console.log(String(serve_file)); 
+            res.download(String(serve_file), function(err){
+                if(err){
+                console.log(err);
+                res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
+                }
+                else{
+                console.log("File served .");
+                }
+            });
+        }
+        else{
+            console.log("NO PDF FILE FOUND FOR STUDENT REQUESTED BY ADMIN");
+            res.status(400).json({"error": "NO FILE FOUND ON SERVER"});
+        }
+        }
+        // forward login errors
     catch(err){
         console.log(err);
         res.status(500).json({"error": err});
