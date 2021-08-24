@@ -7,6 +7,32 @@ const app = express();
 // import cors module
 const cors = require("cors");
 
+const Sentry = require('@sentry/node');
+const Tracing = require("@sentry/tracing");
+
+Sentry.init({
+  dsn: "https://82f368f549ed43fbb3db4437ac2b2c79@o562134.ingest.sentry.io/5923095",
+  integrations: [
+    // enable HTTP calls tracing
+    new Sentry.Integrations.Http({ tracing: true }),
+    // enable Express.js middleware tracing
+    new Tracing.Integrations.Express({ app }),
+  ],
+
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+});
+
+// RequestHandler creates a separate execution context using domains, so that every
+// transaction/span/breadcrumb is attached to its own Hub instance
+app.use(Sentry.Handlers.requestHandler());
+// TracingHandler creates a trace for every incoming request
+app.use(Sentry.Handlers.tracingHandler());
+app.use(Sentry.Handlers.errorHandler());
+
+
 
 //* MIDDLEWARE :
 
@@ -106,18 +132,34 @@ app.use(Session({
 // app.use(forest_conf);
 
 
-var multer = require('multer');
-app.use(function (err, req, res, next){
-    console.log('\nfdsg\n');
-    if(err instanceof multer.MulterError){
-        console.log(err);
-        return res.status(418).send(err.code);
-    }
-    else{
-        console.log('\ngg');
-        next();
-    }
+
+
+// Optional fallthrough error handler
+//app.use(function onError(err, req, res, next) {
+  // The error id is attached to `res.sentry` to be returned
+  // and optionally displayed to the user for support.
+  //res.statusCode = 500;
+  //res.end(res.sentry + "\n");
+//});
+app.get("/api/debug-sentry", function mainHandler(req, res) {
+  console.log("DEBUG SENTRY");
+  throw new Error("Test Sentry error!");
 });
+
+
+
+// multer errors
+var multer = require('multer');
+//app.use(function (err, req, res, next){
+//    if(err instanceof multer.MulterError){
+//        console.log(err);
+//        res.status(500).send(err.code);
+//    }
+//    else{
+//        console.log('\nError caught');
+//        next();
+//   }
+//});
 
 //* ROUTES :
 

@@ -22,6 +22,8 @@
   "dependencies": {
     "@admin-bro/express": "^3.1.0",
     "@admin-bro/mongoose": "^1.1.0",
+    "@sentry/node": "^6.11.0",
+    "@sentry/tracing": "^6.11.0",
     "admin-bro": "^4.0.1",
     "bcryptjs": "^2.4.3",
     "connect-redis": "^6.0.0",

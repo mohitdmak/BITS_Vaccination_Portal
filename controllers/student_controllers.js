@@ -288,8 +288,7 @@ const save_data = async (req, res) => {
                 var student = await Student.findOneAndUpdate({email: req.session["student"].email}, {
                     vaccine: vac, 
 		    pdf: file_name,
-                    pdf_data: fs.readFileSync(path.join(file_name)),
-                    latest_dose_date: vac.QR.evidence[0].date
+                    pdf_data: fs.readFileSync(path.join(file_name))
                     }, {new: true}
                 );
 
@@ -376,10 +375,10 @@ const verify_authenticity = async (req,res) => {
             // student.vaccine.QR.evidence[0].dose = 2
             var new_student;
             if(Number(student.vaccine.QR.evidence[0].dose) > 0 && Number(student.vaccine.QR.evidence[0].dose < student.vaccine.QR.evidence[0].totalDoses)){
-                new_student = await Student.findOneAndUpdate({email: student.email}, {auto_verification: 'DONE', vaccination_status: 'PARTIAL'}, {new: true});
+                new_student = await Student.findOneAndUpdate({email: student.email}, {auto_verification: 'DONE', vaccination_status: 'PARTIAL', latest_dose_date: student.vaccine.QR.evidence[0].date }, {new: true});
             }
             else if(Number(student.vaccine.QR.evidence[0].dose) > 0 && Number(student.vaccine.QR.evidence[0].dose) == Number(student.vaccine.QR.evidence[0].totalDoses)){
-                new_student = await Student.findOneAndUpdate({email: student.email}, {auto_verification: 'DONE', vaccination_status: 'COMPLETE'}, {new: true});
+                new_student = await Student.findOneAndUpdate({email: student.email}, {auto_verification: 'DONE', vaccination_status: 'COMPLETE',  latest_dose_date: student.vaccine.QR.evidence[0].date }, {new: true});
             }
             else if(Number(student.vaccine.QR.evidence[0].dose) == 0){
                 new_student = await Student.findOneAndUpdate({email: student.email}, {auto_verification: 'DONE', vaccination_status: 'NONE'}, {new: true});

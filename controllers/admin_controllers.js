@@ -57,7 +57,6 @@ const post_students = async ( req, res) => {
 
         // update pagination
         var students = await Student.find(filters).skip((page-1) * page_limit).limit(page_limit);
-        console.log(students);
 
         // get filter dates
         var beggining = Date.parse(req.body.between.start);
@@ -68,58 +67,64 @@ const post_students = async ( req, res) => {
 
         // edit entries by batch
         if(batch.length){
-            students.forEach(function(student, index, theArray){
-                if(batch.indexOf(String(student.email.substr(1, 4))) < 0){
-                    console.log(student.email.substr(1, 4));
-                    theArray.splice(index, 1);
+	    console.log(req.body);
+	    for (let i = 0; i < students.length; i++) {
+                if(batch.indexOf(String(students[i].email.substr(1, 4))) > 2 || batch.indexOf(String(students[i].email.substr(1, 4))) < 0){
+                    console.log(students[i].email.substr(1, 4));
+                    students.splice(i, 1);
+		    i--;
                 }
-            });
+            }
         }
 
         // edit all entries for student
-        students.forEach(function(student, index, theArray){
+        //students.forEach(function(student, index, theArray){
+        for (let i = 0; i < students.length; i++) {
             if((beggining != undefined && ending != undefined)){
-                if( beggining <= Date.parse(student.arrival_date) && Date.parse(student.arrival_date) <= ending){
-                    theArray[index] = {
-                        "_id": student._id,
-                        "pic": student.pic,
-                        "name": student.name,
-                        "email": student.email,
-                        "vaccination_status": student.vaccination_status,
-                        "auto_verification": student.auto_verification,
-                        "manual_verification": student.manual_verification,
-                        "overall_status": student.overall_status,
-                        "arrival_date": student.arrival_date,
-                        "city": student.city,
-                        "is_containment_zone": student.is_containment_zone, 
-                        "pdf": student.pdf,
-                        "consent_form": student.consent_form
+                if( beggining <= Date.parse(students[i].arrival_date) && Date.parse(students[i].arrival_date) <= ending){
+                    students[i] = {
+                        "_id": students[i]._id,
+                        "pic": students[i].pic,
+                        "name": students[i].name,
+                        "email": students[i].email,
+                        "vaccination_status": students[i].vaccination_status,
+                        "auto_verification": students[i].auto_verification,
+                        "manual_verification": students[i].manual_verification,
+                        "overall_status": students[i].overall_status,
+                        "arrival_date": students[i].arrival_date,
+                        "city": students[i].city,
+                        "is_containment_zone": students[i].is_containment_zone, 
+                        "pdf": students[i].pdf,
+                        "consent_form": students[i].consent_form
                     }
                 }
                 else{
-                    console.log("removed, not in time range");
-                    theArray.splice(index, 1);
+                    console.log("removed, not in time range :");
+		    console.log(students[i]);
+                    students.splice(i, 1);
+		    i--;
                 }
             }
             else{
-                theArray[index] = {
-                    "_id": student._id,
-                    "pic": student.pic,
-                    "name": student.name,
-                    "email": student.email,
-                    "vaccination_status": student.vaccination_status,
-                    "auto_verification": student.auto_verification,
-                    "manual_verification": student.manual_verification,
-                    "overall_status": student.overall_status,
-                    "arrival_date": student.arrival_date,
-                    "city": student.city,
-                    "is_containment_zone": student.is_containment_zone, 
-                    "pdf": student.pdf,
-                    "consent_form": student.consent_form
+                students[i] = {
+                    "_id": students[i]._id,
+                    "pic": students[i].pic,
+                    "name": students[i].name,
+                    "email": students[i].email,
+                    "vaccination_status": students[i].vaccination_status,
+                    "auto_verification": students[i].auto_verification,
+                    "manual_verification": students[i].manual_verification,
+                    "overall_status": students[i].overall_status,
+                    "arrival_date": students[i].arrival_date,
+                    "city": students[i].city,
+                    "is_containment_zone": students[i].is_containment_zone, 
+                    "pdf": students[i].pdf,
+                    "consent_form": students[i].consent_form
                 }
             }
-        });
+        }
         console.log("	ADMIN PROVIDED STUDENTS LIST");
+	console.log(students);
         res.status(200).json({
             "total_pages": total_pages,
             "data": students
