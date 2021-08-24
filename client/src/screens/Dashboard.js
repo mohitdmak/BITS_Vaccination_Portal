@@ -26,7 +26,7 @@ import "react-datepicker/dist/react-datepicker.css";
 const Dashboard = (props) => {
 
     // USER STATE ITEMS
-    const [name, setName] = useState("")
+    const [name, setName] = useState("a")
     const [pp, setPP] = useState("")
     const [campus, setCampus] = useState("")
     const [certificate, setCertificate] = useState(false)
@@ -37,7 +37,7 @@ const Dashboard = (props) => {
     const [isContainment, setIsContainment] = useState(false)
     const [checkedItems, setCheckedItems] = useState([false, false, false])
     const [arrival, setArrival] = useState(new Date())
-
+    
     // IMAGE RESOURCE CONSTANTS
     const bits = "https://is5-ssl.mzstatic.com/image/thumb/Purple124/v4/b4/20/40/b420401e-c883-b363-03b5-34509d67c214/source/512x512bb.jpg"
     const dvm = "https://i.imgur.com/1F85BuH.png"
@@ -51,8 +51,7 @@ const Dashboard = (props) => {
 
     // ARRIVAL CLEANUP 
     const arrivalHandler = (arrivalDT) => {
-        console.log(arrivalDT)
-        setArrival(arrivalDT.toISOString())
+        setArrival(arrivalDT)
     }
 
     // VERIFICATION STATUS CALCULATOR
@@ -132,7 +131,7 @@ const Dashboard = (props) => {
                 "is_medically_fit": checkedItems[0],
                 "TnC1_Agreement": checkedItems[1],
                 "TnC2_Agreement": checkedItems[2],
-                "arrival_date": arrival,
+                "arrival_date": (arrival).toISOString(),
             }),
             headers: {
                 'Content-Type': 'application/json',
@@ -515,7 +514,7 @@ const Dashboard = (props) => {
                             <Flex flexDir="row" alignItems="center">
                                 <CalendarIcon mr="15px" />
                                 <DatePicker
-                                    selected={arrival}
+                                    selected={(arrival)}
                                     onChange={(date) => {
                                         console.log(date)
                                         arrivalHandler(date)

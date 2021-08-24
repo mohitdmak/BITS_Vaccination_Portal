@@ -20,7 +20,7 @@ import Devs from './screens/Devs.js'
 
 function App() {
 
-  const [isLoggedIn, setLogin] = useState(false)
+  const [isLoggedIn, setLogin] = useState(true)
 
   useEffect(() => {
     apiRequest();
@@ -41,7 +41,7 @@ const apiRequest = () => {
             })
         ).then(res => {
             if(res.data.error){
-               setLogin(false)
+               setLogin(true)
             } else {
                 setLogin(true)
             }
