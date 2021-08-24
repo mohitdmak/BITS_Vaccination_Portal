@@ -15,43 +15,54 @@ import {
     Checkbox,
     Stack,
 } from '@chakra-ui/react'
-
-import DatePicker from "react-datepicker";
-
-import "react-datepicker/dist/react-datepicker.css";
+import { CalendarIcon } from '@chakra-ui/icons'
 
 // import date-fns
 import { parseISO } from 'date-fns'
-
-// import {
-//     Link,
-// } from "react-router-dom";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 
 const Dashboard = (props) => {
 
+    // USER STATE ITEMS
     const [name, setName] = useState("")
     const [pp, setPP] = useState("")
     const [campus, setCampus] = useState("")
     const [certificate, setCertificate] = useState(false)
     const [consent, setConsent] = useState(false)
     const [status, setStatus] = useState("NONE")
-    const [one, setOne] = useState(0)
+    const [one, setOne] = useState(2)
     const [city, setCity] = useState("")
     const [isContainment, setIsContainment] = useState(false)
     const [checkedItems, setCheckedItems] = useState([false, false, false])
     const [arrival, setArrival] = useState(new Date())
 
+    // IMAGE RESOURCE CONSTANTS
+    const bits = "https://is5-ssl.mzstatic.com/image/thumb/Purple124/v4/b4/20/40/b420401e-c883-b363-03b5-34509d67c214/source/512x512bb.jpg"
+    const dvm = "https://i.imgur.com/1F85BuH.png"
+    const done = "https://i.imgur.com/nzWA3lo.png"
+    const pending = "https://i.imgur.com/wBu34AZ.png"
+    const no = "https://i.imgur.com/RiobXwU.png"
+
+    // CHECKBOX STATES
     const allChecked = checkedItems.every(Boolean)
     const isIndeterminate = checkedItems.some(Boolean) && !allChecked
 
+    // ARRIVAL CLEANUP 
+    const arrivalHandler = (arrivalDT) => {
+        console.log(arrivalDT)
+        setArrival(arrivalDT.toISOString())
+    }
 
+    // VERIFICATION STATUS CALCULATOR
     function verifiedStatusCalc(auto, manual) {
         if (manual !== "PENDING") return manual;
         else if (auto === "FAILED") return manual;
         else return auto;
     }
 
+    // CLEAN AUTO/MANUAL VERIFICATION
     function cleanOne(auto, manual) {
         const verifiedStatus = verifiedStatusCalc(auto, manual);
         if (verifiedStatus === "PENDING") setOne(0)
@@ -59,148 +70,7 @@ const Dashboard = (props) => {
         else setOne(2)
     }
 
-    const bits = "https://is5-ssl.mzstatic.com/image/thumb/Purple124/v4/b4/20/40/b420401e-c883-b363-03b5-34509d67c214/source/512x512bb.jpg"
-    const dvm = "https://avatars.githubusercontent.com/u/14038814?s=200&v=4"
-
-    const done = "https://i.imgur.com/nzWA3lo.png"
-    const pending = "https://i.imgur.com/wBu34AZ.png"
-    const no = "https://i.imgur.com/RiobXwU.png"
-
-    useEffect(() => {
-        apiRequest();
-    }, []);
-
-    // This will upload the file after having read it
-    const upload = (data) => {
-        fetch('https://vaccination.bits-dvm.org/api/student/post_pdf', { // Your POST endpoint
-            method: 'POST',
-            body: data // This is your file object
-        }).then(
-            response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                return Promise.reject(response);
-            }
-        ).then(
-            success => {
-                apiRequest();
-                alert("File successfully uploaded!")
-            }
-        ).catch(
-            err => {
-                return err.json().then(errormsg => {
-                    alert("Your PDF was not accepted due to the following error: " + errormsg?.error)
-                })
-                
-            }
-        );
-    };
-
-    const upload2 = (data) => {
-        fetch('https://vaccination.bits-dvm.org/api/student/post_consent', { // Your POST endpoint
-            method: 'POST',
-            body: data // This is your file object
-        }).then(
-            response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                return Promise.reject(response);
-            }
-        ).then(
-            success => {
-                apiRequest();
-                alert("File successfully uploaded!")
-            }
-        ).catch(
-            err => {
-                return err.json().then(errormsg => {
-                    alert("Your PDF was not accepted due to the following error: " + errormsg?.error)
-                })
-            }
-        );
-    };
-
-    const extraDetailsPost = () => {
-        console.log("Extras")
-        console.log(
-            {
-                "city": city,
-                "is_containment_zone": isContainment,
-                "is_medically_fit": checkedItems[0], // should be is_medically_fit
-                "TnC1_Agreement": checkedItems[1],
-                "TnC2_Agreement": checkedItems[2],
-                "arrival_date": arrival,
-            }
-        )
-        fetch('https://vaccination.bits-dvm.org/api/student/extra', { // Your POST endpoint
-            method: 'POST',
-            body: JSON.stringify({
-                "city": city,
-                "is_containment_zone": isContainment,
-                "is_medically_fit": checkedItems[0], // should be is_medically_fit
-                "TnC1_Agreement": checkedItems[1],
-                "TnC2_Agreement": checkedItems[2],
-                "arrival_date": arrival,
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        }).then(
-            response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                return Promise.reject(response);
-            }
-        ).then(
-            success => {
-                alert("Details successfully saved");
-                apiRequest();
-            }
-        ).catch(
-            err => {
-                alert("Your details were not successfully saved due to error: " + err?.error)
-            }
-        );
-    };
-
-
-    const input = document.getElementById('fileinput');
-    const input2 = document.getElementById('fileinput2');
-
-    // Event handler executed when a file is selected
-    const onSelectFile = () => {
-        var data = new FormData()
-        console.log(input)
-        console.log(input.files[0])
-        if (input.files[0]) {
-            if ((input.files[0].size / 1000000) <= 1) {
-                data.append('pdf', input.files[0])
-                upload(data)
-            } else {
-                alert("File size is abnormally large.")
-            }
-        } else {
-            alert("Please choose a valid file!")
-        }
-    }
-
-    const onSelectFile2 = () => {
-        var data = new FormData()
-        if (input2.files[0]) {
-            if ((input2.files[0].size / 1000000) <= 3) {
-                data.append('consent_form', input2.files[0])
-                upload2(data)
-            } else {
-                alert("File size is abnormally large.")
-            }
-        } else {
-            alert("Please choose a valid file!")
-        }
-    }
-
+    // FUNCTION TO COMPUTE USER'S CAMPUS
     const campusCalc = (email) => {
         try {
             if (email.includes("@goa")) return "Goa Campus"
@@ -213,6 +83,7 @@ const Dashboard = (props) => {
         }
     }
 
+    // MAIN STUDENT DATA API REQUEST
     const apiRequest = () => {
         fetch('https://vaccination.bits-dvm.org/api/student/details/',
             {
@@ -227,10 +98,6 @@ const Dashboard = (props) => {
                     return response.json();
                 }
                 return Promise.reject(response);
-                // response.json().then(data => ({
-                //     data: data,
-                //     status: response.status
-                // })
             })
             .then(res => {
                 if (res.email) {
@@ -255,15 +122,167 @@ const Dashboard = (props) => {
             );
     }
 
-    return (
-        <>{name ?
+    // POST EXTRA USER INFORMATION DATA
+    const extraDetailsPost = () => {
+        fetch('https://vaccination.bits-dvm.org/api/student/extra', {
+            method: 'POST',
+            body: JSON.stringify({
+                "city": city,
+                "is_containment_zone": isContainment,
+                "is_medically_fit": checkedItems[0],
+                "TnC1_Agreement": checkedItems[1],
+                "TnC2_Agreement": checkedItems[2],
+                "arrival_date": arrival,
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(
+            response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                return Promise.reject(response);
+            }
+        ).then(
+            success => {
+                alert("Details successfully saved");
+                apiRequest();
+            }
+        ).catch(
+            err => {
+                return err.json().then(errormsg => {
+                    alert("Your details were not successfully saved due to following error: " + errormsg?.error)
+                })
+            }
+        );
+    };
 
+    // =============================================
+    // FLOW FOR UPLOADING A SELECTED CERTIFICATE PDF
+    // =============================================
+    const input = document.getElementById('fileinput');
+
+    // Event handler executed when a file is selected
+    const onSelectFile = () => {
+        var data = new FormData()
+        console.log(input)
+        console.log(input.files[0])
+        if (input.files[0]) {
+            if ((input.files[0].size / 1000000) <= 3) {
+                data.append('pdf', input.files[0])
+                upload(data)
+            } else {
+                alert("File size is abnormally large.")
+            }
+        } else {
+            alert("Please choose a valid file!")
+        }
+    }
+
+    // function to read a certificate PDF and upload it
+    const upload = (data) => {
+        fetch('https://vaccination.bits-dvm.org/api/student/post_pdf', {
+            method: 'POST',
+            body: data // this is the certificate PDF item
+        }).then(
+            response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                return Promise.reject(response);
+            }
+        ).then(
+            success => {
+                // on successful upload, reloads the user data
+                apiRequest();
+                alert("File successfully uploaded!")
+            }
+        ).catch(
+            err => {
+                // on failure, resolves error promise and alerts user
+                return err.json().then(errormsg => {
+                    alert("Your PDF was not accepted due to the following error: " + errormsg?.error)
+                })
+                
+            }
+        );
+    };
+
+    // =============================================
+    // END FLOW FOR UPLOADING A SELECTED CERTIFICATE PDF
+    // =============================================
+
+
+    // =============================================
+    // FLOW FOR UPLOADING A SELECTED CONSENT FORM PDF
+    // =============================================
+    const input2 = document.getElementById('fileinput2');
+
+    const onSelectFile2 = () => {
+        var data = new FormData()
+        if (input2.files[0]) {
+            if ((input2.files[0].size / 1000000) <= 3) {
+                data.append('consent_form', input2.files[0])
+                upload2(data)
+            } else {
+                alert("File size is abnormally large.")
+            }
+        } else {
+            alert("Please choose a valid file!")
+        }
+    }
+
+     // function to read a consent form PDF and upload it
+     const upload2 = (data) => {
+        fetch('https://vaccination.bits-dvm.org/api/student/post_consent', {
+            method: 'POST',
+            body: data // this is the consent PDF item
+        }).then(
+            response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                return Promise.reject(response);
+            }
+        ).then(
+            success => {
+                apiRequest();
+                alert("File successfully uploaded!")
+            }
+        ).catch(
+            err => {
+                return err.json().then(errormsg => {
+                    alert("Your PDF was not accepted due to the following error: " + errormsg?.error)
+                })
+            }
+        );
+    };
+
+    // =============================================
+    // END FLOW FOR UPLOADING A SELECTED CONSENT FORM PDF
+    // =============================================
+
+
+
+    // useEffect loads the user's data on first launch
+    useEffect(() => {
+        apiRequest();
+    }, []);
+
+
+
+
+    return (
+        <>
+        {name ?
             <>
                 <Flex
                     flexDir="column"
                     alignItems="center"
                     justifyContent="center"
                 >
+                    
                     {/* NAVBAR */}
                     <Flex
                         mt="20px"
@@ -372,6 +391,10 @@ const Dashboard = (props) => {
                         </Box>
                     </Flex>
 
+                    <Flex marginTop="40px" ml="5px" width={["80vw", "80vw", "80vw", "1040px", "1040px"]}>
+                        <Heading fontSize="22px">Step 1: Update your documents</Heading>
+                    </Flex>
+                    
                     <Grid
                         templateColumns={["repeat(2, 1fr)", "repeat(2, 1fr)", "repeat(2, 1fr)", "repeat(6, 1fr)", "repeat(6, 1fr)"]}
                         bg="#FAFAFA"
@@ -381,7 +404,7 @@ const Dashboard = (props) => {
                         gap={6}
                         width={["80vw", "80vw", "80vw", "1040px", "1040px"]}
                     >
-                        {/* <Flex flexDir="row" m="10px" alignItems="center"> */}
+    
                         <GridItem rowSpan={1} colSpan={2} display="flex" flexDir="row">
                             <Text fontWeight="bold">Latest Vaccine Certificate (PDF):</Text>
                             {(one === 1) ? <Image src={done} ml="10px" boxSize="30px" /> : null}
@@ -440,6 +463,11 @@ const Dashboard = (props) => {
                         {/* </Flex> */}
                     </Grid>
 
+
+                    <Flex marginTop="60px" ml="5px" width={["80vw", "80vw", "80vw", "1040px", "1040px"]}>
+                        <Heading fontSize="22px">Step 2: Provide additional information</Heading>
+                    </Flex>
+
                     <Flex
                         flexDir="column"
                         justifyContent="center"
@@ -480,21 +508,27 @@ const Dashboard = (props) => {
                             />
                         </Flex>
                         {/* Add a react date time picker */}
-                        <Flex width={"100%"} mt="40px" flexDirection={["column", "column", "row", "row", "row"]} alignItems="center" >
+                        <Flex width={"100%"} mt="40px" flexDirection="column">
                             <Flex fontWeight="bold" whiteSpace="nowrap" width={["100%", "100%", "max-content", "max-content", "max-content" ]} mr={[0, 0, "20px", "20px", "20px"]} >Date of Arrival * </Flex>
-                            <DatePicker
-                                selected={arrival}
-                                onChange={(date) => setArrival(date)}
-                                showTimeSelect
-                                dateFormat="MMMM d, yyyy h:mm aa"
-                            />
+                            <Text fontSize="14px" color="grey" mb="5px">Please select your expected date of arrival on campus.</Text>
+                            
+                            <Flex flexDir="row" alignItems="center">
+                                <CalendarIcon mr="15px" />
+                                <DatePicker
+                                    selected={arrival}
+                                    onChange={(date) => {
+                                        console.log(date)
+                                        arrivalHandler(date)
+                                    }}
+                                    showTimeSelect
+                                    dateFormat="MMMM d, yyyy h:mm aa"
+                                />
+                            </Flex>
+                            
                         </Flex>
 
                         <Box width={"100%"} mt="50px" bg="rgba(0, 0, 0, 0.05)" p="10px" borderRadius="10px" >
-                            {/* Make a checkbox group with 3 checkboxes for the following: 
-                            "I do not have fever/sore throat like symptoms and I am medically fit to travel and stay on the campus.", 
-                            "I understand the severity of the situation and will follow the suggestion given by the doctor at Medical Center, BITS Pilani and I have no objection in undergoing the COVID-19 test. The doctor's suggestion is binding. Any violation of the rule may lead to strict action as per the government/Institute rules. ", 
-                            "I agree with the conditions mentioned above. Any violation of the agreement may lead to disciplinary action. " */}
+    
                             <>
                                 <Checkbox
                                     isChecked={checkedItems}
@@ -511,22 +545,27 @@ const Dashboard = (props) => {
                                         isChecked={checkedItems[0]}
                                         onChange={(e) => setCheckedItems([e.target.checked, checkedItems[1], checkedItems[2]])}
                                         mt="10px"
+                                        mb="15px"
+                                        alignItems="flex-start"
                                     >
-                                        I do not have fever/sore throat like symptoms and I am medically fit to travel and stay on the campus.
+                                         <Text mt="-5px">I do not have fever/sore throat like symptoms and I am medically fit to travel and stay on the campus.</Text>
                                     </Checkbox>
                                     <Checkbox
                                         isChecked={checkedItems[1]}
                                         onChange={(e) => setCheckedItems([checkedItems[0], e.target.checked, checkedItems[2]])}
-                                        mt="10px"
+                                        mt="20px"
+                                        mb="25px"
+                                        alignItems="flex-start"
                                     >
-                                        I understand the severity of the situation and will follow the suggestion given by the doctor at Medical Center, BITS Pilani and I have no objection in undergoing the COVID-19 test. The doctor's suggestion is binding. Any violation of the rule may lead to strict action as per the government/Institute rules.
+                                        <Text mt="-10px">I understand the severity of the situation and will follow the suggestion given by the doctor at Medical Center, BITS Pilani and I have no objection in undergoing the COVID-19 test. The doctor's suggestion is binding. Any violation of the rule may lead to strict action as per the government/Institute rules.</Text>
                                     </Checkbox>
                                     <Checkbox
                                         isChecked={checkedItems[2]}
                                         onChange={(e) => setCheckedItems([checkedItems[0], checkedItems[1], e.target.checked])}
-                                        mt="10px"
+                                        mt="25px"
+                                        alignItems="flex-start"
                                     >
-                                        I agree with the conditions mentioned above. Any violation of the agreement may lead to disciplinary action.
+                                         <Text mt="-5px">I agree with the conditions mentioned above. Any violation of the agreement may lead to disciplinary action.</Text>
                                     </Checkbox>
                                 </Stack>
                             </>
@@ -543,16 +582,15 @@ const Dashboard = (props) => {
                                     extraDetailsPost()
                                 }
                             }}
-                            mt="60px"
-                            width={["100%", "100%", "100%", "200px", "200px"]}
-                            height={["50px", "50px", "50px", "60px", "60px"]}
-                            bg="blue"
-                            color="white"
+                            mt="20px"
+                            width={["150px", "150px", "250px", "250px", "250px"]}
+                            height={["35px", "35px", "45px", "45px", "45px"]}
+                            colorScheme="blue"
                             fontSize={["14px", "14px", "14px", "22px", "22px"]}
                             fontWeight="bold"
                             borderRadius="10px"
                         >
-                            Submit
+                            Update Information
                         </Button>
                     </Flex>
 
@@ -563,9 +601,13 @@ const Dashboard = (props) => {
                         mb="50px"
                     >
                         An initiative by
-                        <Image src={dvm} ml="10px" mr="10px" mt="5px" height="80px" />
+                        <a href="https://bits-dvm.org">
+                            <Image src={dvm} ml="10px" mr="10px" mt="5px" height="70px" />
+                        </a>
                         and
-                        <Image src={bits} ml="20px" mr="20px" mt="10px" boxSize="70px" />
+                        <a href=" https://su-bitspilani.org/">
+                            <Image src={bits} ml="20px" mr="20px" mt="5px" boxSize="70px" />
+                        </a>
                     </Flex>
 
                 </Flex>
