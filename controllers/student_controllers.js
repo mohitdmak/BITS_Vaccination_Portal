@@ -179,6 +179,12 @@ const post_extra_data = async (req, res) => {
             // get post data
             var updates = req.body;
 
+            //utc ist bt
+	    //var date = new Date(Date.parse(updates.arrival_date));
+	    //date.setTime(date.getTime() + 19800000); 
+	    //updates.arrival_date = date.toISOString();
+	    //console.log(date.toISOString());
+
             console.log(updates);
             // update student
             var new_student = await Student.findOneAndUpdate({email: req.session["student"].email}, updates, {new:true});

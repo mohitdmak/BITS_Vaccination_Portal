@@ -74,8 +74,21 @@ const post_students = async ( req, res) => {
                     students.splice(i, 1);
 		    i--;
                 }
+		else{
+		    var date = new Date(Date.parse(students[i].arrival_date));
+		    date.setTime(date.getTime() + 19800000);
+	 	    students[i].arrival_date = date.toISOString();
+		}
             }
         }
+	else{
+	    for (let i = 0; i < students.length; i++) {
+		var date = new Date(Date.parse(students[i].arrival_date));
+		date.setTime(date.getTime() + 19800000);
+		students[i].arrival_date = date.toISOString();
+	    }
+	}
+
 
         // edit all entries for student
         //students.forEach(function(student, index, theArray){
@@ -181,25 +194,38 @@ const update_student = async (req, res) => {
     try{
         var updates = req.body.updates;
         var student = await Student.findOneAndUpdate({_id: id}, updates, {new: true});
+
+	//var new_student;
+	//if(student.pdf && student.consent_form && student.vaccination_status == 'COMPLETE'){
+        //    console.log("All fields proper, updating student model and session cache . . .");
+        //    var new_student = await Student.findOneAndUpdate({email: student.email}, {overall_status: true}, {new:true});
+         //   console.log("Overall Access grant updated .");
+         //   res.status(201).json({"success": "OVERALL ACCESS GRANTED"});
+        //}
+	//else{
+	//    new_student = student;
+//	}
+
+	res.status(201).json(student);
         console.log("	ADMIN UPDATED STUDENT STATUS");
-        console.log("Verifying overall status . . .");
-        if(student.pdf && student.consent_form && student.vaccination_status == 'COMPLETE'){
-            console.log("All fields proper, updating student model and session cache . . .");
-            var new_student = await Student.findOneAndUpdate({email: student.email}, {overall_status: true}, {new:true});
-            console.log("Overall Access grant updated .");
-        }
-        res.status(200).json({
-            "_id": student._id,
-            "pic": student.pic,
-            "name": student.name,
-            "email": student.email,
-            "vaccination_status": student.vaccination_status,
-            "auto_verification": student.auto_verification,
-            "manual_verification": student.manual_verification,
-            "overall_status": student.overall_status,
-            "pdf": student.pdf,
-            "consent_form": student.consent_form
-        });
+        //console.log("Verifying overall status . . .");
+        //if(student.pdf && student.consent_form && student.vaccination_status == 'COMPLETE'){
+        //    console.log("All fields proper, updating student model and session cache . . .");
+        //    var new_student = await Student.findOneAndUpdate({email: student.email}, {overall_status: true}, {new:true});
+        //    console.log("Overall Access grant updated .");
+        //}
+        //res.status(200).json({
+        //    "_id": student._id,
+        //    "pic": student.pic,
+        //    "name": student.name,
+        //    "email": student.email,
+        //    "vaccination_status": student.vaccination_status,
+        //    "auto_verification": student.auto_verification,
+        //    "manual_verification": student.manual_verification,
+        //    "overall_status": student.overall_status,
+        //    "pdf": student.pdf,
+        //    "consent_form": student.consent_form
+        //});
     }
     catch(err){
         console.log(err);
