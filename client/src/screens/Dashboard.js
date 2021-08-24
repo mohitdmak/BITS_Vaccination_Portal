@@ -51,7 +51,8 @@ const Dashboard = (props) => {
 
     // ARRIVAL CLEANUP 
     const arrivalHandler = (arrivalDT) => {
-        setArrival(arrivalDT)
+        if (arrivalDT.toISOString() > (new Date()).toISOString()) setArrival(arrivalDT)
+        else alert("Error selecting date. Please select a date in the future.")
     }
 
     // VERIFICATION STATUS CALCULATOR

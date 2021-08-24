@@ -28,25 +28,24 @@ function App() {
 
 const apiRequest = () => {
     fetch('https://vaccination.bits-dvm.org/api/student/details/',
-            {   
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            }
-        ).then(response => 
-            response.json().then(data => ({
-                data: data,
-                status: response.status
-            })
-        ).then(res => {
-            if(res.data.error){
-               setLogin(false)
-            } else {
-                setLogin(true)
-            }
-        }))
+      {   
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+          }
+      }).then(response => 
+        response.json().then(data => ({
+            data: data,
+            status: response.status
+        })).then(res => {
+    if(res.data.error){
+        setLogin(false)
+    } else {
+        setLogin(true)
+    }
+  }))
 }
+
   return (
     <Router>
       <>
