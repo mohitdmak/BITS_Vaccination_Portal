@@ -26,7 +26,7 @@ import "react-datepicker/dist/react-datepicker.css";
 const Dashboard = (props) => {
 
     // USER STATE ITEMS
-    const [name, setName] = useState("a")
+    const [name, setName] = useState("")
     const [pp, setPP] = useState("")
     const [campus, setCampus] = useState("")
     const [certificate, setCertificate] = useState(false)
