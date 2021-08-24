@@ -169,11 +169,11 @@ const Dashboard = (props) => {
         console.log(input)
         console.log(input.files[0])
         if (input.files[0]) {
-            if ((input.files[0].size / 1000000) <= 3) {
+            if ((input.files[0].size / 1000000) <= 1) {
                 data.append('pdf', input.files[0])
                 upload(data)
             } else {
-                alert("File size is abnormally large.")
+                alert("File size is too large. Please upload your certificate of max size 1MB.")
             }
         } else {
             alert("Please choose a valid file!")
@@ -226,7 +226,7 @@ const Dashboard = (props) => {
                 data.append('consent_form', input2.files[0])
                 upload2(data)
             } else {
-                alert("File size is abnormally large.")
+                alert("File size is too large. Please upload your consent form of max size 3MB.")
             }
         } else {
             alert("Please choose a valid file!")
