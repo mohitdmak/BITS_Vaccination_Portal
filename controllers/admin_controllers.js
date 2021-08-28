@@ -321,11 +321,11 @@ const get_excel = async (req, res) => {
     const data = await Student.find();
 
     // initialize empty array for conversion to xlsl
-    var arr = [];
+    var excel_array = [];
 
     // remove mongoose id pairs 
     data.forEach((student) => {
-        const valu =  {
+        const excel_student =  {
              "_id": student._id,
              "pic": student.pic,
              "name": student.name,
@@ -335,22 +335,26 @@ const get_excel = async (req, res) => {
              "manual_verification": student.manual_verification,
              "overall_status": student.overall_status,
              "pdf": student.pdf,
-             "consent_form": student.consent_form
+             "consent_form": student.consent_form,
+	     "TnC1_Agreement": student.TnC1_Agreement,
+	     "TnC2_Agreement": student.TnC2_Agreement,
+	     "arrival_date": student.arrival_date,
+	     "latest_dose_date": student.latest_dose_date
         };
-        arr.push(valu);
+        excel_array.push(excel_student);
     });
     
     // prepare xlsx document
-    var xlsx = await json2xls(arr);
+    var excel_doc = await json2xls(excel_array);
 
         // write to xlsx file
-    fs.writeFileSync(filename, xlsx, 'binary', (err) => {
+    fs.writeFileSync("ADMIN_ExcelFile.xlsx", excel_doc, 'binary', (err) => {
         if (err) {
             console.log("writeFileSync error :", err);
          }
         console.log("The file has been saved!");
      });
-    res.download("myExcel.xlsx", function(err){
+    res.download("ADMIN_ExcelFile.xlsx", function(err){
         if(err){
             console.log(err);
             res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
