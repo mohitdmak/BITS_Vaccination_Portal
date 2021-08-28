@@ -10,9 +10,19 @@ const password = require('../config/admin.js').password;
 const username = require('../config/admin.js').username;
 const hashed = require('../config/admin.js').hashed;
 
+// reqs for sending excel file
+const json2xls = require('json2xls');
+const filename = 'myExcel.xlsx';
+const fs = require("fs");
 
 // set pagination limit
 const page_limit = 50;
+
+// function to paginate array after applying filters
+function paginate(array, page_size, page_number) {
+  // human-readable page numbers usually start with 1, so we reduce 1 in the first argument
+  return array.slice((page_number - 1) * page_size, page_number * page_size);
+}
 
 //login
 const post_login = async(req, res) => {
@@ -56,7 +66,7 @@ const post_students = async ( req, res) => {
         }
 
         // update pagination
-        var students = await Student.find(filters).skip((page-1) * page_limit).limit(page_limit);
+        var students = await Student.find(filters);
 
         // get filter dates
         var beggining = Date.parse(req.body.between.start);
@@ -136,8 +146,9 @@ const post_students = async ( req, res) => {
                 }
             }
         }
+        students = paginate(students, page_limit, page)
         console.log("	ADMIN PROVIDED STUDENTS LIST");
-	console.log(students);
+        console.log(students);
         res.status(200).json({
             "total_pages": total_pages,
             "data": students
@@ -304,6 +315,52 @@ const get_consent = async (req, res) => {
     }
 }
 
+// get excel file
+const get_excel = async (req, res) => {
+    // get data from mongodb
+    const data = await Student.find();
+
+    // initialize empty array for conversion to xlsl
+    var arr = [];
+
+    // remove mongoose id pairs 
+    data.forEach((student) => {
+        const valu =  {
+             "_id": student._id,
+             "pic": student.pic,
+             "name": student.name,
+             "email": student.email,
+             "vaccination_status": student.vaccination_status,
+             "auto_verification": student.auto_verification,
+             "manual_verification": student.manual_verification,
+             "overall_status": student.overall_status,
+             "pdf": student.pdf,
+             "consent_form": student.consent_form
+        };
+        arr.push(valu);
+    });
+    
+    // prepare xlsx document
+    var xlsx = await json2xls(arr);
+
+        // write to xlsx file
+    fs.writeFileSync(filename, xlsx, 'binary', (err) => {
+        if (err) {
+            console.log("writeFileSync error :", err);
+         }
+        console.log("The file has been saved!");
+     });
+    res.download("myExcel.xlsx", function(err){
+        if(err){
+            console.log(err);
+            res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
+        }
+        //else{
+        //    console.log("CONSENT FORM FILE for student is served");
+        //}
+    });
+}
+
 //alt details
 const post_details = (req, res) => {
     console.log("ALT ADMIN DETAILS CALLED");
@@ -317,5 +374,6 @@ module.exports = {
     get_pdf,
     get_consent,
     post_login,
-    post_details
+    post_details,
+    get_excel
 }

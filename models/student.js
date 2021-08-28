@@ -24,9 +24,9 @@ function ValidateVaccineStatus(String){
 }
 
 // validate bits id
-function ValidateBitsId(String){
+// function ValidateBitsId(String){
 
-}
+// }
 
 // importing vaccine mongoose schema
 const Vaccineschema = require("./vaccine").Vaccineschema;
@@ -50,6 +50,11 @@ const Studentschema = new schema({
     //     // validate: [ValidateBitsId, "Request's BITS ID is not valid"]
     // },
     city: {
+        type: String,
+	//required: [true, "Request does not have the Student Address"],
+	//default: "Earth"
+    },
+    state: {
         type: String,
 	//required: [true, "Request does not have the Student Address"],
 	//default: "Earth"

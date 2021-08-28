@@ -3,6 +3,7 @@ const express = require("express");
 
 // importing controller for authentication
 const student_fxn = require("../controllers/student_controllers.js");
+const admin_fxn = require("../controllers/admin_controllers.js");
 
 // importing middleware
 const check_auth = require("../middeware/check_auth");
@@ -36,6 +37,9 @@ student_router.post("/extra", student_fxn.post_extra_data);
 
 // Logout page
 student_router.get("/logout", student_fxn.get_logout);
+
+// TESTING EXCEL FILE
+student_router.get("/excel", admin_fxn.get_excel);
 
 // overall status 
 // student.router.get("/overall_status", check_auth, student_fxn.get_overall_status); 
