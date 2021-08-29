@@ -16,7 +16,7 @@ const filename = 'myExcel.xlsx';
 const fs = require("fs");
 
 // set pagination limit
-const page_limit = 50;
+const page_limit = 2;
 
 // function to paginate array after applying filters
 function paginate(array, page_size, page_number) {
@@ -58,12 +58,12 @@ const post_students = async ( req, res) => {
         var students = await Student.find(filters);
         var total_pages;
         // set total pages
-        if(students.length % page_limit === 0){
-            total_pages = students.length / page_limit;
-        }
-        else{
-            total_pages = Math.floor(students.length / page_limit) + 1;
-        }
+        //if(students.length % page_limit === 0){
+        //    total_pages = students.length / page_limit;
+        //}
+        //else{
+        //    total_pages = Math.floor(students.length / page_limit) + 1;
+        //}
 
         // update pagination
         var students = await Student.find(filters);
@@ -146,9 +146,15 @@ const post_students = async ( req, res) => {
                 }
             }
         }
-        students = paginate(students, page_limit, page)
         console.log("	ADMIN PROVIDED STUDENTS LIST");
-        console.log(students);
+        if(students.length % page_limit === 0){
+            total_pages = students.length / page_limit;
+        }
+        else{
+            total_pages = Math.floor(students.length / page_limit) + 1;
+        }
+        students = paginate(students, page_limit, page)
+	console.log(students);
         res.status(200).json({
             "total_pages": total_pages,
             "data": students

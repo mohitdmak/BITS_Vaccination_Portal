@@ -1,3 +1,6 @@
+# Excel files
+# ADMIN_ExcelFile.xlsx
+
 # CACHESSSSSS
 PyDIVOC/PyDIVOC/__pycache__/*.pyc
 config/admin.js
