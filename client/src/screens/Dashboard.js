@@ -34,6 +34,7 @@ const Dashboard = (props) => {
     const [status, setStatus] = useState("NONE")
     const [one, setOne] = useState(2)
     const [city, setCity] = useState("")
+    const [region, setRegion] = useState("")
     const [isContainment, setIsContainment] = useState(false)
     const [checkedItems, setCheckedItems] = useState([false, false, false])
     const [arrival, setArrival] = useState(new Date())
@@ -109,6 +110,7 @@ const Dashboard = (props) => {
                     if (res.pdf) setCertificate(true)
                     if (res.consent_form) setConsent(true)
                     setCity(res.city || "")
+                    setRegion(res.state || "")
                     setArrival(res.arrival_date ? parseISO(res.arrival_date) : new Date())
                     setIsContainment(res.is_containment_zone || false)
                     setCheckedItems([res.is_medically_fit || false, res.TnC1_Agreement || false, res.TnC2_Agreement || false])
@@ -128,6 +130,7 @@ const Dashboard = (props) => {
             method: 'POST',
             body: JSON.stringify({
                 "city": city,
+                "state": region,
                 "is_containment_zone": isContainment,
                 "is_medically_fit": checkedItems[0],
                 "TnC1_Agreement": checkedItems[1],
@@ -481,19 +484,36 @@ const Dashboard = (props) => {
                         <Box width={"100%"}>
                             {/* Make a text input field for city of residence */}
                             <Text textAlign={"left"} >
-                                <Text fontWeight="bold">Current place of stay (Village/District + State) * </Text>
+                                <Text fontWeight="bold">Current place of stay (Village/City/District) * </Text>
                                 {(city === "") ?
                                     <Text color="red" fontSize={'small'} >Please enter this field</Text> : null
                                 }
                             </Text>
                             <Input
                                 mt="10px"
-                                placeholder="Village/District + State"
+                                placeholder="Village/City/District"
                                 value={city}
                                 onChange={(e) => setCity(e.target.value)}
                                 required
                             />
                         </Box>
+
+                        <Flex width={"100%"} mt="40px" flexDirection="column">
+                            <Text textAlign={"left"} >
+                                <Text fontWeight="bold">State of Residence * </Text>
+                                {(region === "") ?
+                                    <Text color="red" fontSize={'small'} >Please enter this field</Text> : null
+                                }
+                            </Text>
+                            <Input
+                                mt="10px"
+                                placeholder="Enter your state"
+                                value={region}
+                                onChange={(e) => setRegion(e.target.value)}
+                                required
+                            />
+                        </Flex>
+
                         <Flex width={"100%"} mt="40px" flexDirection="row" alignItems="center" >
                             {/* Make a boolean input with the question "Is your current location is a containment zone?"  */}
                             <Text textAlign={"left"} >

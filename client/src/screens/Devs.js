@@ -17,7 +17,8 @@ const Devs = () => {
                 alignItems="center"
                 justifyContent="center"
                 height="80vh"
-                marginTop={["50px","50px","0","0","0"]}
+                marginTop={["150px","150px","0","0","0"]}
+                marginBottom={["150px","150px","0","0","0"]}
             >
                 <Heading margin="20px">Meet the Developers</Heading>
                 <Flex
