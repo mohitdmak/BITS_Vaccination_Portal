@@ -12,6 +12,7 @@ import {
     Tr,
     Th,
     Td,
+    Spacer,
     TableCaption,
     Spinner,
     RadioGroup,
@@ -35,21 +36,31 @@ const Landing = () => {
     const [table, setTable] = useState(null);
     const [total_pages, setTotal_pages] = useState(5);
 
-    const [checkedVS, setCheckedVS] = useState(["NONE", "PARTIAL", "COMPLETE"])
-    const [checkedMV, setCheckedMV] = useState(["FAILED", "PENDING", "DONE"])
-    const [checkedAV, setCheckedAV] = useState(["FAILED", "PENDING", "DONE"])
+    const [checkedVS, setCheckedVS] = useState(localStorage.getItem('checkedVS') ? JSON.parse(localStorage.getItem('checkedVS')) : (["NONE", "PARTIAL", "COMPLETE"]))
+    const [checkedMV, setCheckedMV] = useState(localStorage.getItem('checkedMV') ? JSON.parse(localStorage.getItem('checkedMV')) : (["FAILED", "PENDING", "DONE"]))
+    const [checkedAV, setCheckedAV] = useState(localStorage.getItem('checkedAV') ? JSON.parse(localStorage.getItem('checkedAV')) : (["FAILED", "PENDING", "DONE"]))
+
+    const [batch, setBatch] = useState(localStorage.getItem('batch') ? JSON.parse(localStorage.getItem('batch')) : (["2020", "2019", "2018"]));
+    // const [startDate, setStartDate] = useState(localStorage.getItem('startDate') ? JSON.parse(localStorage.getItem('startDate')) : new Date("2021/09/01"))
+    // const [endDate, setEndDate] = useState(localStorage.getItem('endDate') ? JSON.parse(localStorage.getItem('endDate')) : (new Date("2021/09/25")))
+
+    const [startDate, setStartDate] = useState(new Date("2021/09/01"))
+    const [endDate, setEndDate] = useState(new Date("2021/09/25"))
 
     const [searchName, setSearchName] = useState(null);
     const [searchEmail, setSearchEmail] = useState(null);
-    const [batch, setBatch] = useState(["2020", "2019", "2018"]);
-
-    const [startDate, setStartDate] = useState(new Date("2021/09/01"));
-    const [endDate, setEndDate] = useState(new Date("2021/09/25"));
 
     const handleNameChange = (event) => setSearchName(event.target.value)
     const handleEmailChange = (event) => setSearchEmail(event.target.value)
 
     const getData = () => {
+        localStorage.setItem('checkedVS', JSON.stringify(checkedVS))
+        localStorage.setItem('checkedMV', JSON.stringify(checkedMV))
+        localStorage.setItem('checkedAV', JSON.stringify(checkedAV))
+        localStorage.setItem('batch', JSON.stringify(batch))
+        // localStorage.setItem('startDate', JSON.stringify(startDate))
+        // localStorage.setItem('endDate', JSON.stringify(endDate))
+
         fetch('https://vaccination.bits-dvm.org/api/admin/students', {
             method: 'POST',
             headers: {
@@ -173,6 +184,25 @@ const Landing = () => {
                     color="#141B41"
                 >BITS Vaccine Portal Admin</Heading>
 
+                <Spacer />
+
+                <Button 
+                    colorScheme="green" 
+                    mr="10px" 
+                    size="md"
+                    onClick={() => {
+                        window.open("https://vaccination.bits-dvm.org/api/admin/excel")
+                    }}
+                >Download as Excel</Button>
+                <Button 
+                    colorScheme="red" 
+                    variant="ghost" 
+                    size="md"
+                    onClick={() => {
+                        localStorage.removeItem('jwt');
+                        window.location.reload();
+                    }}
+                >Logout</Button>
                 
             </Flex>
 
