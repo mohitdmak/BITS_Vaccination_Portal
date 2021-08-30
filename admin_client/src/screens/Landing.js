@@ -91,6 +91,52 @@ const Landing = () => {
             if(res.data){
                 console.log(res.data)
                 setTable(res.data.data)
+                setPage(page);
+                setTotal_pages(res.data.total_pages)
+            } else {
+                alert("ERROR RETRIEVING CONTENT.");
+            }
+    }))}
+
+    const filterData = () => {
+        localStorage.setItem('checkedVS', JSON.stringify(checkedVS))
+        localStorage.setItem('checkedMV', JSON.stringify(checkedMV))
+        localStorage.setItem('checkedAV', JSON.stringify(checkedAV))
+        localStorage.setItem('batch', JSON.stringify(batch))
+        // localStorage.setItem('startDate', JSON.stringify(startDate))
+        // localStorage.setItem('endDate', JSON.stringify(endDate))
+
+        fetch('https://vaccination.bits-dvm.org/api/admin/students', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "Bearer " + localStorage.getItem('jwt')
+            },
+            body: JSON.stringify({
+                "page" : 1,
+                "filters" : {
+                    "name" : cleanSearchString(searchName),
+                    "email" : cleanSearchString(searchEmail),
+                    "auto_verification" : checkedAV,
+                    "manual_verification" : checkedMV,
+                    "vaccination_status" : checkedVS,
+                },
+                "between" : {
+                    "start" : startDate,
+                    "end" : endDate
+                },
+                "batch" : batch
+            })
+        }).then(response => 
+            response.json().then(data => ({
+                data: data,
+                status: response.status
+            })
+        ).then(res => {
+            if(res.data){
+                console.log(res.data)
+                setTable(res.data.data)
+                setPage(1);
                 setTotal_pages(res.data.total_pages)
             } else {
                 alert("ERROR RETRIEVING CONTENT.");
@@ -99,6 +145,7 @@ const Landing = () => {
 
     useEffect(() => {
         getData();
+        console.log("date is queried")
     }, [page])
 
     const previousPage = () => {
@@ -305,7 +352,7 @@ const Landing = () => {
                         />
                     </Flex>
 
-                    <Button width="200px" m="20px" onClick={getData} colorScheme="blue">Filter</Button>
+                    <Button width="200px" m="20px" onClick={filterData} colorScheme="blue">Filter</Button>
                 </Flex>
 
 
