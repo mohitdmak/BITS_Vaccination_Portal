@@ -99,12 +99,11 @@ const Landing = () => {
 
     useEffect(() => {
         getData();
-    }, [])
+    }, [page])
 
     const previousPage = () => {
         if ((page - 1) >= 1) {
             setPage(page - 1);
-            getData();
         }
     }
 
@@ -116,7 +115,6 @@ const Landing = () => {
     const nextPage = () => {
         if ((page + 1) <= total_pages) {
             setPage(page + 1);
-            getData();
         }
     }
 
