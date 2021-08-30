@@ -80,9 +80,11 @@ services:
 
     # Setting volumes between db dir and container
     volumes:
-      - ./db/data/:/data
+      - type: volume
+        source: mongodb_data_volume
+        target: /data/db
 
-    # Setting ports config
+    # Not binding mongo
     ports:
       - 27017
 
@@ -230,3 +232,9 @@ services:
     # Ensuring Dev Container has been started before redis sessions are ready
     # depends_on:
     #   - dev_container
+
+
+# NAMED VOLUMES
+volumes:
+  mongodb_data_volume:
+    external: true
