@@ -258,7 +258,8 @@ const get_pdf = async (req, res) => {
     // get current logged in student
     try{
         // get downloaded file path
-        var id = req.body._id;
+        console.log(req.body);
+        var id = req.query._id;
         var student = await Student.findById(id);
         if(student.pdf){
             var serve_file = student.pdf;
@@ -270,9 +271,18 @@ const get_pdf = async (req, res) => {
                     res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
                 }
                 else{
-                    console.log("File served .");
+                    console.log("CONSENT FORM FILE for student is served");
                 }
             });
+            // res.download(String(serve_file), function(err){
+            // if(err){
+            //     console.log(err);
+            //     res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
+            // }
+            // else{
+            //     console.log("File served .");
+            // }
+        // });
         }
         else{
             console.log("NO PDF FILE FOUND FOR STUDENT REQUESTED BY ADMIN");
@@ -293,6 +303,7 @@ const get_consent = async (req, res) => {
     // get current logged in student
     try{
         // get downloaded file path
+        console.log(req.body);
         var id = req.body._id;
         var student = await Student.findById(id);
         if(student.consent_form){
