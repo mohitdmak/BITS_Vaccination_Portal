@@ -76,10 +76,13 @@ const post_pdf = async ( req, res) => {
         try{
             console.log("\n    Checking validity of post_pdf file . . .");
             if (req.fileValidationError) {
-                return res.send(req.fileValidationError);
+                console.log("Validation error");
+                res.status(400).json({"error": req.fileValidationError});
             }
             else if (!req.file) {
-                return res.send('Please select a pdf to upload');
+                console.log("Validation Error 2");
+                res.status(400).json({"error": "\n File was not a valid PDF."});
+                res.end();
             }
             else{
                 console.log("FILE : PROPER PDF");
@@ -107,10 +110,12 @@ const post_consent = async (req, res) => {
         try{
             console.log("\n    Checking validity of post_consent file . . .");
             if (req.fileValidationError) {
-                return res.send(req.fileValidationError);
+                console.log("Validation error");
+                return res.status(400).json({"error":req.fileValidationError});
             }
             else if (!req.file) {
-                return res.send('Please select a pdf to upload');
+                console.log("Validation error 2");
+                return res.status(400).json({"error": '\n File was not a Valid PDF.'});
             }
             else{
                 console.log("FILE : PROPER PDF");
