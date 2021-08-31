@@ -589,7 +589,7 @@ const Dashboard = (props) => {
     
                             <>
                                 <Checkbox
-                                    isChecked={checkedItems}
+                                    isChecked={allChecked}
                                     isIndeterminate={isIndeterminate}
                                     onChange={(e) => setCheckedItems([e.target.checked, e.target.checked, e.target.checked])}
                                     size={["lg"]}
