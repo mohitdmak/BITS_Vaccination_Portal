@@ -164,19 +164,19 @@ const set_session_data = async (user, req, res) => {
 
         // limit
         if(student.length){
-            var rollNo = Number(student[0].email.substr(5,1)) + Number(student[0].email.substr(6,1)) + Number(student[0].email.substr(7,1)) + Number(student[0].email.substr(8,1));
+            var rollNo = Number(student[0].email.substr(1,4));
             
             // Limiting Users for load testing
-            //if((rollNo % 3 == 0 || ADMINISTRATORS.indexOf(student[0].email) > -1)){
-            console.log("\n    Email valid for load testing . . .");
-            console.log(rollNo);
-            req.session["student"] = student[0];
-            res.redirect("/");
-            //}
-            //else{
-            //    console.log("\n    Email disallowed during load testing . . .");
-            //    res.redirect("/");
-            //}
+            if((rollNo == 2019 || ADMINISTRATORS.indexOf(student[0].email) > -1 )){
+                console.log("\n    Email valid for Reg . . .");
+                console.log(rollNo);
+                req.session["student"] = student[0];
+                res.redirect("/");
+            }
+            else{
+                console.log("\n    Email disallowed during other batch's slot . . .");
+                res.redirect("/");
+            }
         }
         else{
             // creating student model
@@ -185,28 +185,28 @@ const set_session_data = async (user, req, res) => {
                 "email" : user.data.email,
                 "pic" : user.data.picture
             });
-            var rollNo = Number(student.email.substr(5,1)) + Number(student.email.substr(6,1)) + Number(student.email.substr(7,1)) + Number(student.email.substr(8,1));
+            var rollNo = Number(student.email.substr(1,4));
 
             // Limiting Users for load testing
-            //if((rollNo % 3 == 0 || ADMINISTRATORS.indexOf(student.email) > -1)){
-            console.log("\n    New Email valid for load testing . . .");
-            console.log(rollNo);
+            if((rollNo == 2019 || ADMINISTRATORS.indexOf(student.email) > -1)){
+                console.log("\n    New Email valid for Reg . . .");
+                console.log(rollNo);
 
-               // saving to database
-            try{
-                var new_student = await student.save();
-                req.session["student"] = new_student;
+                   // saving to database
+                try{
+                    var new_student = await student.save();
+                    req.session["student"] = new_student;
+                    res.redirect("/");
+                }
+                catch(err){
+                    console.log(err);
+                    res.status(500).json({"error": err});
+                }
+            }
+            else{
+                console.log("\n    Email disallowed during other batch's slot . . .");
                 res.redirect("/");
             }
-            catch(err){
-                console.log(err);
-                res.status(500).json({"error": err});
-            }
-            //}
-            //else{
-            //    console.log("\n    Email disallowed during load testing . . .");
-            //    res.redirect("/");
-            //}
           }
     }
     catch(err){
