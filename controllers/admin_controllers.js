@@ -16,7 +16,7 @@ const filename = 'myExcel.xlsx';
 const fs = require("fs");
 
 // set pagination limit
-const page_limit = 2;
+const page_limit = 50;
 
 // function to paginate array after applying filters
 function paginate(array, page_size, page_number) {
@@ -258,7 +258,8 @@ const get_pdf = async (req, res) => {
     // get current logged in student
     try{
         // get downloaded file path
-        console.log(req.body);
+        console.log("\n ADMIN REQUESTED PDF");
+        console.log(req.query._id);
         var id = req.query._id;
         var student = await Student.findById(id);
         if(student.pdf){
@@ -274,15 +275,6 @@ const get_pdf = async (req, res) => {
                     console.log("CONSENT FORM FILE for student is served");
                 }
             });
-            // res.download(String(serve_file), function(err){
-            // if(err){
-            //     console.log(err);
-            //     res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
-            // }
-            // else{
-            //     console.log("File served .");
-            // }
-        // });
         }
         else{
             console.log("NO PDF FILE FOUND FOR STUDENT REQUESTED BY ADMIN");
@@ -303,8 +295,9 @@ const get_consent = async (req, res) => {
     // get current logged in student
     try{
         // get downloaded file path
-        console.log(req.body);
-        var id = req.body._id;
+        console.log("\n ADMIN REQUESTED CONSENT PDF");
+        console.log(req.query);
+        var id = req.query._id;
         var student = await Student.findById(id);
         if(student.consent_form){
             var serve_file = student.consent_form;
@@ -312,11 +305,11 @@ const get_consent = async (req, res) => {
             console.log(String(serve_file)); 
             res.download(String(serve_file), function(err){
                 if(err){
-                console.log(err);
-                res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
+                    console.log(err);
+                    res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
                 }
                 else{
-                console.log("File served .");
+                    console.log("File served .");
                 }
             });
         }
@@ -324,8 +317,8 @@ const get_consent = async (req, res) => {
             console.log("NO PDF FILE FOUND FOR STUDENT REQUESTED BY ADMIN");
             res.status(400).json({"error": "NO FILE FOUND ON SERVER"});
         }
-        }
-        // forward login errors
+    }
+    // forward login errors
     catch(err){
         console.log(err);
         res.status(500).json({"error": err});
