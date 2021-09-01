@@ -316,6 +316,7 @@ const Landing = () => {
                         <Text fontWeight="bold">Start Date</Text>
                         <DatePicker
                             selected={startDate}
+                            dateFormat="dd/MM/yyyy"
                             onChange={(date) => setStartDate(date)}
                             selectsStart
                             startDate={startDate}
@@ -326,6 +327,7 @@ const Landing = () => {
                             selected={endDate}
                             onChange={(date) => setEndDate(date)}
                             selectsEnd
+                            dateFormat="dd/MM/yyyy"
                             startDate={startDate}
                             endDate={endDate}
                             minDate={startDate}
@@ -347,7 +349,7 @@ const Landing = () => {
                         <Input
                             value={searchEmail}
                             onChange={handleEmailChange}
-                            placeholder="f20XXABCD@bits-pilani.ac.in"
+                            placeholder="f20XXXXX@pilani.bits-pilani.ac.in"
                             size="md"
                         />
                     </Flex>
@@ -397,7 +399,7 @@ const Landing = () => {
 
                 <Thead>
                     <Tr>
-                        <Th>OVERALL STATUS</Th>
+                        {/* <Th>OVERALL STATUS</Th> */}
                         <Th>NAME</Th>
                         <Th>EMAIL</Th>
                         <Th>VACCINATION STATUS</Th>
@@ -413,11 +415,11 @@ const Landing = () => {
                 <Tbody>
                     { (table).map((student, index) => (
                     <Tr>
-                        <Td>
+                        {/* <Td>
                             { student.overall_status ? 
                             <Text color="green" fontWeight="bold">Verified</Text> :
                             <Text color="red" fontWeight="bold">Unverified</Text> }
-                        </Td>
+                        </Td> */}
 
                         <Td>
                             <Text color="black" fontWeight="bold">{ student.name }</Text>
@@ -465,7 +467,7 @@ const Landing = () => {
 
                 <Tfoot>
                     <Tr>
-                        <Th>OVERALL STATUS</Th>
+                        {/* <Th>OVERALL STATUS</Th> */}
                         <Th>NAME</Th>
                         <Th>EMAIL</Th>
                         <Th>VACCINATION STATUS</Th>
