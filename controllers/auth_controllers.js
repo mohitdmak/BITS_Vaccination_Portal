@@ -145,6 +145,8 @@ const set_tokens = async (req, res) => {
 //     });
 // };
 
+// get allowed batches
+var allow_access = require("./admin_controllers.js").allow_access;
 
 // non admin
 const set_session_data = async (user, req, res) => {
@@ -164,10 +166,10 @@ const set_session_data = async (user, req, res) => {
 
         // limit
         if(student.length){
-            var rollNo = Number(student[0].email.substr(1,4));
+            var rollNo = Number(student[0].email.substr(0,5));
             
             // Limiting Users for load testing
-            if((rollNo == 2019 || ADMINISTRATORS.indexOf(student[0].email) > -1 )){
+            if((allow_access.indexOf(rollNo) > -1 || ADMINISTRATORS.indexOf(student[0].email) > -1 )){
                 console.log("\n    Email valid for Reg . . .");
                 console.log(rollNo);
                 req.session["student"] = student[0];
@@ -185,10 +187,10 @@ const set_session_data = async (user, req, res) => {
                 "email" : user.data.email,
                 "pic" : user.data.picture
             });
-            var rollNo = Number(student.email.substr(1,4));
+            var rollNo = Number(student.email.substr(0,5));
 
             // Limiting Users for load testing
-            if((rollNo == 2019 || ADMINISTRATORS.indexOf(student.email) > -1)){
+            if((allow_access.indexOf(rollNo) > -1 || ADMINISTRATORS.indexOf(student.email) > -1)){
                 console.log("\n    New Email valid for Reg . . .");
                 console.log(rollNo);
 
