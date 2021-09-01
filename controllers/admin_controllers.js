@@ -176,6 +176,9 @@ const get_student = async (req, res) => {
     //console.log(id);
     try{
         var student = await Student.findById(id);
+        var date = new Date(Date.parse(student.arrival_date));
+        date.setTime(date.getTime() + 19800000);
+        student.arrival_date = date.toISOString();
         console.log(" STUDENT DETAIL SENT IS : ");
         console.log(student);
         console.log("	ADMIN PROVIDED STUDENT DETAIL");
@@ -335,21 +338,39 @@ const get_excel = async (req, res) => {
 
     // remove mongoose id pairs 
     data.forEach((student) => {
+        var pdf;
+        var consent_form;
+        var latest_dose_date;
+        var agreement = student.TnC1_Agreement && student.TnC2_Agreement && student.is_medically_fit;
+        if(student.latest_dose_date){
+            latest_dose_date = new Date('2020-01-14T17:43:37.000Z').toLocaleString(undefined, {timeZone: 'Asia/Kolkata'});
+        }
+        else{
+            latest_dose_date = "No latest dose";
+        }
+        if(student.pdf){
+            pdf = true;
+        }
+        else{
+            pdf = false;
+        }
+        if(student.consent_form){
+            consent_form = true;
+        }
+        else{
+            consent_form = false;
+        }
         const excel_student =  {
-             "_id": student._id,
-             "pic": student.pic,
-             "name": student.name,
-             "email": student.email,
-             "vaccination_status": student.vaccination_status,
-             "auto_verification": student.auto_verification,
-             "manual_verification": student.manual_verification,
-             "overall_status": student.overall_status,
-             "pdf": student.pdf,
-             "consent_form": student.consent_form,
-	     "TnC1_Agreement": student.TnC1_Agreement,
-	     "TnC2_Agreement": student.TnC2_Agreement,
-	     "arrival_date": student.arrival_date,
-	     "latest_dose_date": student.latest_dose_date
+             "Name": student.name,
+             "Email": student.email,
+             "Vaccination Status": student.vaccination_status,
+             "Auto Verification": student.auto_verification,
+             "Manual Verification": student.manual_verification,
+             "Certificate Uploaded": pdf,
+             "Consent Uploaded": consent_form,
+             "Accepted All Agreements": agreement,
+             "Latest Dose Date": latest_dose_date,
+             "Arrival Date": new Date(student.arrival_date).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'}),
         };
         excel_array.push(excel_student);
     });
