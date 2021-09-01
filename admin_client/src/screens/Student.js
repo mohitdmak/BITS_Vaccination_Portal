@@ -79,28 +79,28 @@ const Student = () => {
         }))
     }
 
-    const getPDF = () => {
-        fetch('https://vaccination.bits-dvm.org/api/admin/get_pdf', { // Your POST endpoint
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': "Bearer " + localStorage.getItem('jwt')
-            },
-            body: JSON.stringify({
-                "_id" : id,
-            })
-        }).then(response => 
-            response.json().then(data => ({
-                data: data,
-                status: response.status
-            })
-        ).then(res => {
-            if(res.data){
-                console.log(res.data)
-            } else {
-                alert("ERROR RETRIEVING CONTENT.");
-            }
-    }))}
+    // const getPDF = () => {
+    //     fetch('https://vaccination.bits-dvm.org/api/admin/get_pdf', { // Your POST endpoint
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': "Bearer " + localStorage.getItem('jwt')
+    //         },
+    //         body: JSON.stringify({
+    //             "_id" : id,
+    //         })
+    //     }).then(response => 
+    //         response.json().then(data => ({
+    //             data: data,
+    //             status: response.status
+    //         })
+    //     ).then(res => {
+    //         if(res.data){
+    //             console.log(res.data)
+    //         } else {
+    //             alert("ERROR RETRIEVING CONTENT.");
+    //         }
+    // }))}
 
     // date cleaner function
     const cleanDate = (dateTime) => {
@@ -137,28 +137,28 @@ const Student = () => {
     }
 
 
-    const getConsent = () => {
-        fetch('https://vaccination.bits-dvm.org/api/admin/get_consent', { // Your POST endpoint
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': "Bearer " + localStorage.getItem('jwt')
-            },
-            body: JSON.stringify({
-                "_id" : id,
-            })
-        }).then(response => 
-            response.json().then(data => ({
-                data: data,
-                status: response.status
-            })
-        ).then(res => {
-            if(res.data){
-                console.log(res.data)
-            } else {
-                alert("ERROR RETRIEVING CONTENT.");
-            }
-    }))}
+    // const getConsent = () => {
+    //     fetch('https://vaccination.bits-dvm.org/api/admin/get_consent', { // Your POST endpoint
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': "Bearer " + localStorage.getItem('jwt')
+    //         },
+    //         body: JSON.stringify({
+    //             "_id" : id,
+    //         })
+    //     }).then(response => 
+    //         response.json().then(data => ({
+    //             data: data,
+    //             status: response.status
+    //         })
+    //     ).then(res => {
+    //         if(res.data){
+    //             console.log(res.data)
+    //         } else {
+    //             alert("ERROR RETRIEVING CONTENT.");
+    //         }
+    // }))}
 
 
     useEffect(() => {
@@ -213,13 +213,13 @@ const Student = () => {
 
            <Flex flexDir="row" width="50vw" padding="10px" justifyContent="space-between" alignItems="center">
                <Text>Certificate PDF</Text>
-                <Button onClick={getPDF} isDisabled={!student.pdf}>View PDF</Button>
+                <Button onClick={() => window.open("https://vaccination.bit-dvm.org/api/admin/get_pdf?_id="+id)} isDisabled={!student.pdf}>View PDF</Button>
            </Flex>
 
            <Flex flexDir="row" width="50vw" padding="10px" justifyContent="space-between" alignItems="center">
                <Text>Consent Form PDF</Text>
                <Link to={ student.consent_form }>
-                <Button onClick={getConsent} isDisabled={!student.consent_form}>View PDF</Button>
+                <Button onClick={() => window.open("https://vaccination.bit-dvm.org/api/admin/get_consent?_id="+id)} isDisabled={!student.consent_form}>View PDF</Button>
                </Link>
            </Flex>
 
@@ -260,7 +260,7 @@ const Student = () => {
 
            <Flex flexDir="row" width="50vw" padding="10px" justifyContent="space-between" alignItems="center">
                <Text>Containment Zone</Text>
-               { student.is_containment_zone ? <Text color="green">Yes</Text> : <Text color="red">No</Text> }
+               { student.is_containment_zone ? <Text color="red">Yes</Text> : <Text color="green">No</Text> }
            </Flex>
 
            <Flex flexDir="row" width="50vw" padding="10px" justifyContent="space-between" alignItems="center">
