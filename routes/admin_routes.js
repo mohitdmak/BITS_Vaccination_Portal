@@ -23,10 +23,10 @@ admin_router.post("/student", check_admin_auth, admin_fxn.get_student);
 admin_router.post("/update", check_admin_auth,  admin_fxn.update_student);
 
 // get consent form
-admin_router.post("/get_consent", check_admin_auth,  admin_fxn.get_consent);
+admin_router.get("/get_consent", check_admin_auth,  admin_fxn.get_consent);
 
 // Setting auth tokens in session
-admin_router.post("/get_pdf", check_admin_auth,  admin_fxn.get_pdf);
+admin_router.get("/get_pdf",  admin_fxn.get_pdf);
 
 // Showing protected page with student details
 admin_router.post("/login", admin_fxn.post_login);
