@@ -213,14 +213,12 @@ const Student = () => {
 
            <Flex flexDir="row" width="50vw" padding="10px" justifyContent="space-between" alignItems="center">
                <Text>Certificate PDF</Text>
-                <Button onClick={() => window.open("https://vaccination.bit-dvm.org/api/admin/get_pdf?_id="+id)} isDisabled={!student.pdf}>View PDF</Button>
+                <Button onClick={() => window.open("https://vaccination.bits-dvm.org/api/admin/get_pdf?_id="+id)} isDisabled={!student.pdf}>View PDF</Button>
            </Flex>
 
            <Flex flexDir="row" width="50vw" padding="10px" justifyContent="space-between" alignItems="center">
                <Text>Consent Form PDF</Text>
-               <Link to={ student.consent_form }>
-                <Button onClick={() => window.open("https://vaccination.bit-dvm.org/api/admin/get_consent?_id="+id)} isDisabled={!student.consent_form}>View PDF</Button>
-               </Link>
+                <Button onClick={() => window.open("https://vaccination.bits-dvm.org/api/admin/get_consent?_id="+id)} isDisabled={!student.consent_form}>View PDF</Button>
            </Flex>
 
 
