@@ -18,6 +18,14 @@ const fs = require("fs");
 // set pagination limit
 const page_limit = 50;
 
+// access data
+var allow_access = ["f2020", "f2019", "f2018", "h2020", "h2019", "h2018"];
+
+const restrict_access = async (req, res) => {
+    allow_access = req.body.batch;
+    res.status(201).json({"success": allow_access});
+}
+
 // function to paginate array after applying filters
 function paginate(array, page_size, page_number) {
   // human-readable page numbers usually start with 1, so we reduce 1 in the first argument
@@ -410,5 +418,7 @@ module.exports = {
     get_consent,
     post_login,
     post_details,
-    get_excel
+    get_excel,
+    restrict_access,
+    allow_access
 }
