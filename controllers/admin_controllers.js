@@ -25,6 +25,11 @@ const restrict_access = async (req, res) => {
     allow_access = req.body.batch;
     res.status(201).json({"success": allow_access});
 }
+const get_restrict_access = async (req, res) => {
+    // allow_access = req.body.batch;
+    res.status(200).json({"batches": allow_access});
+}
+
 
 // function to paginate array after applying filters
 function paginate(array, page_size, page_number) {
@@ -420,5 +425,6 @@ module.exports = {
     post_details,
     get_excel,
     restrict_access,
-    allow_access
+    allow_access,
+    get_restrict_access
 }
