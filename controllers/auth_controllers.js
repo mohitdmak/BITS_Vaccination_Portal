@@ -146,7 +146,7 @@ const set_tokens = async (req, res) => {
 // };
 
 // get allowed batches
-var allow_access = require("./admin_controllers.js").allow_access;
+let get_allow_access = require("./admin_controllers.js").get_allow_access;
 
 // non admin
 const set_session_data = async (user, req, res) => {
@@ -163,13 +163,15 @@ const set_session_data = async (user, req, res) => {
 
         // find for user in db
         var student = await Student.find({email: user.data.email});
-
+        var allow_access = get_allow_access();
+        console.log(allow_access);
         // limit
+        console.log(String(student[0].email.substr(0,5)));
         if(student.length){
-            var rollNo = Number(student[0].email.substr(0,5));
+            var rollNo = String(student[0].email.substr(0,5));
             
-            // Limiting Users for load testing
-            if((allow_access.indexOf(rollNo) > -1 || ADMINISTRATORS.indexOf(student[0].email) > -1 )){
+            // Limiting Users for load testing   || ADMINISTRATORS.indexOf(student[0].email) > -1
+            if((allow_access.indexOf(rollNo) > -1  )){
                 console.log("\n    Email valid for Reg . . .");
                 console.log(rollNo);
                 req.session["student"] = student[0];
@@ -187,10 +189,10 @@ const set_session_data = async (user, req, res) => {
                 "email" : user.data.email,
                 "pic" : user.data.picture
             });
-            var rollNo = Number(student.email.substr(0,5));
+            var rollNo = String(student.email.substr(0,5));
 
-            // Limiting Users for load testing
-            if((allow_access.indexOf(rollNo) > -1 || ADMINISTRATORS.indexOf(student.email) > -1)){
+            // Limiting Users for load testing  || ADMINISTRATORS.indexOf(student.email) > -1
+            if((allow_access.indexOf(rollNo) > -1 )){
                 console.log("\n    New Email valid for Reg . . .");
                 console.log(rollNo);
 
