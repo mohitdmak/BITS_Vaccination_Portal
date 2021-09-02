@@ -515,7 +515,7 @@ function BasicUsage() {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': "Bearer " + localStorage.getItem('jwt')
+                // 'Authorization': "Bearer " + localStorage.getItem('jwt')
             },
         }).then(response => 
             response.json().then(data => ({
@@ -548,6 +548,7 @@ function BasicUsage() {
         ).then(res => {
             if(res.data){
                 console.log("successfully updated.")
+                alert("Successfully updated form permissions.")
             } else {
                 console.log("error updating content.");
             }
@@ -567,8 +568,10 @@ function BasicUsage() {
             <ModalHeader>Enable Submissions</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-                <Flex flexDir="column" padding="10px">
-                    <Text fontWeight="bold">Batch</Text>
+                <Flex flexDir="column" padding="0px">
+                    <Text fontWeight="bold" color="red">Important</Text>
+                    <Text fontSize="14px">This is the admin section to enable students of which batches are allowed to submit their PDFs and personal details. Please only use this feature after approval from Chief Warden.</Text>
+                    <Text fontWeight="bold" mt="20px">Batch</Text>
                     <CheckboxGroup 
                     onChange={setFormB}
                     value={formB}>
@@ -587,10 +590,13 @@ function BasicUsage() {
             </ModalBody>
   
             <ModalFooter>
-              <Button colorScheme="blue" variant="ghost" mr={3} onClick={onClose}>
+              <Button variant="ghost" mr={3} onClick={onClose}>
                 Close
               </Button>
-              <Button onClick={() => postBatchData()} variant="solid">Modify Permission</Button>
+              <Button onClick={() => {
+                  postBatchData();
+                  onClose();
+              }} colorScheme="blue" variant="solid">Modify Permission</Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
