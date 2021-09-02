@@ -19,15 +19,18 @@ const fs = require("fs");
 const page_limit = 50;
 
 // access data
-var allow_access = ["f2020", "f2019", "f2018", "h2020", "h2019", "h2018"];
+let allow_access = ["f2020", "f2019", "f2018", "h2020", "h2019", "h2018"];
+const get_allow_access = () => {
+    return allow_access;
+}
 
 const restrict_access = async (req, res) => {
     allow_access = req.body.batch;
-    res.status(201).json({"success": allow_access});
+    res.status(201).json({"batch": allow_access});
 }
 const get_restrict_access = async (req, res) => {
     // allow_access = req.body.batch;
-    res.status(200).json({"batches": allow_access});
+    res.status(200).json({"batch": allow_access});
 }
 
 
@@ -90,27 +93,26 @@ const post_students = async ( req, res) => {
 
         // edit entries by batch
         if(batch.length){
-	    console.log(req.body);
-	    for (let i = 0; i < students.length; i++) {
+            for (let i = 0; i < students.length; i++) {
                 if(batch.indexOf(String(students[i].email.substr(1, 4))) > 2 || batch.indexOf(String(students[i].email.substr(1, 4))) < 0){
                     console.log(students[i].email.substr(1, 4));
                     students.splice(i, 1);
-		    i--;
+                    i--;
                 }
-		else{
-		    var date = new Date(Date.parse(students[i].arrival_date));
-		    date.setTime(date.getTime() + 19800000);
-	 	    students[i].arrival_date = date.toISOString();
-		}
+                else{
+                    var date = new Date(Date.parse(students[i].arrival_date));
+                    date.setTime(date.getTime() + 19800000);
+                    students[i].arrival_date = date.toISOString();
+                }
             }
         }
-	else{
-	    for (let i = 0; i < students.length; i++) {
-		var date = new Date(Date.parse(students[i].arrival_date));
-		date.setTime(date.getTime() + 19800000);
-		students[i].arrival_date = date.toISOString();
-	    }
-	}
+        else{
+            for (let i = 0; i < students.length; i++) {
+            var date = new Date(Date.parse(students[i].arrival_date));
+            date.setTime(date.getTime() + 19800000);
+            students[i].arrival_date = date.toISOString();
+            }
+        }
 
 
         // edit all entries for student
@@ -136,9 +138,8 @@ const post_students = async ( req, res) => {
                 }
                 else{
                     console.log("removed, not in time range :");
-		    console.log(students[i]);
                     students.splice(i, 1);
-		    i--;
+                    i--;
                 }
             }
             else{
@@ -167,7 +168,6 @@ const post_students = async ( req, res) => {
             total_pages = Math.floor(students.length / page_limit) + 1;
         }
         students = paginate(students, page_limit, page)
-	console.log(students);
         res.status(200).json({
             "total_pages": total_pages,
             "data": students
@@ -426,5 +426,6 @@ module.exports = {
     get_excel,
     restrict_access,
     allow_access,
-    get_restrict_access
+    get_restrict_access,
+    get_allow_access
 }
