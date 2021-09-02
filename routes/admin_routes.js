@@ -40,5 +40,8 @@ admin_router.get("/excel", admin_fxn.get_excel);
 // access modifier 
 admin_router.post("/allow", check_admin_auth, admin_fxn.restrict_access); 
 
+// get access
+admin_router.get("/allow", check_admin_auth, admin_fxn.get_restrict_access); 
+
 // exporting express router
 module.exports = admin_router;

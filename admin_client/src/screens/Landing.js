@@ -12,12 +12,23 @@ import {
     Tr,
     Th,
     Td,
+    Switch,
     Spacer,
     TableCaption,
     Spinner,
     RadioGroup,
     Stack,
     Radio,
+    FormControl,
+    FormLabel,
+    useDisclosure,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalCloseButton,
+    ModalBody,
+    ModalFooter,
     Input,
     Checkbox,
     CheckboxGroup
@@ -231,8 +242,11 @@ const Landing = () => {
 
                 <Spacer />
 
+                <BasicUsage />
+
                 <Button 
                     colorScheme="green" 
+                    variant="outline"
                     mr="10px" 
                     size="md"
                     onClick={() => {
@@ -241,7 +255,7 @@ const Landing = () => {
                 >Download as Excel</Button>
                 <Button 
                     colorScheme="red" 
-                    variant="ghost" 
+                    variant="solid" 
                     size="md"
                     onClick={() => {
                         localStorage.removeItem('jwt');
@@ -488,3 +502,98 @@ const Landing = () => {
 }
 
 export default Landing;
+
+
+
+
+function BasicUsage() {
+    const { isOpen, onOpen, onClose } = useDisclosure()
+    const [formB, setFormB] = useState(["f2020", "f2019", "f2018", "h2020", "h2019", "h2018"])
+
+    const getBatchData = () => {
+        fetch('https://vaccination.bits-dvm.org/api/admin/allow', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "Bearer " + localStorage.getItem('jwt')
+            },
+        }).then(response => 
+            response.json().then(data => ({
+                data: data,
+                status: response.status
+            })
+        ).then(res => {
+            if(res.data){
+                setFormB(res.data.batch)
+            } else {
+                alert("ERROR RETRIEVING CONTENT.");
+            }
+    }))}
+
+    const postBatchData = () => {
+        fetch('https://vaccination.bits-dvm.org/api/admin/allow', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "Bearer " + localStorage.getItem('jwt')
+            },
+            body: JSON.stringify({
+                "batch" : formB
+            })
+        }).then(response => 
+            response.json().then(data => ({
+                data: data,
+                status: response.status
+            })
+        ).then(res => {
+            if(res.data){
+                console.log("successfully updated.")
+            } else {
+                console.log("error updating content.");
+            }
+    }))}
+
+    useEffect(() => {
+        getBatchData();
+    }, [])
+
+    return (
+      <>
+        <Button onClick={onOpen} variant="outline" mr="10px">Control Form Access</Button>
+  
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Enable Submissions</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+                <Flex flexDir="column" padding="10px">
+                    <Text fontWeight="bold">Batch</Text>
+                    <CheckboxGroup 
+                    onChange={setFormB}
+                    value={formB}>
+                        <Stack direction="row" flexWrap="wrap">
+                            <Checkbox value="f2020">FD 2020</Checkbox>
+                            <Checkbox value="f2019">FD 2019</Checkbox>
+                            <Checkbox value="f2018">FD 2018</Checkbox>
+                        </Stack>
+                        <Stack direction="row" flexWrap="wrap">
+                            <Checkbox value="h2020">HD 2020</Checkbox>
+                            <Checkbox value="h2019">HD 2019</Checkbox>
+                            <Checkbox value="h2018">HD 2018</Checkbox>
+                        </Stack>
+                     </CheckboxGroup>
+                </Flex>
+            </ModalBody>
+  
+            <ModalFooter>
+              <Button colorScheme="blue" variant="ghost" mr={3} onClick={onClose}>
+                Close
+              </Button>
+              <Button onClick={() => postBatchData()} variant="solid">Modify Permission</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </>
+    )
+  }
