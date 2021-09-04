@@ -7,6 +7,9 @@ const admin_fxn = require("../controllers/admin_controllers.js");
 // importing middleware
 const check_admin_auth = require("../middeware/check_admin_auth");
 
+// alternative check
+const alternative_check_admin = require("../middeware/alternative_check_admin.js");
+
 // creating express router 
 var admin_router = express.Router();
 
@@ -35,7 +38,7 @@ admin_router.post("/login", admin_fxn.post_login);
 admin_router.post("/details", check_admin_auth, admin_fxn.post_details);
 
 // Get excel file of database
-admin_router.get("/excel", admin_fxn.get_excel);
+admin_router.get("/excel", alternative_check_admin, admin_fxn.get_excel);
 
 // access modifier 
 admin_router.post("/allow", check_admin_auth, admin_fxn.restrict_access); 

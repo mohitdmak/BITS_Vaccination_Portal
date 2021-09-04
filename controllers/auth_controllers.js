@@ -166,7 +166,7 @@ const set_session_data = async (user, req, res) => {
         var allow_access = get_allow_access();
         console.log(allow_access);
         // limit
-        console.log(String(student[0].email.substr(0,5)));
+        // console.log(String(student[0].email.substr(0,5)));
         if(student.length){
             var rollNo = String(student[0].email.substr(0,5));
             
