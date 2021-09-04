@@ -30,6 +30,7 @@ const restrict_access = async (req, res) => {
 }
 const get_restrict_access = async (req, res) => {
     // allow_access = req.body.batch;
+    // console.log(req.get("host"));
     res.status(200).json({"batch": allow_access});
 }
 
@@ -67,6 +68,13 @@ const post_students = async ( req, res) => {
             console.log(key);
             delete filters[key];
         }
+    }
+
+    // implement incomplete and case insensitive match
+    if(filters["name"] != null){
+        var name_var = filters["name"];
+        filters["name"] = {"$regex": String(name_var), "$options" : "i"};
+        console.log(filters["name"]);
     }
 
     try{
