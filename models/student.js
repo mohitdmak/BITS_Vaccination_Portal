@@ -1,9 +1,11 @@
-// Requiring mongoose and using its schema ORM
+// mongo ORM and validator
 const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 const { isEmail } = require('validator');
 
-// validating status
+
+// ########################### Validators ###########################
+// validating verification status
 function ValidateStatus(String){
     if(String === 'PENDING' || String === 'DONE' || String === 'FAILED'){
         return true;
@@ -13,7 +15,7 @@ function ValidateStatus(String){
     }
 }
 
-// validating status
+// validating vaccination status
 function ValidateVaccineStatus(String){
     if(String === 'COMPLETE' || String === 'PARTIAL' || String === 'NONE'){
         return true;
@@ -22,12 +24,10 @@ function ValidateVaccineStatus(String){
         return false;
     }
 }
+// ########################### / ########################### / ###########################
 
-// validate bits id
-// function ValidateBitsId(String){
 
-// }
-
+// ########################### Schemas ###########################
 // importing vaccine mongoose schema
 const Vaccineschema = require("./vaccine").Vaccineschema;
 
@@ -131,9 +131,8 @@ const Studentschema = new schema({
     // },
     vaccine: Vaccineschema
 });
+// ########################### / ########################### / ###########################
 
 
-
-//Exporting student model.
 const Student = mongoose.model('student', Studentschema);
 module.exports = Student;

@@ -1,15 +1,15 @@
-// importing express
+// import express
 const express = require("express");
-
-// creating express app instance
 const app = express();
 
-// import cors module
-const cors = require("cors");
 
+// ####################### SENTRY MIDDLEWARE ####################### 
+
+// Sentry tracing tools
 const Sentry = require('@sentry/node');
 const Tracing = require("@sentry/tracing");
 
+// sentry configuration and attaching project to assigned dsn
 Sentry.init({
   dsn: "https://82f368f549ed43fbb3db4437ac2b2c79@o562134.ingest.sentry.io/5923095",
   integrations: [
@@ -21,20 +21,27 @@ Sentry.init({
 
   // Set tracesSampleRate to 1.0 to capture 100%
   // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
   tracesSampleRate: 1.0,
 });
 
-// RequestHandler creates a separate execution context using domains, so that every
+// request handler creates a separate execution context using domains, so that every
 // transaction/span/breadcrumb is attached to its own Hub instance
 app.use(Sentry.Handlers.requestHandler());
-// TracingHandler creates a trace for every incoming request
+// tracing Handler creates a trace for every incoming request
 app.use(Sentry.Handlers.tracingHandler());
+// Sentry error handling middleware
 app.use(Sentry.Handlers.errorHandler());
 
+// test endpoint for sentry
+app.get("/api/debug-sentry", function mainHandler(req, res) {
+  console.log("DEBUG SENTRY");
+  throw new Error("Test Sentry error!");
+});
+// ########################### / ########################### / ###########################
 
 
-//* MIDDLEWARE :
+
+// ########################### Request Parsing Middlewares ###########################
 
 // this parses data submitted through forms generally.
 app.use(express.urlencoded({ extended:true }));
@@ -42,36 +49,48 @@ app.use(express.urlencoded({ extended:true }));
 app.use(express.json());
 
 // cors settings
+const cors = require("cors");
 app.use(cors());
 
-// run behind a proxy (nginx)
+// trust 'x-forwarded' headers set via nginx proxy
 app.set('trust proxy', 1);
 
-//* SESSION HANDLING :
+// multer errors
+var multer = require('multer');
+//app.use(function (err, req, res, next){
+//    if(err instanceof multer.MulterError){
+//        console.log(err);
+//        res.status(500).send(err.code);
+//    }
+//    else{
+//        console.log('\nError caught');
+//        next();
+//   }
+//});
+// ########################### / ########################### / ###########################
 
-// Requiring redis and module to use redis as Caching layer
+
+
+// ########################### Session Management ###########################
+
+// redis cache layer to store session data on server
 const redis = require('redis');
 const connectRedis = require('connect-redis');
 
-// using express-session to store session data.
+// using custom redis db as session store 
 const Session = require("express-session");
-// Creating express session
-const SESSION_SECRET = require("./config/session-secret.js");
-
-// Creating a redis store to store session data.
 const RedisStore = connectRedis(Session)
 
 //Configure redis client
 var redis_host = "RedisSessionContainer";
-
-// Importing configs
 const redisClient = redis.createClient({
     host: redis_host,
     port: 7000,
 });
 
+// configure session settings for express
+const SESSION_SECRET = require("./config/session-secret.js");
 app.use(Session({
-
     // Session configurations
     name: "express-session-id",
     secret: SESSION_SECRET,
@@ -87,7 +106,11 @@ app.use(Session({
     }
 }));
 
+// ########################### / ########################### / ###########################
 
+
+
+// ########################### NOTE : We have Migrated from forest admin to using our own Mongo admin ###########################
 //* CONFIGURE FOREST ADMIN
 // const Vaccine = require('./models/vaccine.js').Vaccine;
 // const Student = require('./models/student.js');
@@ -130,44 +153,17 @@ app.use(Session({
      
 //// FOREST ADMIN configurations
 // app.use(forest_conf);
+// ########################### / ########################### / ###########################
 
 
 
-
-// Optional fallthrough error handler
-//app.use(function onError(err, req, res, next) {
-  // The error id is attached to `res.sentry` to be returned
-  // and optionally displayed to the user for support.
-  //res.statusCode = 500;
-  //res.end(res.sentry + "\n");
-//});
-app.get("/api/debug-sentry", function mainHandler(req, res) {
-  console.log("DEBUG SENTRY");
-  throw new Error("Test Sentry error!");
-});
-
-
-
-// multer errors
-var multer = require('multer');
-//app.use(function (err, req, res, next){
-//    if(err instanceof multer.MulterError){
-//        console.log(err);
-//        res.status(500).send(err.code);
-//    }
-//    else{
-//        console.log('\nError caught');
-//        next();
-//   }
-//});
-
-//* ROUTES :
+// ########################### Api Endpoints ###########################
 
 // Home route
 app.get("/api", (req, res) => {
     console.log("Landed on home page");
-    console.log(req.session);
-    console.log(req.sessionID);
+    // console.log(req.session);
+    // console.log(req.sessionID);
 
     // creating appropriate redirection url
     var RedirectionUrl;
@@ -201,6 +197,8 @@ app.use("/api/student", student_routes);
 // Admin Route
 const admin_routes = require("./routes/admin_routes.js");
 app.use("/api/admin", admin_routes);
+// ########################### / ########################### / ###########################
+
 
 
  // exporting express app and redis client

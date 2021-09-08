@@ -1,5 +1,6 @@
-// importing express 
+// express  router
 const express = require("express");
+var student_router = express.Router();
 
 // importing controller for authentication
 const student_fxn = require("../controllers/student_controllers.js");
@@ -8,13 +9,10 @@ const admin_fxn = require("../controllers/admin_controllers.js");
 // importing middleware
 const check_auth = require("../middeware/check_auth");
 
-// creating express router 
-var student_router = express.Router();
 
 
-//* Defining routes
-//
-// Auth landing page
+// ########################### Defining routes ###########################
+// handling certificate pdf post
 student_router.post("/post_pdf", check_auth, student_fxn.upload.single("pdf"), student_fxn.post_pdf);
 
 // getting student's pdf
@@ -43,6 +41,9 @@ student_router.get("/logout", student_fxn.get_logout);
 
 // overall status 
 // student.router.get("/overall_status", check_auth, student_fxn.get_overall_status); 
+// ########################### / ########################### / ###########################
+
+
 
 // exporting express router
 module.exports = student_router;
