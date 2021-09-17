@@ -19,7 +19,7 @@ const fs = require("fs");
 const page_limit = 50;
 
 // access data
-let allow_access = ["f2020", "f2019", "f2018", "h2020", "h2019", "h2018"];
+let allow_access = [];
 const get_allow_access = () => {
     return allow_access;
 }
@@ -384,6 +384,8 @@ const get_excel = async (req, res) => {
         const excel_student =  {
              "Name": student.name,
              "Email": student.email,
+             "City": student.city,
+             "State": student.state,
              "Vaccination Status": student.vaccination_status,
              "Auto Verification": student.auto_verification,
              "Manual Verification": student.manual_verification,
