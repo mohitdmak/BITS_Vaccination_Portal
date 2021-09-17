@@ -81,13 +81,13 @@ const Studentschema = new schema({
     },
     latest_dose_date: {
         type: Date,
-        //required: [true, "Request does not specify a Date for 1st Dose"],
-        //default: new Date(2002, 08, 09, 10, 33, 30, 0)
+        // required: [true, "Request does not specify a Date for 1st Dose"],
+        // default: new Date(2002, 08, 09, 10, 33, 30, 0)
     },
     arrival_date: {
         type: Date,
         required: [true, "Request does not specify a Date for Arrival"],
-        default: new Date().setTime(new Date().getTime() + 19800000)
+        default: new Date()
     },
     vaccination_status: {
         type: String,
