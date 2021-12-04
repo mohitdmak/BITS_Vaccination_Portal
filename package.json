@@ -1,7 +1,7 @@
 {
   "name": "gsmaster",
   "version": "1.0.0",
-  "description": "Official Site Server Code for Gsmaster",
+  "description": "Official Site Server Code for BITS Vaccination Portal @ Vaccination.bits-dvm.org",
   "main": "server.js",
   "scripts": {
     "test": "npm run test",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mohitdmak/Gsmaster.git"
+    "url": "https://gitlab.com/dvm-bitspilani/vaccination_portal.git"
   },
   "author": "Mohit Makwana",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mohitdmak/Gsmaster/issues"
+    "url": "https://gitlab.com/dvm-bitspilani/vaccination_portal/-/issues"
   },
-  "homepage": "https://github.com/mohitdmak/Gsmaster#readme",
+  "homepage": "https://gitlab.com/dvm-bitspilani/vaccination_portal",
   "dependencies": {
     "@sentry/node": "^6.11.0",
     "@sentry/tracing": "^6.11.0",

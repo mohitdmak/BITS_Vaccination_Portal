@@ -1,15 +1,13 @@
-// importing express 
+// express router
 const express = require("express");
+var auth_router = express.Router();
 
 // importing controller for authentication
 const auth_fxn = require("../controllers/auth_controllers.js");
 
-// creating express router 
-var auth_router = express.Router();
 
 
-//* Defining routes
-
+// ########################### Defining routes ###########################
 // Auth landing page
 auth_router.get("/", auth_fxn.get_auth_url);
 
@@ -30,6 +28,9 @@ auth_router.get("/logout", auth_fxn.get_logout);
 
 // JSON Obtaining fxn
 // auth_router.get("/data", auth_fxn.get_data); 
+// ########################### / ########################### / ###########################
+
+
 
 // exporting express router
 module.exports = auth_router;

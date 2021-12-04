@@ -3,22 +3,6 @@ version: "3.3"
 # Docker containers in the network
 services:
   
-  # strapi:
-  #   image: strapi/strapi
-  #   environment:
-  #     DATABASE_CLIENT: mongo
-  #     DATABASE_NAME: Portal
-  #     DATABASE_HOST: MongoContainer
-  #     DATABASE_PORT: 27017
-  #     # DATABASE_USERNAME: VACC_PORTAL
-  #     # DATABASE_PASSWORD: lgocoronagol
-  #   volumes:
-  #     - ./:/srv/app
-  #   ports:
-  #     - '1337:1337'
-  #   depends_on:
-  #     - mongo_container
-
   # app:
   #   build:
   #     context: ./TRIAL_THREE
