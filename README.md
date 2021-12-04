@@ -1,5 +1,12 @@
 # Vaccination_Portal
 
+# TODO
+- nvim cocaction binding
+- gh repo node best practices
+- gh actions auto deploy to main
+- closures usage in controllers
+- passing web objects to controllers?
+- centralized error handling
 
 
 ## Getting started
