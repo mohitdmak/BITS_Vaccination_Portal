@@ -11,6 +11,7 @@ COPY ./db/mongod.conf /etc/mongod.conf
 EXPOSE 27017
 
 # Expose HTTP Port too
+# Superadmin probably accesses collections via this port
 EXPOSE 28017
 
 # Start mongod service

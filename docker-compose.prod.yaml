@@ -78,7 +78,7 @@ services:
     # DB needs to always be up
     restart: always
 
-    # Setting volumes between db dir and container
+    # Setting external volume for /data/db in mongo container
     volumes:
       - type: volume
         source: mongodb_data_volume
@@ -191,7 +191,7 @@ services:
     # Proxy to listen always
     restart: always
 
-    # Binding port 80 with host os port 1340
+    # Binding port 80 with host port 1340
     ports:
       - 1370:443
 
