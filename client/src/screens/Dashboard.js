@@ -1,4 +1,5 @@
 import { React, useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 
 import {
     Flex,
@@ -14,6 +15,8 @@ import {
     Switch,
     Checkbox,
     Select,
+    Radio,
+    RadioGroup,
     Stack,
 } from '@chakra-ui/react'
 import { CalendarIcon } from '@chakra-ui/icons'
@@ -36,6 +39,8 @@ const Dashboard = (props) => {
     const [one, setOne] = useState(2)
     const [city, setCity] = useState("")
     const [region, setRegion] = useState("")
+    const [gender, setGender] = useState("female")
+    const [studentId, setStudentId] = useState("")
     const [isContainment, setIsContainment] = useState(false)
     const [checkedItems, setCheckedItems] = useState([false, false, false])
     const [arrival, setArrival] = useState(new Date())
@@ -112,6 +117,8 @@ const Dashboard = (props) => {
                     if (res.consent_form) setConsent(true)
                     setCity(res.city || "")
                     setRegion(res.state || "")
+                    setGender(res.gender || "")
+                    setStudentId(res.studentId || "")
                     setArrival(res.arrival_date ? parseISO(res.arrival_date) : new Date())
                     setIsContainment(res.is_containment_zone || false)
                     setCheckedItems([res.is_medically_fit || false, res.TnC1_Agreement || false, res.TnC2_Agreement || false])
@@ -130,6 +137,8 @@ const Dashboard = (props) => {
         fetch('https://vaccination.bits-dvm.org/api/student/extra', {
             method: 'POST',
             body: JSON.stringify({
+                "studentId": studentId,
+                "gender": gender,
                 "city": city,
                 "state": region,
                 "is_containment_zone": isContainment,
@@ -395,8 +404,9 @@ const Dashboard = (props) => {
                         </Box>
                     </Flex>
 
-                    <Flex marginTop="40px" ml="5px" width={["80vw", "80vw", "80vw", "1040px", "1040px"]}>
+                    <Flex marginTop="40px" ml="5px" flexDir="column" width={["80vw", "80vw", "80vw", "1040px", "1040px"]}>
                         <Heading fontSize="22px">Step 1: Update your documents</Heading>
+                        <Text mt="5px">Click on the select button to select a file from your computer. Once you have selected the correct file, please press the Update button. Once your PDFs are both updated and you can see the View button, proceed to filling in the rest of your details.</Text>
                     </Flex>
                     
                     <Grid
@@ -482,7 +492,41 @@ const Dashboard = (props) => {
                         p="20px"
                         borderRadius="10px"
                     >
+
                         <Box width={"100%"}>
+                            {/* Make a text input field for BITS ID*/}
+                            <Text textAlign={"left"} >
+                                <Text fontWeight="bold">Enter your BITS ID * </Text>
+                                {(studentId === "") ?
+                                    <Text color="red" fontSize={'small'} >Please enter this field</Text> : null
+                                }
+                            </Text>
+                            <Input
+                                mt="10px"
+                                placeholder="20XXAXPSXXXXP"
+                                value={studentId}
+                                onChange={(e) => setStudentId(e.target.value)}
+                                required
+                            />
+                        </Box>
+
+                        <Box mt="10px" width={"100%"}>
+                            {/* Make a text input field for BITS ID*/}
+                            <Text textAlign={"left"} >
+                                <Text fontWeight="bold">Please select your gender *</Text>
+                                {(gender === "") ?
+                                    <Text color="red" fontSize={'small'} >Please enter this field</Text> : null
+                                }
+                            </Text>
+                            <RadioGroup onChange={setGender} value={gender}>
+                                <Stack direction="row">
+                                    <Radio value="male">Male</Radio>
+                                    <Radio value="female">Female</Radio>
+                                </Stack>
+                            </RadioGroup>
+                        </Box>
+
+                        <Box mt="40px" width={"100%"}>
                             {/* Make a text input field for city of residence */}
                             <Text textAlign={"left"} >
                                 <Text fontWeight="bold">Current place of stay (Village/City/District) * </Text>
@@ -498,6 +542,8 @@ const Dashboard = (props) => {
                                 required
                             />
                         </Box>
+
+                        
 
                         <Flex width={"100%"} mt="40px" flexDirection="column">
                             <Text textAlign={"left"} >
@@ -652,23 +698,13 @@ const Dashboard = (props) => {
                         </Button>
                     </Flex>
 
-                    <Flex
-                        flexDir={["column", "column", "column", "row", "row"]}
-                        alignItems="center"
-                        mt="80px"
-                        mb="50px"
-                    >
-                        An initiative by
-                        <a href="https://bits-dvm.org">
-                            <Image src={dvm} ml="10px" mr="10px" mt="5px" height="70px" />
-                        </a>
-                        and
-                        <a href=" https://su-bitspilani.org/">
-                            <Image src={bits} ml="20px" mr="20px" mt="5px" boxSize="70px" />
-                        </a>
-                    </Flex>
+                    
+
+                    
 
                 </Flex>
+
+                
 
             </> : <Flex flexDir="row" alignItems="center" justifyContent="center">
                 <Spinner /></Flex>}</>
