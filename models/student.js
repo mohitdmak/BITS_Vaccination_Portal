@@ -49,6 +49,16 @@ const Studentschema = new schema({
         default: ""
     //     // validate: [ValidateBitsId, "Request's BITS ID is not valid"]
     },
+    is_above_18: {
+        type: Boolean,
+        required: [true, 'Request does not have is_above_18 field'],
+        default: true
+    },
+    staying_on_campus: {
+        type: Boolean,
+        required: [true, 'Request does not contain preference for staying on campus'],
+        default: true
+    },
     gender: {
         type: String
     },
