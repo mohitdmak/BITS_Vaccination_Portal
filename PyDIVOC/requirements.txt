@@ -1,0 +1,8 @@
+autopep8==1.5.7
+joblib==1.0.1
+numpy==1.21.0
+opencv-python
+pycodestyle==2.7.0
+toml==0.10.2
+zbar-py==1.0.4
+pdf2image

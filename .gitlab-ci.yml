@@ -1,0 +1,85 @@
+# Custom made CI CD setup file
+# For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
+
+# Workflow rules to trigger CI only when pushed via a tag/MR/to Main
+workflow:
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_TAG
+    # DEFAULT BRANCH == main
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+
+# Variables for container registry
+variables:
+  DOCKER_REGISTRY_USER: $DOCKER_REGISTRY_USER
+  DOCKER_REGISTRY_PASSWORD: $DOCKER_REGISTRY_PASSWORD
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
+
+# Dind service for docker
+services:
+  - docker:19.03.13-dind
+
+
+# List stages for jobs, and their order of execution
+stages:          
+  - build
+  - staging
+  - deploy
+
+
+# This runs to tag containers by upping them once
+build-job:
+  # Building on docker image
+  image: docker/compose:latest       
+  stage: build
+
+  # Running before script to print env vars for debugging
+  before_script:
+    - docker info
+
+  # Run docker-compose
+  script:
+    - echo "Compiling the code in containers..."
+    # Touching env files ignored for the gitlab runner 
+    - touch config/mongo.env
+    - touch config/mongo-express.env
+    - touch config/mongo-express2.env
+    - touch config/DB_ADMIN_CONFIG.env
+    - docker-compose -f docker-compose.prod.yaml build
+
+
+# This pushes the tagged containers to their registry
+stage-job:
+    # Building on docker image
+    image: docker/compose:latest
+    # Stage images to push
+    stage: staging
+    
+    # Use containers built by build-job
+    dependencies:
+      - build-job
+
+    # Login to dockerhub and push
+    script:
+    # Touching env files ignored for the gitlab runner
+    - touch config/mongo.env
+    - touch config/mongo-express.env
+    - touch config/mongo-express2.env
+    - touch config/DB_ADMIN_CONFIG.env
+    # Push to registry
+    - docker-compose -f docker-compose.prod.yaml build
+    - echo "Pushing Docker Images to Registry..."
+    - docker login -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_PASSWORD
+    - docker-compose -f docker-compose.prod.yaml push
+
+
+# This would pull code from hosted repo into server directly
+deploy-job:    
+  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+  
+  # No way currently to SSH into DVM repo
+  script:
+    - echo "Deploying application..."
+    - echo "No way to deploy currently"
