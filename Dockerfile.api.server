@@ -40,7 +40,7 @@ RUN cd PyDIVOC && pip3 install -r requirements.txt && python3 setup.py build
 
 # RUN  chmod -R 777 /Portal
 
-RUN apt-get update && apt-get install ghostscript graphicsmagick
+RUN apt-get update && apt-get install ghostscript graphicsmagick -y
 
 # Dev environment
 CMD ["npm", "run", "dev_server"]
