@@ -42,13 +42,16 @@ const Studentschema = new schema({
         unique: true,
         validate: [isEmail, 'Request\'s email-id is not a valid email addresss']
     },
-    // bits_id: {
-    //     type: String,
-    //     required: [true, 'Request does not have a BITS ID'],
-    //     unique: true,
-    //     default: "2020A7PS0048P"
+    studentId: {
+        type: String,
+        required: [true, 'Request does not have a BITS ID'],
+        unique: true,
+        default: ""
     //     // validate: [ValidateBitsId, "Request's BITS ID is not valid"]
-    // },
+    },
+    gender: {
+        type: String
+    },
     city: {
         type: String,
 	//required: [true, "Request does not have the Student Address"],
@@ -130,7 +133,10 @@ const Studentschema = new schema({
     //     type: Buffer
     // },
     vaccine: Vaccineschema
-});
+},
+    {
+        timestamps: true
+    });
 
 
 

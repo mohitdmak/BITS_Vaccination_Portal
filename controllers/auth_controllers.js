@@ -158,7 +158,8 @@ const set_session_data = async (user, req, res) => {
             "f20201229@pilani.bits-pilani.ac.in",  // PARTH SHARMA
             "f20190024@pilani.bits-pilani.ac.in",  // NIDHEESH JAIN
             "f20190663@pilani.bits-pilani.ac.in",  // DARSH MISHRA
-            "f20190363@pilani.bits-pilani.ac.in"   // ANSHAL SHUKLA
+            "f20190363@pilani.bits-pilani.ac.in",   // ANSHAL SHUKLA
+            // "f20170806@pilani.bits-pilani.ac.in"   // MSR (EX STUCCAN)
         ];
 
         // find for user in db
@@ -171,7 +172,7 @@ const set_session_data = async (user, req, res) => {
             var rollNo = String(student[0].email.substr(0,5));
             
             // Limiting Users for load testing   || ADMINISTRATORS.indexOf(student[0].email) > -1
-            if((allow_access.indexOf(rollNo) > -1  )){
+            if((allow_access.indexOf(rollNo) > -1  || ADMINISTRATORS.indexOf(student[0].email) > -1)){
                 console.log("\n    Email valid for Reg . . .");
                 console.log(rollNo);
                 req.session["student"] = student[0];
@@ -192,7 +193,7 @@ const set_session_data = async (user, req, res) => {
             var rollNo = String(student.email.substr(0,5));
 
             // Limiting Users for load testing  || ADMINISTRATORS.indexOf(student.email) > -1
-            if((allow_access.indexOf(rollNo) > -1 )){
+            if((allow_access.indexOf(rollNo) > -1 || ADMINISTRATORS.indexOf(student.email) > -1)){
                 console.log("\n    New Email valid for Reg . . .");
                 console.log(rollNo);
 

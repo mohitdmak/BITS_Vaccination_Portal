@@ -34,6 +34,97 @@ const get_restrict_access = async (req, res) => {
     res.status(200).json({"batch": allow_access});
 }
 
+// validate for hostel portal
+const validate = async (req, res) => {
+    var emailId = req.query.email;
+    var student = await Student.findOne({email: emailId});
+    var check_exists = true;
+    var valid = true;
+    var result = "";
+    var verdict;
+    var details = {};
+    var agreement;
+    if(!student){
+        result = result + "The Student with provided EmailId does not exist. \n";
+        check_exists = false;
+        valid = false;
+    }
+    else{
+        agreement = student.TnC1_Agreement && student.TnC2_Agreement && student.is_medically_fit;
+        details["name"] = student.name;
+    }
+    if(check_exists == true && agreement == false){
+        result = result + "Non Acceptance of Terms And Conditions,";
+        valid = false;
+    }
+    if(check_exists == true && !student.consent_form){
+        result = result + " No Consent Form,";
+        valid = false;
+    }
+    if(check_exists == true && !student.state){
+        result = result + " State of Residence not uploaded,";
+        valid = false;
+    }
+    else if(check_exists == true){
+        details["state"] = student.state;
+    }
+    if(check_exists == true && !student.city){
+        result = result + " City of Residence not uploaded,";
+        valid = false;
+    }
+    else if(check_exists == true){
+        details["city"] = student.city;
+    }
+    if(check_exists == true && student.vaccination_status == "NONE"){
+        result = result + " Vaccination status being NONE,";
+        valid = false;
+    }
+    else if(check_exists == true){
+        details["vaccination_status"] = student.vaccination_status;
+    }
+    if(check_exists == true && !student.gender){
+        result = result + " gender not uploaded,";
+        valid = false;
+    }
+    else if(check_exists == true){
+        details["gender"] = student.gender;
+    }
+    if(check_exists == true && !student.studentId){
+        result = result + " BITS ID not uploaded,";
+        valid = false;
+    }
+    else if(check_exists == true){
+        details["studentId"] = student.studentId;
+    }
+    if(check_exists && valid){
+        verdict = true;
+    }
+    else{
+        verdict = false;
+        result = "Student is not allowed to login due to: " + result;
+        result = result.slice(0, -1);
+    }
+    if(emailId == "f20201976@pilani.bits-pilani.ac.in" || emailId == "f20200931@pilani.bits-pilani.ac.in"){
+        result = "ADMINISTRATORS allowed access.";
+        verdict = true;
+        valid = true;
+        check_exists = true;
+    }
+    res.status(200).json({"result": verdict, "message": result, "details": details});
+//     // if(student && student.consent_form && student.gender && student.studentId && (student.createdAt != student.updatedAt)){
+//     //     res.status(200).json({
+//     //         "result": true,
+//     //         "name": student.name,
+//     //         "gender": student.gender,
+//     //         "studentId": student.studentId
+//     //     });
+//     // }
+//     // else{
+//         // res.status(200).json({
+//         //     "result": false
+//         // });
+//     }
+}
 
 // function to paginate array after applying filters
 function paginate(array, page_size, page_number) {
@@ -216,7 +307,11 @@ const get_student = async (req, res) => {
             "arrival_date": student.arrival_date,
             "is_containment_zone": student.is_containment_zone,
             "pdf": student.pdf,
-            "consent_form": student.consent_form
+            "consent_form": student.consent_form,
+            "gender": student.gender,
+            "studentId": student.studentId,
+            "createdAt": student.createdAt,
+            "updatedAt": student.updatedAt
         });
     }
     catch(err){
@@ -362,12 +457,18 @@ const get_excel = async (req, res) => {
         var pdf;
         var consent_form;
         var latest_dose_date;
+        var vaccine;
+        var last_dose_date_start;
+        // var last_dose_date_finish;
         var agreement = student.TnC1_Agreement && student.TnC2_Agreement && student.is_medically_fit;
         if(student.latest_dose_date){
-            latest_dose_date = new Date('2020-01-14T17:43:37.000Z').toLocaleString(undefined, {timeZone: 'Asia/Kolkata'});
+            latest_dose_date = new Date(student.latest_dose_date).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
+        }
+        else if(student.manual_verification == "DONE" && student.vaccine){
+            latest_dose_date = new Date(student.vaccine.QR.evidence[0].date).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
         }
         else{
-            latest_dose_date = "No latest dose";
+            latest_dose_date = "DATA UNAVAILABLE";
         }
         if(student.pdf){
             pdf = true;
@@ -381,11 +482,94 @@ const get_excel = async (req, res) => {
         else{
             consent_form = false;
         }
+        if(student.vaccine && latest_dose_date != "DATA UNAVAILABLE" && student.vaccination_status != "COMPLETE"){
+            vaccine = student.vaccine.QR.evidence[0].vaccine;
+            if(vaccine == "COVISHIELD"){
+                // if(student.auto_verification == ""){
+                    var date = new Date(Date.parse(latest_dose_date));
+                    date.setDate(date.getDate() + 84); 
+                    last_dose_date_start = date.toISOString();
+                    date.setDate(date.getDate() + 112 - 84);
+                    last_dose_date_finish = date.toISOString();
+                    last_dose_date_start = new Date(last_dose_date_start).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
+                    last_dose_date_finish = new Date(last_dose_date_finish).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
+                // }
+                // else{
+                    // last_dose_date_start = "MANUALLY VERIFIED";
+                    // last_dose_date_finish = "MANUALLY VERIFIED";
+                // }
+            }
+            else if(vaccine == "COVAXIN"){
+                // if(student.auto_verification == "DONE"){
+                    var date = new Date(Date.parse(latest_dose_date));
+                    date.setDate(date.getDate() + 28); 
+                    last_dose_date_start = date.toISOString();
+                    date.setDate(date.getDate() + 42 - 28);
+                    last_dose_date_finish = date.toISOString();
+                    last_dose_date_start = new Date(last_dose_date_start).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
+                    last_dose_date_finish = new Date(last_dose_date_finish).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
+                // }
+                // else{
+                //     last_dose_date_start = "MANUALLY VERIFIED";
+                //     last_dose_date_finish = "MANUALLY VERIFIED";
+                // }
+            }
+            else if(vaccine == "SPUTNIK V"){
+                // if(student.auto_verification == "DONE"){
+                    var date = new Date(Date.parse(latest_dose_date));
+                    date.setDate(date.getDate() + 21); 
+                    last_dose_date_start = date.toISOString();
+                    last_dose_date_start = new Date(last_dose_date_start).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
+                    last_dose_date_finish = "NO END DATE";
+                // }
+                // else{
+                //     last_dose_date_start = "MANUALLY VERIFIED";
+                //     last_dose_date_finish = "MANUALLY VERIFIED";
+                // }
+            }
+            // var date = new Date(Date.parse(last_dose_date_start));
+            // date.setDate(date.getDate() + 14);
+            // last_dose_date_finish = date.toISOString();
+            // last_dose_date_finish = new Date(last_dose_date_finish).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'});
+            var dates = latest_dose_date.split("/");
+            latest_dose_date = dates[1]+"/"+dates[0]+"/"+dates[2];
+            var dates = String(last_dose_date_start).split("/");
+            last_dose_date_start = dates[1]+"/"+dates[0]+"/"+dates[2];
+            var dates = last_dose_date_finish.split("/");
+            if(dates.length > 1){
+                last_dose_date_finish = dates[1]+"/"+dates[0]+"/"+dates[2];
+            }
+        }
+        else if(student.vaccination_status == "COMPLETE" && student.vaccine){
+            last_dose_date_start = "COMPLETELY VACCINATED";
+            last_dose_date_finish = "COMPLETELY VACCINATED";
+            vaccine = student.vaccine.QR.evidence[0].vaccine;
+            var dates = latest_dose_date.split("/");
+            latest_dose_date = dates[1]+"/"+dates[0]+"/"+dates[2];
+        }
+        else{
+            vaccine = "DATA UNAVAILABLE";
+            last_dose_date_start = "DATA UNAVAILABLE";
+            last_dose_date_finish = "DATA UNAVAILABLE";
+        }
+        var arrival_date = new Date(student.arrival_date).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'})
+        var createdAt = new Date(student.createdAt).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'})
+        var updatedAt = new Date(student.updatedAt).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'})
+        var dates = arrival_date.split("/");
+        arrival_date = dates[1]+"/"+dates[0]+"/"+dates[2];
+        var dates = createdAt.split("/");
+        createdAt = dates[1]+"/"+dates[0]+"/"+dates[2];
+        var dates = updatedAt.split("/");
+        updatedAt = dates[1]+"/"+dates[0]+"/"+dates[2];
         const excel_student =  {
              "Name": student.name,
+             "Gender": student.gender,
+             "BITS ID": student.studentId,
              "Email": student.email,
              "City": student.city,
+             "Arrival Date": arrival_date,
              "State": student.state,
+             "Vaccine": vaccine,
              "Vaccination Status": student.vaccination_status,
              "Auto Verification": student.auto_verification,
              "Manual Verification": student.manual_verification,
@@ -393,9 +577,14 @@ const get_excel = async (req, res) => {
              "Consent Uploaded": consent_form,
              "Accepted All Agreements": agreement,
              "Latest Dose Date": latest_dose_date,
-             "Arrival Date": new Date(student.arrival_date).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'}),
-        };
+             "Last Dose Starting": last_dose_date_start,
+             // "Last Dose Ending": last_dose_date_finish,
+             "Created At": createdAt,
+             "Updated At": updatedAt 
+        }
+        // if(consent_form){
         excel_array.push(excel_student);
+        // }
     });
     
     // prepare xlsx document
@@ -437,5 +626,6 @@ module.exports = {
     restrict_access,
     allow_access,
     get_restrict_access,
-    get_allow_access
+    get_allow_access,
+    validate
 }
