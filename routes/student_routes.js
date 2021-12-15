@@ -17,7 +17,7 @@ var student_router = express.Router();
 // Auth landing page
 student_router.post("/post_pdf", check_auth, student_fxn.upload.single("pdf"), student_fxn.post_pdf);
 
-student_router.post("/update", student_fxn.update);
+// student_router.post("/update", student_fxn.update);
 
 // getting student's pdf
 student_router.get("/get_pdf", check_auth, student_fxn.get_pdf);
