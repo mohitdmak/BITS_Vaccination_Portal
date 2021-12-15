@@ -44,9 +44,9 @@ const Studentschema = new schema({
     },
     studentId: {
         type: String,
-        required: [true, 'Request does not have a BITS ID'],
-        unique: true,
-        default: ""
+        //required: [true, 'Request does not have a BITS ID'],
+        //unique: true,
+        //default: ""
     //     // validate: [ValidateBitsId, "Request's BITS ID is not valid"]
     },
     is_above_18: {

@@ -52,7 +52,7 @@ const Landing = () => {
     const [checkedMV, setCheckedMV] = useState(localStorage.getItem('checkedMV') ? JSON.parse(localStorage.getItem('checkedMV')) : (["FAILED", "PENDING", "DONE"]))
     const [checkedAV, setCheckedAV] = useState(localStorage.getItem('checkedAV') ? JSON.parse(localStorage.getItem('checkedAV')) : (["FAILED", "PENDING", "DONE"]))
 
-    const [batch, setBatch] = useState(localStorage.getItem('batch') ? JSON.parse(localStorage.getItem('batch')) : (["2020", "2019", "2018", "2017", "2016"]));
+    const [batch, setBatch] = useState(localStorage.getItem('batch') ? JSON.parse(localStorage.getItem('batch')) : (["2021", "2020", "2019", "2018", "2017", "2016"])); // Interesting
 
     // const [startDate, setStartDate] = useState(localStorage.getItem('startDate') ? JSON.parse(localStorage.getItem('startDate')): new Date("2021/10/01"))
     // const [endDate, setEndDate] = useState(localStorage.getItem('endDate') ? JSON.parse(localStorage.getItem('endDate')) : new Date("2021/12/01"))
@@ -321,7 +321,9 @@ const Landing = () => {
                         <CheckboxGroup 
                         onChange={setBatch}
                         value={batch}>
-                            <Stack direction="row" flexWrap="wrap">
+                            <Stack direction="row" flexWrap="wrap"> 
+                            {/* // Interesting */}
+                                <Checkbox value="2021">2021</Checkbox>
                                 <Checkbox value="2020">2020</Checkbox>
                                 <Checkbox value="2019">2019</Checkbox>
                                 <Checkbox value="2018">2018</Checkbox>
@@ -515,7 +517,7 @@ export default Landing;
 
 function BasicUsage() {
     const { isOpen, onOpen, onClose } = useDisclosure()
-    const [formB, setFormB] = useState(["f2020", "f2019", "f2018", "f2017", "f2016", "h2020", "h2019", "h2018", "h2017", "h2016"])
+    const [formB, setFormB] = useState(["f2021", "f2020", "f2019", "f2018", "f2017", "f2016", "h2021", "h2020", "h2019", "h2018", "h2017", "h2016"]) // Interesting
 
     const getBatchData = () => {
         fetch('https://vaccination.bits-dvm.org/api/admin/allow', {
@@ -583,6 +585,8 @@ function BasicUsage() {
                     onChange={setFormB}
                     value={formB}>
                         <Stack direction="row" flexWrap="wrap">
+                            {/* // Interesting */}
+                            <Checkbox value="f2021">FD 2021</Checkbox>
                             <Checkbox value="f2020">FD 2020</Checkbox>
                             <Checkbox value="f2019">FD 2019</Checkbox>
                             <Checkbox value="f2018">FD 2018</Checkbox>
@@ -590,6 +594,8 @@ function BasicUsage() {
                             <Checkbox value="f2016">FD 2016</Checkbox>
                         </Stack>
                         <Stack direction="row" flexWrap="wrap">
+                        {/* // Interesting */}
+                            <Checkbox value="h2021">HD 2021</Checkbox>
                             <Checkbox value="h2020">HD 2020</Checkbox>
                             <Checkbox value="h2019">HD 2019</Checkbox>
                             <Checkbox value="h2018">HD 2018</Checkbox>
