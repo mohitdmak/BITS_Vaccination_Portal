@@ -173,6 +173,19 @@ const get_consent = async (req, res) => {
     }
 }
 
+const update = async (req, res) => {
+    try{
+        var email = req.session["student"].email;
+        var is_above_18 = req.body.is_above_18;
+        var staying_on_campus = req.body.staying_on_campus;
+        await Student.findOneAndUpdate({email: email}, {is_above_18: is_above_18, staying_on_campus: staying_on_campus});
+        res.status(201).json({"message": "Successfully updated details"});
+    }
+    catch(e){
+        console.log(e);
+        res.status(500).json({"Error": "Error in updating detail"});
+    }
+}
 
 // post extra data
 const post_extra_data = async (req, res) => {
@@ -554,5 +567,6 @@ module.exports = {
     post_consent,
     get_consent,
     post_details,
-    post_extra_data
+    post_extra_data,
+    update
 }
