@@ -100,7 +100,7 @@ const Studentschema = new schema({
     arrival_date: {
         type: Date,
         required: [true, "Request does not specify a Date for Arrival"],
-        default: new Date()
+        default: Date.now()
     },
     vaccination_status: {
         type: String,

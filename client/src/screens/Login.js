@@ -58,11 +58,11 @@ const Login = (props) => {
                         onClick={() => window.open("https://vaccination.bits-dvm.org/api/auth", "_parent")}
                     >Login with BITS Mail</Button>
 
-                    <Box pt="10px" pb="10px" pl="10px" pr="10px" bg="gray.100" width="90vw" mt="40px" borderRadius="5px" display="flex" flexDir="column">
+                    <Box pt="10px" pb="10px" pl="10px" pr="10px" bg="gray.100" width={['90vw', '90vw', '60vw']} mt="40px" borderRadius="5px" display="flex" flexDir="column">
                         <Text align="center" fontWeight="medium" fontSize="15px" color="gray.600">For details about Campus Reopening, please visit<br />
-                        <Link href='https://navinbits.blogspot.com/' isExternal style={{color:"black", fontWeight: "700"}}>
+                        <a href='https://navinbits.blogspot.com/' style={{color:"black", fontWeight: "700"}}>
                             Campus Reopening Details Page <ExternalLinkIcon mx='2px' />
-                        </Link></Text>
+                        </a></Text>
                     </Box>
 
 

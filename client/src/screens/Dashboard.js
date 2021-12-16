@@ -125,10 +125,10 @@ const Dashboard = (props) => {
                     setGender(res.gender || "male")
                     setStudentId(res.studentId || "")
                     setArrival(res.arrival_date ? parseISO(res.arrival_date) : new Date())
-                    setIsContainment(res.is_containment_zone != null ? toString(res.is_containment_zone) : "false")
+                    setIsContainment(res.is_containment_zone != null ? `${res.is_containment_zone}` : "false")
                     setCheckedItems([res.is_medically_fit || false, res.TnC1_Agreement || false, res.TnC2_Agreement || false])
-                    setStay(res.staying_on_campus != null ? toString(res.staying_on_campus) : "true")
-                    setIsAbove18(res.is_above_18 != null ? toString(res.is_above_18) : "true")
+                    setStay(res.staying_on_campus != null ? `${res.staying_on_campus}` : "true")
+                    setIsAbove18(res.is_above_18 != null ? `${res.is_above_18}` : "true")
                 } else {
                     alert("ERROR RETRIEVING CONTENT.");
                 }
