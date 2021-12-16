@@ -285,7 +285,7 @@ const get_student = async (req, res) => {
 
     // get id no
     const id = req.body._id;
-    //console.log(id);
+    console.log(id);
     try{
         var student = await Student.findById(id);
         var date = new Date(Date.parse(student.arrival_date));
@@ -310,6 +310,8 @@ const get_student = async (req, res) => {
             "consent_form": student.consent_form,
             "gender": student.gender,
             "studentId": student.studentId,
+            "is_above_18": student.is_above_18,
+            "staying_on_campus": student.staying_on_campus,
             "createdAt": student.createdAt,
             "updatedAt": student.updatedAt
         });
@@ -579,6 +581,8 @@ const get_excel = async (req, res) => {
              "Latest Dose Date": latest_dose_date,
              "Last Dose Starting": last_dose_date_start,
              // "Last Dose Ending": last_dose_date_finish,
+             "Is Above 18": student.is_above_18,
+             "Staying on campus": student.staying_on_campus,
              "Created At": createdAt,
              "Updated At": updatedAt 
         }
