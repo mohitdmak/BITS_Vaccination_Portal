@@ -30,12 +30,24 @@ app.use(Sentry.Handlers.requestHandler());
 // tracing Handler creates a trace for every incoming request
 app.use(Sentry.Handlers.tracingHandler());
 // Sentry error handling middleware
-app.use(Sentry.Handlers.errorHandler());
+// app.use(Sentry.Handlers.errorHandler());
 
 // test endpoint for sentry
-app.get("/api/debug-sentry", function mainHandler(req, res) {
-  console.log("DEBUG SENTRY");
-  throw new Error("Test Sentry error!");
+app.get("/api/debug-sentry", async function mainHandler(req, res) {
+    error_handler = require("./middeware/error_handler").error_handler;
+    const {APIError} = require("./middeware/error_models");
+    const HttpStatusCode = require("./middeware/error_models").HttpStatusCode;
+    try{
+        throw new APIError(HttpStatusCode.UNAUTHORIZED_REQUEST, "Student needs to login first", false);
+    }
+    catch(e){
+        if(error_handler.isHandleAble(e)){
+            await error_handler.handleError(e, res);
+        }
+        else{
+            console.log("DEBUG SENTRY");
+        }
+    }
 });
 // ########################### / ########################### / ###########################
 

@@ -6,7 +6,8 @@
 - gh actions auto deploy to main
 - closures usage in controllers
 - passing web objects to controllers?
-- centralized error handling
+- unhandleable errors, uncaught exceptions, kill signal emittors, handle these and use pm2/else
+- setup mailer for mailing whenever critical error happens
 
 
 ## Getting started
