@@ -557,6 +557,18 @@ const post_details = (req, res) => {
     res.status(200).json({"success": "admin is allowed"});
 }
 
+// endpoint for hostel portal verification
+const get_staying_on_campus_status = async (req, res) => {
+    try{
+        var student = await Student.findOne({email: req.body.email});
+        res.status(200).json({"staying_on_campus": student.staying_on_campus});
+    }
+    catch(e){
+        console.log(e);
+        res.status(500).json({"Error": e});
+    }
+}
+
 module.exports = {
     get_all,
     get_student_details,
@@ -568,5 +580,6 @@ module.exports = {
     get_consent,
     post_details,
     post_extra_data,
-    update
+    update,
+    get_staying_on_campus_status
 }

@@ -44,7 +44,7 @@ student_router.get("/logout", student_fxn.get_logout);
 // student_router.get("/excel", admin_fxn.get_excel);
 
 // overall status 
-// student.router.get("/overall_status", check_auth, student_fxn.get_overall_status); 
+student_router.post("/staying_on_campus", student_fxn.get_staying_on_campus_status); 
 
 // exporting express router
 module.exports = student_router;
