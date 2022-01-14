@@ -1,12 +1,12 @@
 {
-  "name": "gsmaster",
+  "name": "BITS_VACCINATION_PORTAL",
   "version": "1.0.0",
   "description": "Official Site Server Code for BITS Vaccination Portal @ Vaccination.bits-dvm.org",
   "main": "server.js",
   "scripts": {
     "test": "npm run test",
     "dev_local": "nodemon server.js",
-    "dev_server": "nodemon server.js",
+    "dev_server": "ts-node server.ts",
     "production": "node server.js"
   },
   "repository": {
@@ -38,11 +38,14 @@
     "mongoose": "^5.13.4",
     "multer": "^1.4.3",
     "path": "^0.12.7",
+    "pino": "^7.6.2",
+    "pino-pretty": "^7.3.0",
     "redis": "^3.1.2",
     "tslib": "^2.3.1",
     "validator": "^13.6.0"
   },
   "devDependencies": {
-    "@types/jquery": "^3.5.10"
+    "@types/jquery": "^3.5.10",
+    "ts-node": "^10.4.0"
   }
 }
