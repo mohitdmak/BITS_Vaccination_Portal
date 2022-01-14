@@ -1,11 +1,12 @@
-import pino, { stdTimeFunctions } from "pino";
-
-import { join } from 'path';
-const error_log_file = join("/Portal/middeware", "error_logs");
-const fatal_log_file = join("/Portal/middeware", "fatal_logs");
-
+"use strict";
+exports.__esModule = true;
+exports.logger = void 0;
+var pino_1 = require("pino");
+var path_1 = require("path");
+var error_log_file = (0, path_1.join)("/Portal/middeware", "error_logs");
+var fatal_log_file = (0, path_1.join)("/Portal/middeware", "fatal_logs");
 // create test logger instance
-var test_logger = pino({
+var test_logger = (0, pino_1["default"])({
     enabled: true,
     name: "debut_logger",
     // custom timestamp?
@@ -23,49 +24,45 @@ var test_logger = pino({
     // prevents sensitive information from being logged
     redact: {
         paths: ['oauth.client_id', 'oauth.secret', 'QR'],
-        censor: "**CENSORED**", // specifies censored text instead of default "Redacted" mention or removing key itself
+        censor: "**CENSORED**",
         remove: false
     },
     // intermediate custom functions to trigger while logging
     hooks: {
-        logMethod(logArgs: any[], logMethod: pino.LogFn, logLevel: number){
+        logMethod: function (logArgs, logMethod, logLevel) {
             // logArgs.unshift(logArgs.pop());
             // console.log("Log Args: " + logArgs + "Log Level: " + logLevel + "\n"); 
             return logMethod.apply(this, logArgs);
         }
-    }, 
+    },
     // format the shape of logs
     formatters: {
-        level(label: String, number: number){
-            return {label};
+        level: function (label, number) {
+            return { label: label };
         },
-        bindings(bindings: pino.Bindings){
+        bindings: function (bindings) {
             // return {"Process ID": bindings.pid, "Process Hostname": bindings.hostname};
             return {};
         },
-        log(logObject: Object){
+        log: function (logObject) {
             return logObject;
         }
     },
-    timestamp: stdTimeFunctions.isoTime, // human readable timestamps
-    nestedKey: "load", // prefix as key to object provided to prevent conflict with properties with pino keys
+    timestamp: pino_1.stdTimeFunctions.isoTime,
+    nestedKey: "load",
     transport: {
         target: "pino-pretty",
         options: {
             colorize: true,
             // destination: error_log_file,
-            levelFirst: true, // --levelFirst
+            levelFirst: true,
             destination: 1,
             hideObject: 0,
             singleLine: 0,
-            ignore: "bindings", // --ignore
+            ignore: "bindings"
         }
     }
-}, // a destination parameter can be passed, if "transport" is not used in options parameter
-// pino.destination(error_log_file),
-);
-
-
+});
 // set log file dir and export
-test_logger.info({error_log_file}, "Logging Pino logs here . . .");
-export var logger = test_logger;
+test_logger.info({ error_log_file: error_log_file }, "Logging Pino logs here . . .");
+exports.logger = test_logger;

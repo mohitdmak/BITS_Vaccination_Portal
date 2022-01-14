@@ -1,7 +1,14 @@
 // import configured express app and redis client
+const http = require("http");
 const app = require("./app").app;
 const redisClient = require("./app").redisClient;
 
+// import logger
+const { logger } = require("./middeware/logger");
+
+// import ERROR models and error handler
+const ERROR = require("./middeware/error_models");
+const { error_handler } = require("./middeware/error_handler");
 
 
 // ########################### Mongo database and ORM configs ###########################
@@ -26,72 +33,35 @@ var db_connection;
 
 
 
-// ########################### NOTE : We have migrated from admin bro to using custom admin panel ###########################
-// INSTALL ADMIN BRO DEPENDENCIES
-// const AdminBro = require('admin-bro');
-// const mongooseAdminBro = require('@admin-bro/mongoose');
-// const expressAdminBro = require('@admin-bro/express');
-
-
-// Admin Bro and Models
-// const Vaccine = require('./models/vaccine.js').Vaccine;
-// const Student = require('./models/student.js');
-
-// // import forest admin
-// const forest = require('forest-express-mongoose');
-
-// !!!!!!! ADMIN BRO CONFIGS (NOT IN USE CURRENTLY)
-// ADMIN BRO ADAPTOR FOR MONGOOSE
-// AdminBro.registerAdapter(mongooseAdminBro)
-// const AdminBroOptions = {
-//   resources: [Vaccine, Student],
-//   rootPath: "/api/admin",
-// }
-
-// // ADMIN BRO ADAPTOR FOR STUDENT
-// const adminBro = new AdminBro(AdminBroOptions)
-// const router = expressAdminBro.buildRouter(adminBro)
-
-// // USE ADMIN BRO ROUTER FOR EXPRESS
-// app.use(adminBro.options.rootPath, router)
-// ########################### / ########################### / ###########################
-
-
-
 // ########################### Connecting to Cache and db, opening port ###########################
 //* Configuring port
 let port = process.env.PORT || 3000; 
 
 // Open port for node app, once redis and mongodb is connected
-redisClient.on('connect', async function () {
-    console.log('\n     Connected to redis successfully\n');
+redisClient.on('connect', async function (){
+    logger.info('Connected to redis successfully');
     
     try{
         //* Wait for connection to db
         db_connection = await mongoose.connect(db_uri);
-        console.log("\n     Connection to Mongodb Instance established.\n");
+        logger.info("Connection to Mongodb Instance established");
 
         //* Opening port for express app.
         app.listen(port, () => {
-            console.log("Server started on port " + port);
-        
-            // Listening for requests
-            if(process.env.npm_lifecycle_event === 'dev_local'){
-                console.log("\n     Entering Development environment locally\n");
-            }
-            else if(process.env.npm_lifecycle_event === 'dev_server'){
-                console.log("\n     Entering Development environment in Dev mode in server\n");
-            }
+            logger.info(`Server started on port: ${port} with mode: ${process.env.npm_lifecycle_event}`);
         });
     }
     catch(err){
+        if(error_handler.isHandleAble(err)){
+            await error_handler.handleError(err);
+        }
         // Stop for any redis errors
         redisClient.on('error', function (err) {
             console.log('\n     Could not establish a connection with redis. \n' + err);
         });
-        console.log(err);
-    }}
-);
+        logger.error(err);
+    }
+});
 // ########################### / ########################### /###########################
 
 

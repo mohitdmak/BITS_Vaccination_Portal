@@ -38,38 +38,48 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.error_handler = void 0;
+// express server instance (returned by "app.listen()")
+// import server from "../server";
+// Pino logging instance
+var logger_1 = require("./logger");
 // Error Models
-var BaseError = require("./error_models").BaseError;
-var DBError = require("./error_models").DBError;
-var APIError = require("./error_models").APIError;
-var ClientError = require("./error_models").ClientError;
-var MailError = require("./error_models").MailError;
+var error_models_1 = require("./error_models");
+var error_models_2 = require("./error_models");
+var error_models_3 = require("./error_models");
+var error_models_4 = require("./error_models");
+var error_models_5 = require("./error_models");
 // Sentry tools
 var Sentry = require('@sentry/node');
 var Tracing = require("@sentry/tracing");
 // MailHandler class
 var mail_handler_1 = require("./mail_handler");
-var app = require("../app").app;
+var app_js_1 = require("../app.js");
 // sentry configuration and attaching project to assigned dsn
 Sentry.init({
     dsn: "https://82f368f549ed43fbb3db4437ac2b2c79@o562134.ingest.sentry.io/5923095",
     integrations: [
         // enable HTTP calls tracing
         new Sentry.Integrations.Http({ tracing: true }),
-        new Tracing.Integrations.Express({ app: app }),
+        new Tracing.Integrations.Express({ app: app_js_1.app }),
     ],
     // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
     tracesSampleRate: 1.0
 });
 // request handler creates a separate execution context using domains, so that every transaction/span/breadcrumb is attached to its own Hub instance
-app.use(Sentry.Handlers.requestHandler());
-app.use(Sentry.Handlers.tracingHandler());
+app_js_1.app.use(Sentry.Handlers.requestHandler());
+app_js_1.app.use(Sentry.Handlers.tracingHandler());
 // error-handling class
 var ErrorHandler = /** @class */ (function () {
     function ErrorHandler() {
     }
     // properly log error
     ErrorHandler.prototype.logError = function (error) {
+        if (error instanceof error_models_1.BaseError) {
+            logger_1.logger.error({ "STACK": error.stack + "\n" }, "TYPE: ".concat(error.constructor.name, "; DESC: ").concat(error.message));
+        }
+        else {
+            logger_1.logger.error({ "STACK": error.stack + "\n" }, "UNCAUGHT EXEPTION: ".concat(error.message));
+        }
     };
     // send appropriate response
     ErrorHandler.prototype.handleResponse = function (error, response) {
@@ -77,17 +87,17 @@ var ErrorHandler = /** @class */ (function () {
         var res_data = { reason: error.name, description: error.message };
         switch (error.constructor.name) {
             // segregate responses
-            case ClientError:
-                response.status(error.HttpCode).json(res_data);
+            case error_models_4.ClientError.name:
+                response.status(error.httpCode).json(res_data);
                 break;
-            case APIError:
-                response.status(error.HttpCode).json(res_data);
+            case error_models_3.APIError.name:
+                response.status(error.httpCode).json(res_data);
                 break;
-            case DBError:
-                response.status(error.HttpCode).json(res_data);
+            case error_models_2.DBError.name:
+                response.status(error.httpCode).json(res_data);
                 break;
-            case BaseError:
-                response.status(error.HttpCode).json(res_data);
+            case error_models_1.BaseError.name:
+                response.status(error.httpCode).json(res_data);
                 break;
             default:
                 response.json(res_data);
@@ -103,9 +113,9 @@ var ErrorHandler = /** @class */ (function () {
                     case 0:
                         // capture@sentryDashboard
                         Sentry.captureException(error);
-                        if (!(!(error instanceof MailError) && error.severe)) return [3 /*break*/, 2];
+                        if (!(!(error instanceof error_models_5.MailError) && error.severe)) return [3 /*break*/, 2];
                         body = "";
-                        if (error instanceof APIError || DBError || ClientError) {
+                        if (error instanceof error_models_3.APIError || error_models_2.DBError || error_models_4.ClientError) {
                             body += "\nDescription : ".concat(error.message, "\n");
                         }
                         body += "StackTrace : \n".concat(error.stack, "\n");
@@ -119,10 +129,12 @@ var ErrorHandler = /** @class */ (function () {
                         _a.sent();
                         _a.label = 2;
                     case 2:
+                        // leave a response
+                        if (typeof response !== undefined) {
+                            this.handleResponse(error, response);
+                        }
                         // leave logs
                         this.logError(error);
-                        // leave a response
-                        this.handleResponse(error, response);
                         return [2 /*return*/];
                 }
             });
@@ -130,12 +142,40 @@ var ErrorHandler = /** @class */ (function () {
     };
     // determine whether to handle or crash gracefully
     ErrorHandler.prototype.isHandleAble = function (error) {
-        if (error instanceof BaseError || APIError || DBError || ClientError) {
+        if (error instanceof error_models_1.BaseError || error_models_3.APIError || error_models_2.DBError || error_models_4.ClientError) {
             return error.isOperational;
         }
         return false;
     };
     return ErrorHandler;
 }());
+var error_handler_instance = new ErrorHandler();
+// get the unhandled rejection and throw it to another fallback handler we already have.
+process.on('unhandledRejection', function (reason, promise) {
+    console.log("\n     Unhandled Promise Rejection caught by Error Handler Instance > > >\n");
+    error_handler_instance.logError(reason);
+    console.log("\n     Unhandled Promise Rejection logged < < <\n");
+    throw reason;
+});
+// FIXME: Not functioning as expected
+process.on('uncaughtException', function (error) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                console.log("\n     Unhandled Exception caught by Error Handler Instance > > >\n");
+                error_handler_instance.logError(error);
+                console.log("\n     Unhandled Exception logged < < <\n");
+                if (!!error_handler_instance.isHandleAble(error)) return [3 /*break*/, 1];
+                console.log("Error not handleable, Gracefully shutting down now. . .\n");
+                return [3 /*break*/, 3];
+            case 1: return [4 /*yield*/, error_handler_instance.handleError(error)];
+            case 2:
+                _a.sent();
+                console.log("\n     Unhandled Exception handled < < <\n");
+                _a.label = 3;
+            case 3: return [2 /*return*/];
+        }
+    });
+}); });
 // export handler class
-exports.error_handler = new ErrorHandler();
+exports.error_handler = error_handler_instance;

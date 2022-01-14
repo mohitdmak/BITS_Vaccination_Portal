@@ -1,40 +1,12 @@
-// import express
+// create express app
 const express = require("express");
 const app = express();
 
-
-// ####################### SENTRY MIDDLEWARE ####################### 
-
-// Sentry tracing tools
-const Sentry = require('@sentry/node');
-const Tracing = require("@sentry/tracing");
-
-// sentry configuration and attaching project to assigned dsn
-Sentry.init({
-  dsn: "https://82f368f549ed43fbb3db4437ac2b2c79@o562134.ingest.sentry.io/5923095",
-  integrations: [
-    // enable HTTP calls tracing
-    new Sentry.Integrations.Http({ tracing: true }),
-    // enable Express.js middleware tracing
-    new Tracing.Integrations.Express({ app }),
-  ],
-
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  tracesSampleRate: 1.0,
-});
-
-// request handler creates a separate execution context using domains, so that every
-// transaction/span/breadcrumb is attached to its own Hub instance
-app.use(Sentry.Handlers.requestHandler());
-// tracing Handler creates a trace for every incoming request
-app.use(Sentry.Handlers.tracingHandler());
-// Sentry error handling middleware
-// app.use(Sentry.Handlers.errorHandler());
+// import centralized error handler
+// error_handler = require("./middeware/error_handler").error_handler;
 
 // test endpoint for sentry
 app.get("/api/debug-sentry", async function mainHandler(req, res) {
-    error_handler = require("./middeware/error_handler").error_handler;
     const {APIError} = require("./middeware/error_models");
     const HttpStatusCode = require("./middeware/error_models").HttpStatusCode;
     try{
@@ -42,13 +14,18 @@ app.get("/api/debug-sentry", async function mainHandler(req, res) {
     }
     catch(e){
         if(error_handler.isHandleAble(e)){
-            await error_handler.handleError(e, res);
+            // await error_handler.handleError(e, res);
         }
         else{
             console.log("DEBUG SENTRY");
         }
     }
 });
+
+// process.on('uncaughtException', ErrorHandler.exitHandler(1, 'Unexpected Error'));
+// process.on('unhandledRejection', ErrorHandler.exitHandler(1, 'Unhandled Promise'));
+// process.on('SIGTERM', ErrorHandler.exitHandler(0, 'SIGTERM'));
+// process.on('SIGINT', ErrorHandler.exitHandler(0, 'SIGINT'));
 // ########################### / ########################### / ###########################
 
 
