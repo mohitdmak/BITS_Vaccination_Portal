@@ -2,12 +2,12 @@
   "name": "BITS_VACCINATION_PORTAL",
   "version": "1.0.0",
   "description": "Official Site Server Code for BITS Vaccination Portal @ Vaccination.bits-dvm.org",
-  "main": "server.js",
+  "main": "./src/server.ts",
   "scripts": {
     "test": "npm run test",
-    "dev_local": "nodemon server.js",
-    "dev_server": "ts-node server.ts",
-    "production": "node server.js"
+    "dev_local": "nodemon src/server.ts",
+    "dev_server": "ts-node src/server.ts",
+    "production": "node src/server.ts"
   },
   "repository": {
     "type": "git",
@@ -45,7 +45,16 @@
     "validator": "^13.6.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/connect-redis": "^0.0.18",
+    "@types/cors": "^2.8.12",
+    "@types/express-session": "^1.17.4",
     "@types/jquery": "^3.5.10",
+    "@types/jsonwebtoken": "^8.5.7",
+    "@types/mailgun-js": "^0.22.12",
+    "@types/multer": "^1.4.7",
+    "@types/redis": "^4.0.11",
+    "@types/validator": "^13.7.1",
     "ts-node": "^10.4.0"
   }
 }
