@@ -8,7 +8,7 @@ services:
 
     # Passing build context
     build:
-      context: ./admin_client
+      context: ./src/admin_client
       dockerfile: Dockerfile
 
     # Syncing with dockerhub stored image
@@ -22,7 +22,7 @@ services:
 
     # Set volumes
     volumes:
-      - './admin_client:/app'
+      - './src/admin_client:/app'
       - '/app/node_modules' 
 
     # Set ports config
@@ -35,7 +35,7 @@ services:
 
     # Passing build context
     build:
-      context: ./client
+      context: ./src/client
       dockerfile: Dockerfile
 
     # Syncing with dockerhub stored image
@@ -49,7 +49,7 @@ services:
 
     # Set volumes
     volumes:
-      - './client:/app'
+      - './src/client:/app'
       - '/app/node_modules' 
 
     # Set ports config
@@ -105,7 +105,7 @@ services:
 
     # Supply env configs
     env_file:
-      - config/DB_ADMIN_CONFIG.env
+      - src/config/DB_ADMIN_CONFIG.env
 
   # Dont start admin panel before db is running
   #  depends_on:
@@ -197,7 +197,7 @@ services:
 
     # Using nginx config defined in folder
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - ./src/nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
 
     # Wait for web_api container to start first
     depends_on:
@@ -227,7 +227,7 @@ services:
 
     # Using nginx config defined in folder
     volumes:
-      - ./redis:/data      
+      - ./src/redis:/data      
 
     # Ensuring Dev Container has been started before redis sessions are ready
     # depends_on:

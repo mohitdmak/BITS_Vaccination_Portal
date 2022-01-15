@@ -8,6 +8,7 @@ WORKDIR /Portal
 
 # source code dependancies
 COPY ./package.json .
+COPY ./tsconfig.json .
 
 # Nodemon for automatic restart on failures for tests
 RUN npm install -g nodemon
@@ -19,7 +20,7 @@ RUN npm install -g npm@7.20.1
 RUN npm install 
 
 # Copy source code
-COPY . .
+ADD src /Portal/src
 # ########################### / ########################### / ###########################
 
 
@@ -53,12 +54,13 @@ RUN apt-get install ffmpeg libsm6 libxext6  -y
 RUN apt-get update && apt-get install poppler-utils -y
 
 # PyDIVOC dependencies
-RUN cd PyDIVOC && pip3 install -r requirements.txt && python3 setup.py build
+RUN cd src/PyDIVOC && pip3 install -r requirements.txt && python3 setup.py build 
 
 # Libs for generating png from cert pdf
-RUN apt-get update && apt-get install ghostscript graphicsmagick
+RUN apt-get update && apt-get install ghostscript graphicsmagick -y
 # ########################### / ########################### / ###########################
 
+# RUN cd ../../
 
 # Dev environment
 CMD ["npm", "run", "dev_server"]
