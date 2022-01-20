@@ -1,13 +1,13 @@
 // express  router
-const express = require("express");
+import express from "express";
 var student_router = express.Router();
 
 // importing controller for authentication
-const student_fxn = require("../controllers/student_controllers.js");
-const admin_fxn = require("../controllers/admin_controllers.js");
+import student_fxn from "../controllers/student_controllers.js";
+import admin_fxn from "../controllers/admin_controllers.js";
 
 // importing middleware
-const check_auth = require("../middeware/check_auth");
+import check_auth from "../middeware/check_auth";
 
 
 
@@ -62,4 +62,4 @@ student_router.get("/logout", student_fxn.get_logout);
 
 
 // exporting express router
-module.exports = student_router;
+export default  student_router;
