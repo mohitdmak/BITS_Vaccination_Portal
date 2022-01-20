@@ -1,10 +1,10 @@
 // auth requirements
-var {google} = require('googleapis');
+import { google } from 'googleapis';
 const ClientId = require("../config/oauth2-api-creds.json").web.client_id;
 const ClientSecret = require("../config/oauth2-api-creds.json").web.client_secret;
 
 // Importing Student Model
-var Student = require("../models/student");
+import Student from '../models/student';
 
 
 // Setting appropriate callback url
@@ -148,7 +148,7 @@ const set_tokens = async (req, res) => {
 // };
 
 // get allowed batches
-let get_allow_access = require("./admin_controllers.js").get_allow_access;
+let get_allow_access = require("./admin_controllers").default.get_allow_access;
 
 // non admin
 const set_session_data = async (user, req, res) => {
@@ -192,6 +192,7 @@ const set_session_data = async (user, req, res) => {
                 "email" : user.data.email,
                 "pic" : user.data.picture
             });
+            // @ts-ignore
             var rollNo = String(student.email.substr(0,5));
 
             // Limiting Users for load testing  || ADMINISTRATORS.indexOf(student.email) > -1
@@ -201,6 +202,7 @@ const set_session_data = async (user, req, res) => {
 
                    // saving to database
                 try{
+                    // @ts-ignore
                     var new_student = await student.save();
                     req.session["student"] = new_student;
                     res.redirect("/");
@@ -406,7 +408,7 @@ const get_login = async (req, res) => {
 };
 
 
-module.exports = {
+export default {
     get_user_details,
     get_auth_url,
     set_tokens,

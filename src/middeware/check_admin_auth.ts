@@ -1,4 +1,4 @@
-const hashed = require("../config/admin.js").hashed;
+import { hashed } from "../config/admin.js";
 
 const check_admin_auth = async (req, res, next) => {
 
@@ -55,4 +55,4 @@ const check_admin_auth = async (req, res, next) => {
 }
 
 
-module.exports = check_admin_auth;
+export default check_admin_auth;

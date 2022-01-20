@@ -1,13 +1,13 @@
 // mongo ORM and validator
-const mongoose = require('mongoose');
-const schema = mongoose.Schema;
+import { Schema, model, Document } from 'mongoose';
+// const schema = Schema;
 //@ts-ignore  FIXME
-const { isEmail } = require('validator');
+import { isEmail } from 'validator';
 
 
 // ########################### Validators ###########################
 // validating verification status
-function ValidateStatus(String){
+function ValidateStatus(String: string){
     if(String === 'PENDING' || String === 'DONE' || String === 'FAILED'){
         return true;
     }
@@ -17,7 +17,7 @@ function ValidateStatus(String){
 }
 
 // validating vaccination status
-function ValidateVaccineStatus(String){
+function ValidateVaccineStatus(String: string){
     if(String === 'COMPLETE' || String === 'PARTIAL' || String === 'NONE'){
         return true;
     }
@@ -30,9 +30,30 @@ function ValidateVaccineStatus(String){
 
 // ########################### Schemas ###########################
 // importing vaccine mongoose schema
-const Vaccineschema = require("./vaccine").Vaccineschema;
+import { Vaccineschema } from "./vaccine";
 
-const Studentschema = new schema({
+export interface Stud extends Document{
+    name: String,
+    email: String,
+    city?: String,
+    state?: String,
+    is_containment_zone: Boolean,
+    is_medically_fit: Boolean,
+    TnC1_Agreement: Boolean,
+    TnC2_Agreement: Boolean,
+    latest_dose_date?: Date,
+    arrival_date: Date,
+    vaccination_status: String,
+    manual_verification: String,
+    auto_verification: String,
+    overall_status: Boolean,
+    pic: String,
+    pdf: String,
+    consent_form: String,
+    vaccine: Object
+}
+
+const Studentschema = new Schema({
     name: {
         type: String,
         required: [true, 'Request does not have a Name']
@@ -135,5 +156,5 @@ const Studentschema = new schema({
 // ########################### / ########################### / ###########################
 
 
-const Student = mongoose.model('student', Studentschema);
-module.exports = Student;
+const Student = model<Stud>('student', Studentschema);
+export default Student;

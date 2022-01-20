@@ -2,13 +2,13 @@
 import express from "express";
 
 // importing controller for authentication
-import admin_fxn from "../controllers/admin_controllers.js";
+import admin_fxn from "../controllers/admin_controllers";
 
 // importing admin authenticating middleware
 import check_admin_auth from "../middeware/check_admin_auth";
 
 // alternative check (referrer being admin client)
-import alternative_check_admin from "../middeware/alternative_check_admin.js";
+import alternative_check_admin from "../middeware/alternative_check_admin";
 
 var admin_router = express.Router();
 

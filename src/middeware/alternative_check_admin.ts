@@ -45,4 +45,4 @@ const alternative_check_admin = async (req, res, next) => {
 }
 
 
-module.exports = alternative_check_admin;
+export default alternative_check_admin;
