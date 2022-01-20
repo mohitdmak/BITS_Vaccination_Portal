@@ -1,16 +1,16 @@
 // auth requirements
-var {google} = require('googleapis');
+// var {google} = require('googleapis');
 // Importing mongo student model
-const Student = require('../models/student.js');
+import Student from '../models/student';
 // importing vaccine model
-const Vaccine = require('../models/vaccine.js').Vaccine;
+import { Vaccine } from '../models/vaccine';
 //import fs
-const fs = require('fs');
+import fs from 'fs';
 
 
 // configuring multer for storing pdfs
-const multer = require('multer');
-const path = require('path');
+import multer from 'multer';
+import path from 'path';
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
         if(req.path == '/post_pdf'){
@@ -28,7 +28,7 @@ const storage = multer.diskStorage({
 });
 
 // Importing function to generate OauthClient
-var { getOAuthClient } = require("./auth_controllers");
+var { getOAuthClient } = require("./auth_controllers").default;
 
 let upload = multer(
     { storage: storage,
@@ -407,6 +407,7 @@ const verify_authenticity = async (req,res) => {
         }
         else{
             console.log("Enough names are not matched");
+            //@ts-ignore
             var new_student = await Student.findOneAndUpdate({email: student.email}, {auto_verification: 'FAILED'}, {new: true});
             req.session["student"] = new_student;
             req.session.save();
@@ -545,7 +546,7 @@ const post_details = (req, res) => {
     res.status(200).json({"success": "admin is allowed"});
 }
 
-module.exports = {
+export default {
     get_all,
     get_student_details,
     get_logout,

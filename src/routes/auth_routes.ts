@@ -3,7 +3,7 @@ import express from "express";
 var auth_router = express.Router();
 
 // importing controller for authentication
-import auth_fxn from "../controllers/auth_controllers.js";
+import auth_fxn from "../controllers/auth_controllers";
 
 
 // ########################### Defining routes ###########################

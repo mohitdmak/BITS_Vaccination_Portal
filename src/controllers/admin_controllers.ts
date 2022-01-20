@@ -1,19 +1,19 @@
 // auth requirements
-var {google} = require('googleapis');
+// import { google } from 'googleapis';
 // Importing mongo student model
-const Student = require('../models/student.js');
+import Student from '../models/student';
 // importing vaccine model
-const Vaccine = require('../models/vaccine.js').Vaccine;
+// import { Vaccine } from '../models/vaccine';
 
 //password configs
-const password = require('../config/admin.js').password;
-const username = require('../config/admin.js').username;
-const hashed = require('../config/admin.js').hashed;
+import { password } from '../config/admin.js';
+import { username } from '../config/admin.js';
+import { hashed } from '../config/admin.js';
 
 // reqs for sending excel file
-const json2xls = require('json2xls');
+import json2xls from 'json2xls';
 const filename = 'myExcel.xlsx';
-const fs = require("fs");
+import { writeFileSync } from "fs";
 
 // set pagination limit
 const page_limit = 50;
@@ -108,16 +108,20 @@ const post_students = async ( req, res) => {
                     i--;
                 }
                 else{
+                    //@ts-ignore
                     var date = new Date(Date.parse(students[i].arrival_date));
                     date.setTime(date.getTime() + 19800000);
+                    //@ts-ignore
                     students[i].arrival_date = date.toISOString();
                 }
             }
         }
         else{
             for (let i = 0; i < students.length; i++) {
+                    //@ts-ignore
             var date = new Date(Date.parse(students[i].arrival_date));
             date.setTime(date.getTime() + 19800000);
+                    //@ts-ignore
             students[i].arrival_date = date.toISOString();
             }
         }
@@ -127,7 +131,9 @@ const post_students = async ( req, res) => {
         //students.forEach(function(student, index, theArray){
         for (let i = 0; i < students.length; i++) {
             if((beggining != undefined && ending != undefined)){
+                    //@ts-ignore
                 if( beggining <= Date.parse(students[i].arrival_date) && Date.parse(students[i].arrival_date) <= ending){
+                    //@ts-ignore
                     students[i] = {
                         "_id": students[i]._id,
                         "pic": students[i].pic,
@@ -151,6 +157,7 @@ const post_students = async ( req, res) => {
                 }
             }
             else{
+                    //@ts-ignore
                 students[i] = {
                     "_id": students[i]._id,
                     "pic": students[i].pic,
@@ -197,25 +204,40 @@ const get_student = async (req, res) => {
     //console.log(id);
     try{
         var student = await Student.findById(id);
+                    //@ts-ignore
         var date = new Date(Date.parse(student.arrival_date));
         date.setTime(date.getTime() + 19800000);
+                    //@ts-ignore
         student.arrival_date = date.toISOString();
         console.log(" STUDENT DETAIL SENT IS : ");
         console.log(student);
         console.log("	ADMIN PROVIDED STUDENT DETAIL");
         res.status(200).json({
+                    //@ts-ignore
             "_id": student._id,
+                    //@ts-ignore
             "pic": student.pic,
+                    //@ts-ignore
             "name": student.name,
+                    //@ts-ignore
             "email": student.email,
+                    //@ts-ignore
             "vaccination_status": student.vaccination_status,
+                    //@ts-ignore
             "auto_verification": student.auto_verification,
+                    //@ts-ignore
             "manual_verification": student.manual_verification,
+                    //@ts-ignore
             "overall_status": student.overall_status,
+                    //@ts-ignore
             "city": student.city,
+                    //@ts-ignore
             "arrival_date": student.arrival_date,
+                    //@ts-ignore
             "is_containment_zone": student.is_containment_zone,
+                    //@ts-ignore
             "pdf": student.pdf,
+                    //@ts-ignore
             "consent_form": student.consent_form
         });
     }
@@ -286,7 +308,9 @@ const get_pdf = async (req, res) => {
         console.log(req.query._id);
         var id = req.query._id;
         var student = await Student.findById(id);
+                    //@ts-ignore
         if(student.pdf){
+                    //@ts-ignore
             var serve_file = student.pdf;
             console.log("\n		Serving PDF file at : ");
             console.log(String(serve_file)); 
@@ -323,7 +347,9 @@ const get_consent = async (req, res) => {
         console.log(req.query);
         var id = req.query._id;
         var student = await Student.findById(id);
+                    //@ts-ignore
         if(student.consent_form){
+                    //@ts-ignore
             var serve_file = student.consent_form;
             console.log("\n		Serving PDF file at : ");
             console.log(String(serve_file)); 
@@ -395,6 +421,7 @@ const get_excel = async (req, res) => {
              "Latest Dose Date": latest_dose_date,
              "Arrival Date": new Date(student.arrival_date).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'}),
         };
+                    //@ts-ignore
         excel_array.push(excel_student);
     });
     
@@ -403,7 +430,7 @@ const get_excel = async (req, res) => {
 
         // write to xlsx file
     //@ts-ignore  FIXME
-    fs.writeFileSync("ADMIN_ExcelFile.xlsx", excel_doc, 'binary', (err) => {
+    writeFileSync("ADMIN_ExcelFile.xlsx", excel_doc, 'binary', (err) => {
         if (err) {
             console.log("writeFileSync error :", err);
          }
@@ -426,7 +453,7 @@ const post_details = (req, res) => {
     res.status(200).json({"success": "admin is allowed"});
 }
 
-module.exports = {
+export default {
     update_student,
     get_student,
     post_students,
