@@ -11,4 +11,4 @@ const check_auth = async (req, res, next) => {
 }
 
 
-module.exports = check_auth;
+export default check_auth;
