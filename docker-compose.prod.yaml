@@ -63,7 +63,7 @@ services:
     # Passing build context
     build:
       context: .
-      dockerfile: Dockerfile.mongo
+      dockerfile: dockerfiles/Dockerfile.mongo
 
     # Syncing with dockerhub stored image
     image: mohitdmak/bits_vaccination_portal:mongo
@@ -95,7 +95,7 @@ services:
     # Provide build context
     build:
       context: .
-      dockerfile: Dockerfile.db.admin
+      dockerfile: dockerfiles/Dockerfile.db.admin
 
     # Push to registry hosting containers
     image: mohitdmak/bits_vaccination_portal:db_admin
@@ -150,7 +150,7 @@ services:
     # Passing build context
     build:
         context: .
-        dockerfile: Dockerfile.api.server
+        dockerfile: dockerfiles/Dockerfile.api.server
 
     # Syncing with dockerhub stored image
     image: mohitdmak/bits_vaccination_portal:dev_web
@@ -180,7 +180,7 @@ services:
     # Build context
     build:
         context: .
-        dockerfile: Dockerfile.nginx
+        dockerfile: dockerfiles/Dockerfile.nginx
 
     # Sync with dockerhub stored image
     image: mohitdmak/bits_vaccination_portal:nginx
@@ -210,7 +210,7 @@ services:
     # Build context
     build:
         context: .
-        dockerfile: Dockerfile.redis.session
+        dockerfile: dockerfiles/Dockerfile.redis.session
 
     # Sync with dockerhub stored image
     image: mohitdmak/bits_vaccination_portal:redis_sessions

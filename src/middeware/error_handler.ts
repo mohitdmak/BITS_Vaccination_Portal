@@ -24,7 +24,7 @@ import {Message} from "./mail_handler";
 // NOTE THAT :::::::::: FOLL TYPE DEFS MUST BE INSTALLED TO USE EXPRESS TYPES :  npm install @types/express
 // express app
 import * as express from 'express';
-import { app } from "../app.js";
+import { app } from "../app";
 
 // sentry configuration and attaching project to assigned dsn
 Sentry.init({
@@ -83,6 +83,9 @@ class ErrorHandler{
                 break;
         }
     }
+
+    // terminate server in case of unhandled rejection or uncaught ExceptionResponse
+    // public terminateServer()
 
     // logging and clean up errors
     public async handleError(error: Error, response?: express.Response): Promise<void>{

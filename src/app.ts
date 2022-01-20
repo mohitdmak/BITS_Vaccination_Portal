@@ -1,9 +1,15 @@
-// create express app
-const express = require("express");
+// ########################### Express, debug url ###########################
+import express, { urlencoded, json } from "express";
 const app = express();
 
-// import centralized error handler
+// import logger
+import { logger } from "./middeware/logger";
+
+// import centralized error handler FIXME: Circular Dependancy!
 // error_handler = require("./middeware/error_handler").error_handler;
+
+// NOTE: When you have 'type': 'module' in the package.json file, your source code should use import syntax. When you do not have, you should use require syntax.
+// Adding 'type': 'module' to the package.json enables ES 6 modules.
 
 // test endpoint for sentry
 app.get("/api/debug-sentry", async function mainHandler(req, res) {
@@ -21,31 +27,24 @@ app.get("/api/debug-sentry", async function mainHandler(req, res) {
         // }
     }
 });
-
-// process.on('uncaughtException', ErrorHandler.exitHandler(1, 'Unexpected Error'));
-// process.on('unhandledRejection', ErrorHandler.exitHandler(1, 'Unhandled Promise'));
-// process.on('SIGTERM', ErrorHandler.exitHandler(0, 'SIGTERM'));
-// process.on('SIGINT', ErrorHandler.exitHandler(0, 'SIGINT'));
 // ########################### / ########################### / ###########################
 
 
 
 // ########################### Request Parsing Middlewares ###########################
-
-// this parses data submitted through forms generally.
-app.use(express.urlencoded({ extended:true }));
-// this parses data submitted in json format.
-app.use(express.json());
+// parse data through forms, and json formats
+app.use(urlencoded({ extended:true }));
+app.use(json());
 
 // cors settings
-const cors = require("cors");
+import cors from "cors";
 app.use(cors());
 
 // trust 'x-forwarded' headers set via nginx proxy
 app.set('trust proxy', 1);
 
-// multer errors
-var multer = require('multer');
+// multer errors FIXME: multer add to errorhandler
+import multer from 'multer';
 //app.use(function (err, req, res, next){
 //    if(err instanceof multer.MulterError){
 //        console.log(err);
@@ -61,24 +60,21 @@ var multer = require('multer');
 
 
 // ########################### Session Management ###########################
-
 // redis cache layer to store session data on server
-const redis = require('redis');
-const connectRedis = require('connect-redis');
+import { createClient } from 'redis';
+import connectRedis from 'connect-redis';
 
 // using custom redis db as session store 
-const Session = require("express-session");
+import Session from "express-session";
 const RedisStore = connectRedis(Session)
-
-//Configure redis client
 var redis_host = "RedisSessionContainer";
-const redisClient = redis.createClient({
+const redisClient = createClient({
     host: redis_host,
     port: 7000,
 });
 
 // configure session settings for express
-const SESSION_SECRET = require("./config/session-secret.js");
+import SESSION_SECRET from "./config/session-secret.js";
 app.use(Session({
     // Session configurations
     name: "express-session-id",
@@ -87,76 +83,26 @@ app.use(Session({
     saveUninitialized: true,
     store: new RedisStore({ client: redisClient }),
 
-    //! NOTE-THAT : Uncomment these settings for Production !!!
+    // NOTE: Uncomment these settings for Production !!!
     cookie: {
         // secure: true, // Only allowing transmitting cookie over https
         // httpOnly: true, // Preventing client side JS from reading the cookie 
         // maxAge: 1000 * 60 * 10 // session max age in miliseconds
     }
 }));
-
-// ########################### / ########################### / ###########################
-
-
-
-// ########################### NOTE : We have Migrated from forest admin to using our own Mongo admin ###########################
-//* CONFIGURE FOREST ADMIN
-// const Vaccine = require('./models/vaccine.js').Vaccine;
-// const Student = require('./models/student.js');
-
-// Import FOREST Module and db connection server
-// const db_connection = require('./server.js');
-// const forest = require('forest-express-mongoose');
-
- //allow cors for forest admin backend
-//app.use('^(?!forest/?$).*', cors());
-
-// //function to load forest configs
-//async function load_forest(){
-//    //* CONFIGURE FOREST ADMIN
-//    const Vaccine = require('./models/vaccine.js').Vaccine;
-//    const Student = require('./models/student.js');
-
-//    // Import FOREST Module and db connection server
-//    const db_connection = require('./server.js');
-//    const forest = require('forest-express-mongoose');
-
-//    try{
-//        const forest_conf = await forest.init({
-//            envSecret: process.env.FOREST_ENV_SECRET,
-//            authSecret: process.env.FOREST_AUTH_SECRET,
-//            objectMapping: Student,
-//            connections: { default: db_connection }
-//        });
-//        // FOREST ADMIN configurations
-//        app.use(forest_conf);
-//        console.log("FOREST CONFIGURED");
-//    }
-//    catch(err){
-//        console.log(err);
-//    }
-//}
-
-//// load forest admin
-//load_forest();
-     
-//// FOREST ADMIN configurations
-// app.use(forest_conf);
 // ########################### / ########################### / ###########################
 
 
 
 // ########################### Api Endpoints ###########################
-
 // Home route
 app.get("/api", (req, res) => {
-    console.log("Landed on home page");
-    // console.log(req.session);
-    // console.log(req.sessionID);
+    logger.info({"SESSION": req.session, "SESSION_ID": req.sessionID}, 'Landed on API page');
 
+    // NOTE: MOVE THESE TO CONFIGS.
     // creating appropriate redirection url
-    var RedirectionUrl;
-    var LogoutUrl;
+    var RedirectionUrl: string;
+    var LogoutUrl: string;
 
     // for dev env
     RedirectionUrl = "/api/auth/";
@@ -176,22 +122,22 @@ app.get("/api", (req, res) => {
 });
 
 // Auth route
-const auth_routes = require("./routes/auth_routes.js");
+import auth_routes from "./routes/auth_routes";
 app.use("/api/auth", auth_routes);
 
 // Student Route
-const student_routes = require("./routes/student_routes.js");
+import student_routes from "./routes/student_routes";
 app.use("/api/student", student_routes);
 
 // Admin Route
-const admin_routes = require("./routes/admin_routes.js");
-app.use("/api/admin", admin_routes);
+import admin_router from "./routes/admin_routes";
+app.use("/api/admin", admin_router);
 // ########################### / ########################### / ###########################
 
 
 
  // exporting express app and redis client
-module.exports = {
+export {
     app,
     redisClient
 };
