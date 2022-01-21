@@ -2,8 +2,8 @@
 import { Schema, model, Document } from 'mongoose';
 // const schema = Schema;
 
-export interface Vacc extends Document{
-    QR: Object
+interface VACCINE extends Document{
+    QR: any,
 }
 
 // schema for QR being a json object
@@ -16,8 +16,9 @@ const Vaccineschema = new Schema({
 
 
 // export ORM's vaccine model and schema seperately for controllers and student schema resp.
-const Vaccine = model<Vacc>('vaccine', Vaccineschema);
+const Vaccine = model<VACCINE>('vaccine', Vaccineschema);
 export {
     Vaccine,
+    VACCINE,
     Vaccineschema
 };

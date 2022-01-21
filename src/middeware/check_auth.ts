@@ -1,12 +1,24 @@
-const check_auth = async (req, res, next) => {
-    console.log(req.session);
-    if(req.session["student"]){
-        console.log('FORWARDED FROM MIDDLEWARE');
-        next();
+// import logger
+import { logger } from  "./logger";
+import { RequestType, ResponseType } from "../controllers/student_controllers";
+// import error handlers
+import * as ERROR from "../middeware/error_models";
+import { error_handler } from "../middeware/error_handler";
+
+const check_auth = async (req: RequestType, res: ResponseType, next) => {
+    try{
+        if(req.session["student"]){
+            res.locals.child_logger = logger.child({"STUDENT_EMAIL": req.session["student"].email});
+            res.locals.child_logger.info('Auth Middleware verified.');
+            next();
+        }
+        else{
+            throw new ERROR.ClientError(ERROR.HttpStatusCode.UNAUTHORIZED_REQUEST, "Student has not logged in yet.", false);
+        }
     }
-    else{
-        res.status(400).json({"error": "Student has not logged in yet"});
-        res.end();
+    catch(err){
+        if(!error_handler.isHandleAble(err)) throw err;
+        error_handler.handleError(err, res);
     }
 }
 

@@ -32,7 +32,7 @@ function ValidateVaccineStatus(String: string){
 // importing vaccine mongoose schema
 import { Vaccineschema } from "./vaccine";
 
-export interface Stud extends Document{
+interface STUDENT extends Document{
     name: String,
     email: String,
     city?: String,
@@ -50,7 +50,7 @@ export interface Stud extends Document{
     pic: String,
     pdf: String,
     consent_form: String,
-    vaccine: Object
+    vaccine: any
 }
 
 const Studentschema = new Schema({
@@ -156,5 +156,5 @@ const Studentschema = new Schema({
 // ########################### / ########################### / ###########################
 
 
-const Student = model<Stud>('student', Studentschema);
-export default Student;
+const Student = model<STUDENT>('student', Studentschema);
+export { Student, STUDENT };

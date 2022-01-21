@@ -18,13 +18,14 @@ const Sentry = require('@sentry/node');
 const Tracing = require("@sentry/tracing");
 
 // MailHandler class
-import {mail_handler} from "./mail_handler";
-import {Message} from "./mail_handler";
+import { mail_handler } from "./mail_handler";
+import { Message } from "./mail_handler";
 
 // NOTE THAT :::::::::: FOLL TYPE DEFS MUST BE INSTALLED TO USE EXPRESS TYPES :  npm install @types/express
 // express app
 import * as express from 'express';
 import { app } from "../app";
+import pino from "pino";
 
 // sentry configuration and attaching project to assigned dsn
 Sentry.init({
@@ -44,26 +45,30 @@ app.use(Sentry.Handlers.tracingHandler());
 // Exception Response custom Datatype
 type ExceptionResponse = {
     reason: string,
-    description: string
+    error: string
 }
 
 // error-handling class
 class ErrorHandler{
 
     // properly log error
-    public logError(error: Error): void{
-        if(error instanceof BaseError){
-            logger.error({"STACK": error.stack + "\n"}, `TYPE: ${error.constructor.name}; DESC: ${error.message}`);
+    public logError(error: Error, child_logger?: pino.Logger): void{
+        const error_logger = child_logger? child_logger : logger;
+        if(error instanceof ClientError){
+            error_logger.warn({"STACK": error.stack + "\n"}, `TYPE: ${error.constructor.name}; DESC: ${error.message}`);
+        }
+        else if(error instanceof BaseError){
+            error_logger.error({"STACK": error.stack + "\n"}, `TYPE: ${error.constructor.name}; DESC: ${error.message}`);
         }
         else{
-            logger.error({"STACK": error.stack + "\n"}, `UNCAUGHT EXEPTION: ${error.message}`);
+            error_logger.error({"STACK": error.stack + "\n"}, `UNCAUGHT EXEPTION: ${error.message}`);
         }
     }
 
     // send appropriate response
     public handleResponse(error: Error, response: express.Response): void{
         // form response data
-        const res_data: ExceptionResponse = {reason: error.name, description: error.message};
+        const res_data: ExceptionResponse = {reason: error.name, error: error.message};
         switch (error.constructor.name){
             // segregate responses
             case ClientError.name:
@@ -88,7 +93,7 @@ class ErrorHandler{
     // public terminateServer()
 
     // logging and clean up errors
-    public async handleError(error: Error, response?: express.Response): Promise<void>{
+    public async handleError(error: Error, response?: express.Response, child_logger?: pino.Logger): Promise<void>{
         // capture@sentryDashboard
         Sentry.captureException(error);
         // mail severe errors to ADMIN
@@ -109,10 +114,10 @@ class ErrorHandler{
         // leave a response
         if(typeof response !== undefined){
             //@ts-ignore  FIXME
-            this.handleResponse(error, response);
+            this.handleResponse(error, response, child_logger);
         }
         // leave logs
-        this.logError(error);
+        this.logError(error, child_logger);
     }
 
     // determine whether to handle or crash gracefully
