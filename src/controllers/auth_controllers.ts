@@ -4,8 +4,9 @@ const ClientId = require("../config/oauth2-api-creds.json").web.client_id;
 const ClientSecret = require("../config/oauth2-api-creds.json").web.client_secret;
 
 // Importing Student Model
-import Student from '../models/student';
+import { Student } from '../models/student';
 
+import { logger } from "../middeware/logger";
 
 // Setting appropriate callback url
 // var AdminRedirectionUrl;
@@ -369,6 +370,7 @@ const get_data = async (req, res) => {
 const get_auth_url = (req, res) => {
     try{
         var url = getAuthUrl();
+        logger.info(url);
             // res.status(200).json({"authentication_url": url});
         res.redirect(url);
     }catch(err){

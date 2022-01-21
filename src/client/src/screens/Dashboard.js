@@ -23,6 +23,8 @@ import { parseISO } from 'date-fns'
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+// added by --- Mohit
+const host = "http://localhost:1370";
 
 const Dashboard = (props) => {
 
@@ -87,7 +89,7 @@ const Dashboard = (props) => {
 
     // MAIN STUDENT DATA API REQUEST
     const apiRequest = () => {
-        fetch('https://vaccination.bits-dvm.org/api/student/details/',
+        fetch(host + '/api/student/details/',
             {
                 method: 'GET',
                 headers: {
@@ -127,7 +129,7 @@ const Dashboard = (props) => {
 
     // POST EXTRA USER INFORMATION DATA
     const extraDetailsPost = () => {
-        fetch('https://vaccination.bits-dvm.org/api/student/extra', {
+        fetch(host + '/api/student/extra', {
             method: 'POST',
             body: JSON.stringify({
                 "city": city,
@@ -186,7 +188,7 @@ const Dashboard = (props) => {
 
     // function to read a certificate PDF and upload it
     const upload = (data) => {
-        fetch('https://vaccination.bits-dvm.org/api/student/post_pdf', {
+        fetch(host + '/api/student/post_pdf', {
             method: 'POST',
             body: data // this is the certificate PDF item
         }).then(
@@ -239,7 +241,7 @@ const Dashboard = (props) => {
 
      // function to read a consent form PDF and upload it
      const upload2 = (data) => {
-        fetch('https://vaccination.bits-dvm.org/api/student/post_consent', {
+        fetch(host + '/api/student/post_consent', {
             method: 'POST',
             body: data // this is the consent PDF item
         }).then(
@@ -311,7 +313,7 @@ const Dashboard = (props) => {
                             fontSize={["12px", "12px", "12px", "18px", "18px"]}
                             onClick={
                                 () => {
-                                    window.open("https://vaccination.bits-dvm.org/api/auth/logout", "_parent")
+                                    window.open(host + "/api/auth/logout", "_parent")
                                 }
                             }
                         >Logout
@@ -421,7 +423,7 @@ const Dashboard = (props) => {
                                 ml="10px"
                                 mr="10px"
                                 isDisabled={!certificate}
-                                onClick={() => window.open("https://vaccination.bits-dvm.org/api/student/get_pdf", "_blank")}
+                                onClick={() => window.open(host + "/api/student/get_pdf", "_blank")}
                             >View</Button>
                         </GridItem>
 
@@ -450,7 +452,7 @@ const Dashboard = (props) => {
                         <GridItem rowSpan={1} colSpan={1}>
                             <Button
                                 isDisabled={!consent}
-                                onClick={() => window.open("https://vaccination.bits-dvm.org/api/student/get_consent", "_blank")}
+                                onClick={() => window.open(host + "/api/student/get_consent", "_blank")}
                                 ml="10px" mr="10px" mt="20px"
                             >View</Button>
                         </GridItem>

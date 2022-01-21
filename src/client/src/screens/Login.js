@@ -12,11 +12,14 @@ import {
     Link,
   } from "react-router-dom";
 
+// added by --- Mohit
+const host = "http://localhost:1370";
+
 const Login = (props) => {
     const [batches, setBatches] = useState([]);
 
     const getBatch = () => {
-        fetch('https://vaccination.bits-dvm.org/api/admin/allow', {
+        fetch(host + '/api/admin/allow', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -45,7 +48,7 @@ const Login = (props) => {
                 <Heading fontSize="24px" textAlign="center" fontWeight="bold" mt="200px" mb="20px">BITS Vaccination Status Portal</Heading>
                 <Button 
                     padding="20px"
-                    onClick={() => window.open("https://vaccination.bits-dvm.org/api/auth", "_parent")}
+                    onClick={() => window.open(host + "/api/auth", "_parent")}
                 >Login with BITS Mail</Button>
                 <Text mt="20px">Made with ❤️  by DVM</Text>
                 <Text mt="20px" p="20px" width="400px" textAlign="center" color="grey">Please note, only students from the following batches will be currently allowed access:</Text>

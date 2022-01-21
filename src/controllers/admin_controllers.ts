@@ -1,7 +1,7 @@
 // auth requirements
 // import { google } from 'googleapis';
 // Importing mongo student model
-import Student from '../models/student';
+import { Student } from '../models/student';
 // importing vaccine model
 // import { Vaccine } from '../models/vaccine';
 
@@ -19,7 +19,7 @@ import { writeFileSync } from "fs";
 const page_limit = 50;
 
 // access data
-let allow_access = [];
+let allow_access = ["f2020"];
 const get_allow_access = () => {
     return allow_access;
 }
