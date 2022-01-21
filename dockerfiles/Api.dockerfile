@@ -63,4 +63,4 @@ RUN apt-get update && apt-get install ghostscript graphicsmagick -y
 # RUN cd ../../
 
 # Dev environment
-CMD ["npm", "run", "dev_server"]
+CMD ["npm", "run", "dev_local"]

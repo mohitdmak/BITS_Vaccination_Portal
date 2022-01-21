@@ -15,6 +15,8 @@ import Dashboard from './screens/Dashboard.js'
 import Login from './screens/Login.js'
 import Devs from './screens/Devs.js'
 
+// added by --- Mohit
+const host = "http://localhost:1370";
 
 // /api/student/details
 
@@ -27,7 +29,7 @@ function App() {
 }, []); 
 
 const apiRequest = () => {
-    fetch('https://vaccination.bits-dvm.org/api/student/details/',
+    fetch(host + '/api/student/details/',
       {   
           method: 'GET',
           headers: {

@@ -79,9 +79,3 @@ enum HttpStatusCode{
 
 // export all models
 export {HttpStatusCode, BaseError, APIError, DBError, ClientError, MailError};
-// module.exports = {
-//     HttpStatusCode,
-//     BaseError,
-//     APIError,
-//     DBError
-// }
