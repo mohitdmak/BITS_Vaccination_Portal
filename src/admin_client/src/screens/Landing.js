@@ -41,6 +41,9 @@ import {
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css";
 
+// added by --- Mohit
+const host = "http://localhost:1370";
+
 const Landing = () => {
 
     const [page, setPage] = useState(1);
@@ -72,7 +75,7 @@ const Landing = () => {
         // localStorage.setItem('startDate', JSON.stringify(startDate))
         // localStorage.setItem('endDate', JSON.stringify(endDate))
 
-        fetch('https://vaccination.bits-dvm.org/api/admin/students', {
+        fetch(host + '/api/admin/students', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -117,7 +120,7 @@ const Landing = () => {
         // localStorage.setItem('startDate', JSON.stringify(startDate))
         // localStorage.setItem('endDate', JSON.stringify(endDate))
 
-        fetch('https://vaccination.bits-dvm.org/api/admin/students', {
+        fetch(host + '/api/admin/students', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -250,7 +253,7 @@ const Landing = () => {
                     mr="10px" 
                     size="md"
                     onClick={() => {
-                        window.open("https://vaccination.bits-dvm.org/api/admin/excel")
+                        window.open(host + "/api/admin/excel")
                     }}
                 >Download as Excel</Button>
                 <Button 
@@ -511,7 +514,7 @@ function BasicUsage() {
     const [formB, setFormB] = useState(["f2020", "f2019", "f2018", "h2020", "h2019", "h2018"])
 
     const getBatchData = () => {
-        fetch('https://vaccination.bits-dvm.org/api/admin/allow', {
+        fetch(host + '/api/admin/allow', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -531,7 +534,7 @@ function BasicUsage() {
     }))}
 
     const postBatchData = () => {
-        fetch('https://vaccination.bits-dvm.org/api/admin/allow', {
+        fetch(host + '/api/admin/allow', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

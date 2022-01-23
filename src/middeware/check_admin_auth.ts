@@ -1,58 +1,37 @@
-import { hashed } from "../config/admin.js";
+// import logger
+import { logger } from  "./logger";
+import { hashed } from "../config/admin";
+import { RequestType, ResponseType } from "../controllers/student_controllers";
+// import error handlers
+import * as ERROR from "../middeware/error_models";
+import { error_handler } from "../middeware/error_handler";
 
-const check_admin_auth = async (req, res, next) => {
-
-    console.log(req.headers);
-    var authHeader = req.headers.authorization;
-    if(!authHeader){
-        console.log("NO AUTH HEADER");
-        res.status(400).json({"error": "NO AUTH HEADER"});
-    }
-    else{
-        console.log(authHeader);
-        if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
-            const token = req.headers.authorization.split(' ')[1];
-
-            if(token === hashed){
-                console.log("ADMIN ALLOWED");
-                next();
-            }
-            else{
-                console.log("INVALID TOKEN");
-                res.status(400).json({"error": "TOKEN IS INCORRECT"});
-            }
+const check_admin_auth = async (req: RequestType, res: ResponseType, next: any): Promise<void> => {
+    try{
+        var authHeader: string = req.headers.authorization!;
+        if(!authHeader){
+            throw new ERROR.ClientError(ERROR.HttpStatusCode.UNAUTHORIZED_REQUEST, "No auth header for ADMIN.", false);
         }
         else{
-            console.log("AUTH HEADER IS NOT BEARER AUTH");
-            res.status(400).json({"error": "NO BEARER AUTH IN AUTH HEADER"});
+            if(req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer'){
+                const token: string = req.headers.authorization.split(' ')[1];
+                if(token === hashed){
+                    logger.info('ADMIN allowed access.');
+                    next();
+                }
+                else{
+                    throw new ERROR.ClientError(ERROR.HttpStatusCode.UNAUTHORIZED_REQUEST, "Invalid auth header for ADMIN.", false);
+                }
+            }
+            else{
+                throw new ERROR.ClientError(ERROR.HttpStatusCode.UNAUTHORIZED_REQUEST, "No bearer auth for ADMIN.", false);
+            }
         }
     }
-
-    // // DEVELOPERS WITH ADMINISTRATOR ACCESS :P
-    // const ADMINISTRATORS = [
-    //     "f20200048@pilani.bits-pilani.ac.in",  // MOHIT MAKWANA
-    //     "f20201229@pilani.bits-pilani.ac.in",  // PARTH SHARMA
-    //     "f20190024@pilani.bits-pilani.ac.in",  // NIDHEESH JAIN
-    //     "f20190663@pilani.bits-pilani.ac.in",  // DARSH MISHRA
-    //     "f20190363@pilani.bits-pilani.ac.in"   // ANSHAL SHUKLA
-    // ];
-
-    // // ALLOW ONLY ADMINS
-    // if(req.session["student"]){
-    //     if(ADMINISTRATORS.indexOf(req.session["student"].email) > -1){
-    //         console.log('ALLOWED ADMIN');
-    //         next();
-    //     }
-    //     else{
-    //         console.log('ADMIN ACCESS DENIED');
-    //         res.status(400).json({"error": "ACCESS DENIED TO ADMIN PAGE :p"});
-    //     }
-    // }
-    // else{
-    //     res.status(400).json({"error": "ACCESS NOT GRANTED TO ADMIN PAGE"});
-    //     res.end();
-    // }
+    catch(err){
+        if(!error_handler.isHandleAble(err)) { res.status(ERROR.HttpStatusCode.INTERNAL_SERVER_ERROR).json({"error": err.message}); throw err };
+        error_handler.handleError(err, res);
+    }
 }
-
 
 export default check_admin_auth;
