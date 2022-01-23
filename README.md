@@ -1,13 +1,12 @@
 # Vaccination_Portal
 
 # TODO
-- gh repo node best practices
 - gh actions auto deploy to main
-- closures usage in controllers
-- passing web objects to controllers?
-- unhandleable errors, uncaught exceptions, kill signal emittors, handle these and use pm2/else
+- use pm2/else
 - Githooks pre-commit for testing
+- document api using swagger
 - setup mailer for mailing whenever critical error happens
+- write tests
 
 
 ## Getting started

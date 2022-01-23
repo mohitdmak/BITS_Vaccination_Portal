@@ -1,14 +1,18 @@
 // auth requirements
 // import { google } from 'googleapis';
-// Importing mongo student model
-import { Student } from '../models/student';
-// importing vaccine model
-// import { Vaccine } from '../models/vaccine';
+// Importing mongo student model, error handlers, logger
+import * as ERROR from "../middeware/error_models";
+import { HttpStatusCode } from "../middeware/error_models";
+import { error_handler } from "../middeware/error_handler";
+import { Student, STUDENT } from '../models/student';
+import { Vaccine, VACCINE } from '../models/vaccine';
+import { RequestType, ResponseType } from "../controllers/student_controllers";
+import { logger } from "../middeware/logger";
 
 //password configs
-import { password } from '../config/admin.js';
-import { username } from '../config/admin.js';
-import { hashed } from '../config/admin.js';
+import { password } from '../config/admin';
+import { username } from '../config/admin';
+import { hashed } from '../config/admin';
 
 // reqs for sending excel file
 import json2xls from 'json2xls';
@@ -23,159 +27,112 @@ let allow_access = ["f2020"];
 const get_allow_access = () => {
     return allow_access;
 }
-
-const restrict_access = async (req, res) => {
+const restrict_access = async (req: RequestType, res: ResponseType): Promise<void> => {
     allow_access = req.body.batch;
-    res.status(201).json({"batch": allow_access});
+    res.status(HttpStatusCode.CREATED_RESOURCE).json({"batch": allow_access});
 }
-const get_restrict_access = async (req, res) => {
-    // allow_access = req.body.batch;
-    // console.log(req.get("host"));
-    res.status(200).json({"batch": allow_access});
+const get_restrict_access = async (req: RequestType, res: ResponseType): Promise<void> => {
+    res.status(HttpStatusCode.OK).json({"batch": allow_access});
 }
-
 
 // function to paginate array after applying filters
-function paginate(array, page_size, page_number) {
+function paginate(array: any[], page_size: number, page_number: number): any[] {
   // human-readable page numbers usually start with 1, so we reduce 1 in the first argument
   return array.slice((page_number - 1) * page_size, page_number * page_size);
 }
 
-//login
-const post_login = async(req, res) => {
-    const {client_username, client_password} = req.body;
-    if(client_username == username && client_password === password){
-        res.status(201).json({"jwt": hashed});
+function trim_res_data(students: any[], beggining?: number, ending?: number, student?: STUDENT): STUDENT[] | STUDENT{
+    students = student ? new Array(1).fill(student) : students;
+    console.log(students);
+    for(let i = 0; i < students.length; i++){
+        if(student || (beggining! <= Date.parse(<string>(students[i].arrival_date as any)) && Date.parse(<string>(students[i].arrival_date as any)) <= ending!)){
+            students[i] = {
+                "_id": students[i]._id,
+                "pic": students[i].pic,
+                "name": students[i].name,
+                "email": students[i].email,
+                "vaccination_status": students[i].vaccination_status,
+                "auto_verification": students[i].auto_verification,
+                "manual_verification": students[i].manual_verification,
+                "overall_status": students[i].overall_status,
+                "arrival_date": students[i].arrival_date,
+                "city": students[i].city,
+                "is_containment_zone": students[i].is_containment_zone, 
+                "pdf": students[i].pdf,
+                "consent_form": students[i].consent_form
+            }
+        }
+        else{
+            students.splice(i, 1);
+            i--;
+        }
     }
-    else{
-        console.log("WRONG ADMIN PASSWORD OR USERNAME");
-        res.status(400).json({"error": "ADMIN PASSWORD OR USERNAME IS INCORRECT"});
+    return student ? students[0] : students;
+}
+// admin login
+const post_login = async(req: RequestType, res: ResponseType): Promise<void> => {
+    try{
+        const {client_username, client_password} = req.body;
+        if(client_username == username && client_password === password){
+            res.status(HttpStatusCode.CREATED_RESOURCE).json({"jwt": hashed});
+        }
+        else{
+            throw new ERROR.ClientError(ERROR.HttpStatusCode.UNAUTHORIZED_REQUEST, "ADMIN PASSWORD OR USERNAME IS INCORRECT", false);
+        }
+    }
+    catch(err){
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({"error": err.message}); throw err };
+        error_handler.handleError(err, res);
     }
 }
 
-// Handler for POST REQs submitting pdfs
-const post_students = async ( req, res) => {
-
-    // get page no
-    const page = Number(req.body.page);
-    // iterate through json to get filter specs
-    var filters = req.body.filters;
-
+// handle providing data of students requested in admin page
+const post_students = async (req: RequestType, res: ResponseType): Promise<void> => {
+    // get page no, iterate through json to get filter specs
+    const page: number = Number(req.body.page);
+    var filters: any = req.body.filters;
     // parse filters
-    console.log("Deleting null filters . . .");
+    logger.info({"FILTERS": req.body}, 'Trimming student data by filters set by admin > > >');
     for(var key in filters){
         if(filters[key] == null){
-            console.log(key);
             delete filters[key];
         }
     }
-
     // implement incomplete and case insensitive match
     if(filters["name"] != null){
         var name_var = filters["name"];
         filters["name"] = {"$regex": String(name_var), "$options" : "i"};
-        console.log(filters["name"]);
     }
-
     try{
-        // return list of students
-        var students = await Student.find(filters);
-        var total_pages;
-        // set total pages
-        //if(students.length % page_limit === 0){
-        //    total_pages = students.length / page_limit;
-        //}
-        //else{
-        //    total_pages = Math.floor(students.length / page_limit) + 1;
-        //}
-
-        // update pagination
-        var students = await Student.find(filters);
-
-        // get filter dates
-        var beggining = Date.parse(req.body.between.start);
-        var ending = Date.parse(req.body.between.end);
-
-        // get batchwise filter
-        var batch = req.body.batch;
-
-        // edit entries by batch
+        var total_pages: number;
+        var students: STUDENT[] | null = await Student.find(filters);
+        // get filter dates, batchwise filter, entries by batch
+        var beggining: number = Date.parse(req.body.between.start);
+        var ending: number = Date.parse(req.body.between.end);
+        var batch: string = req.body.batch;
         if(batch.length){
-            for (let i = 0; i < students.length; i++) {
+            for(let i = 0; i < students.length; i++){
                 if(batch.indexOf(String(students[i].email.substr(1, 4))) > 2 || batch.indexOf(String(students[i].email.substr(1, 4))) < 0){
-                    console.log(students[i].email.substr(1, 4));
                     students.splice(i, 1);
                     i--;
                 }
                 else{
-                    //@ts-ignore
-                    var date = new Date(Date.parse(students[i].arrival_date));
+                    // conversion to IST
+                    var date = new Date(Date.parse(<string>(students[i].arrival_date as any)));
                     date.setTime(date.getTime() + 19800000);
-                    //@ts-ignore
-                    students[i].arrival_date = date.toISOString();
+                    students[i].arrival_date = <Date>(date.toISOString() as any);
                 }
             }
         }
         else{
-            for (let i = 0; i < students.length; i++) {
-                    //@ts-ignore
-            var date = new Date(Date.parse(students[i].arrival_date));
-            date.setTime(date.getTime() + 19800000);
-                    //@ts-ignore
-            students[i].arrival_date = date.toISOString();
+            for(let i = 0; i < students.length; i++){
+                // conversion to IST
+                var date = new Date(Date.parse(<string>(students[i].arrival_date as any)));
+                date.setTime(date.getTime() + 19800000);
+                students[i].arrival_date = <Date>(date.toISOString() as any);
             }
         }
-
-
-        // edit all entries for student
-        //students.forEach(function(student, index, theArray){
-        for (let i = 0; i < students.length; i++) {
-            if((beggining != undefined && ending != undefined)){
-                    //@ts-ignore
-                if( beggining <= Date.parse(students[i].arrival_date) && Date.parse(students[i].arrival_date) <= ending){
-                    //@ts-ignore
-                    students[i] = {
-                        "_id": students[i]._id,
-                        "pic": students[i].pic,
-                        "name": students[i].name,
-                        "email": students[i].email,
-                        "vaccination_status": students[i].vaccination_status,
-                        "auto_verification": students[i].auto_verification,
-                        "manual_verification": students[i].manual_verification,
-                        "overall_status": students[i].overall_status,
-                        "arrival_date": students[i].arrival_date,
-                        "city": students[i].city,
-                        "is_containment_zone": students[i].is_containment_zone, 
-                        "pdf": students[i].pdf,
-                        "consent_form": students[i].consent_form
-                    }
-                }
-                else{
-                    console.log("removed, not in time range :");
-                    students.splice(i, 1);
-                    i--;
-                }
-            }
-            else{
-                    //@ts-ignore
-                students[i] = {
-                    "_id": students[i]._id,
-                    "pic": students[i].pic,
-                    "name": students[i].name,
-                    "email": students[i].email,
-                    "vaccination_status": students[i].vaccination_status,
-                    "auto_verification": students[i].auto_verification,
-                    "manual_verification": students[i].manual_verification,
-                    "overall_status": students[i].overall_status,
-                    "arrival_date": students[i].arrival_date,
-                    "city": students[i].city,
-                    "is_containment_zone": students[i].is_containment_zone, 
-                    "pdf": students[i].pdf,
-                    "consent_form": students[i].consent_form
-                }
-            }
-        }
-        console.log("	ADMIN PROVIDED STUDENTS LIST");
+        students! = <STUDENT[]>(trim_res_data(students, beggining, ending));
         if(students.length % page_limit === 0){
             total_pages = students.length / page_limit;
         }
@@ -183,268 +140,180 @@ const post_students = async ( req, res) => {
             total_pages = Math.floor(students.length / page_limit) + 1;
         }
         students = paginate(students, page_limit, page)
-        res.status(200).json({
-            "total_pages": total_pages,
-            "data": students
-        });
+        res.status(HttpStatusCode.OK).json({"total_pages": total_pages, "data": students});
+        logger.info({"FILTERS": req.body}, "Provided students list < < <");
     }
     catch(err){
-        console.log(err);
-        res.status(500).json({
-            "error": err
-        });
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({"error": err.message}); throw err };
+        error_handler.handleError(err, res);
     }
 }
 
 // Handler for GET REQs on particular student
-const get_student = async (req, res) => {
-
-    // get id no
-    const id = req.body._id;
-    //console.log(id);
+const get_student = async (req: RequestType, res: ResponseType): Promise<void> => {
+    const id: number = req.body._id;
     try{
-        var student = await Student.findById(id);
-                    //@ts-ignore
-        var date = new Date(Date.parse(student.arrival_date));
+        var student: STUDENT | null = await Student.findById(id);
+        // convert to IST
+        var date = new Date(Date.parse(<string>(student!.arrival_date as any)));
         date.setTime(date.getTime() + 19800000);
-                    //@ts-ignore
-        student.arrival_date = date.toISOString();
-        console.log(" STUDENT DETAIL SENT IS : ");
-        console.log(student);
-        console.log("	ADMIN PROVIDED STUDENT DETAIL");
-        res.status(200).json({
-                    //@ts-ignore
-            "_id": student._id,
-                    //@ts-ignore
-            "pic": student.pic,
-                    //@ts-ignore
-            "name": student.name,
-                    //@ts-ignore
-            "email": student.email,
-                    //@ts-ignore
-            "vaccination_status": student.vaccination_status,
-                    //@ts-ignore
-            "auto_verification": student.auto_verification,
-                    //@ts-ignore
-            "manual_verification": student.manual_verification,
-                    //@ts-ignore
-            "overall_status": student.overall_status,
-                    //@ts-ignore
-            "city": student.city,
-                    //@ts-ignore
-            "arrival_date": student.arrival_date,
-                    //@ts-ignore
-            "is_containment_zone": student.is_containment_zone,
-                    //@ts-ignore
-            "pdf": student.pdf,
-                    //@ts-ignore
-            "consent_form": student.consent_form
-        });
+        student!.arrival_date = <Date>(date.toISOString() as any);
+        logger.info({"STUDENT_EMAIL": student!.email}, "Admin provided student detail.");
+        student! = <STUDENT>(trim_res_data([], undefined, undefined, student!));
+        res.status(HttpStatusCode.OK).json(student);
     }
     catch(err){
-        console.log(err);
-        res.status(500).json({
-            "error": err
-        });
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.DB_ERROR).json({"error": err.message}); throw err };
+        error_handler.handleError(err, res);
     }
 }
 
 // Handler for UPDATE REQs on a particular student
-const update_student = async (req, res) => {
-
-    // get  id no
+const update_student = async (req: RequestType, res: ResponseType): Promise<void> => {
     const id = req.body._id;
     try{
-        var updates = req.body.updates;
-        var student = await Student.findOneAndUpdate({_id: id}, updates, {new: true});
-
-	//var new_student;
-	//if(student.pdf && student.consent_form && student.vaccination_status == 'COMPLETE'){
-        //    console.log("All fields proper, updating student model and session cache . . .");
-        //    var new_student = await Student.findOneAndUpdate({email: student.email}, {overall_status: true}, {new:true});
-         //   console.log("Overall Access grant updated .");
-         //   res.status(201).json({"success": "OVERALL ACCESS GRANTED"});
-        //}
-	//else{
-	//    new_student = student;
-//	}
-
-	res.status(201).json(student);
-        console.log("	ADMIN UPDATED STUDENT STATUS");
-        //console.log("Verifying overall status . . .");
-        //if(student.pdf && student.consent_form && student.vaccination_status == 'COMPLETE'){
-        //    console.log("All fields proper, updating student model and session cache . . .");
-        //    var new_student = await Student.findOneAndUpdate({email: student.email}, {overall_status: true}, {new:true});
-        //    console.log("Overall Access grant updated .");
-        //}
-        //res.status(200).json({
-        //    "_id": student._id,
-        //    "pic": student.pic,
-        //    "name": student.name,
-        //    "email": student.email,
-        //    "vaccination_status": student.vaccination_status,
-        //    "auto_verification": student.auto_verification,
-        //    "manual_verification": student.manual_verification,
-        //    "overall_status": student.overall_status,
-        //    "pdf": student.pdf,
-        //    "consent_form": student.consent_form
-        //});
+        var updates: any[] = req.body.updates;
+        var student: STUDENT | null = await Student.findOneAndUpdate({_id: id}, updates, {new: true});
+        res.status(HttpStatusCode.CREATED_RESOURCE).json(student);
+        logger.info({"STUDENT_EMAIL": student!.email}, "Admin updated student status.");
     }
     catch(err){
-        console.log(err);
-        res.status(500).json({
-            "error": err
-        });
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.DB_ERROR).json({"error": err.message}); throw err };
+        error_handler.handleError(err, res);
     }
 }
 
 // Handler for VIEW REQs of pdfs for student
-// serving stored pdf file
-const get_pdf = async (req, res) => {
-    // get current logged in student
+const get_pdf = async (req: RequestType, res: ResponseType): Promise<void> => {
     try{
         // get downloaded file path
-        console.log("\n ADMIN REQUESTED PDF");
-        console.log(req.query._id);
-        var id = req.query._id;
-        var student = await Student.findById(id);
-                    //@ts-ignore
-        if(student.pdf){
-                    //@ts-ignore
-            var serve_file = student.pdf;
-            console.log("\n		Serving PDF file at : ");
-            console.log(String(serve_file)); 
-            res.download(String(serve_file), function(err){
-                if(err){
-                    console.log(err);
-                    res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
-                }
-                else{
-                    console.log("CONSENT FORM FILE for student is served");
-                }
-            });
-        }
-        else{
-            console.log("NO PDF FILE FOUND FOR STUDENT REQUESTED BY ADMIN");
-            res.status(400).json({"error": "NO FILE FOUND ON SERVER"});
-        }
+        var id: any = req.query._id;
+        var student: STUDENT | null = await Student.findById(id);
+        var serve_file: string = student!.pdf;
+        logger.info({"STUDENT_EMAIL": student!.email}, "ADMIN: Request to serve Consent form > > >");
+        // serve file as a download
+        res.download(String(serve_file), function(err){
+            var file_error: ERROR.BaseError
+            //@ts-ignore
+            if(err && err.statusCode == 404){
+                file_error = new ERROR.ClientError(ERROR.HttpStatusCode.NOT_FOUND, "No vaccination pdf found on server < < <", false);
+                error_handler.handleError(file_error, res);
+            }
+            else if(err){
+                file_error = new ERROR.BaseError("PDF Serve error", ERROR.HttpStatusCode.INTERNAL_SERVER_ERROR, "Could not serve vaccination pdf < < <", false, true);
+                file_error.stack = err.stack;
+                error_handler.handleError(file_error, res);
+            }
+            else{
+                logger.info({"STUDENT_EMAIL": student!.email, "SERVED_FILE": serve_file}, "ADMIN: Vaccination pdf is served < < <");
+            }
+        });
     }
     // forward login errors
     catch(err){
-        console.log(err);
-        res.status(500).json({"error": err});
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.DB_ERROR).json({"error": err.message}); throw err };
+        error_handler.handleError(err, res);
     }
 }
 
-
 //Handler for view requests of consent form by admin
-// serving stored pdf file
-const get_consent = async (req, res) => {
-    // get current logged in student
+const get_consent = async (req: RequestType, res: ResponseType): Promise<void> => {
     try{
         // get downloaded file path
-        console.log("\n ADMIN REQUESTED CONSENT PDF");
-        console.log(req.query);
-        var id = req.query._id;
-        var student = await Student.findById(id);
-                    //@ts-ignore
-        if(student.consent_form){
-                    //@ts-ignore
-            var serve_file = student.consent_form;
-            console.log("\n		Serving PDF file at : ");
-            console.log(String(serve_file)); 
-            res.download(String(serve_file), function(err){
-                if(err){
-                    console.log(err);
-                    res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
-                }
-                else{
-                    console.log("File served .");
-                }
-            });
-        }
-        else{
-            console.log("NO PDF FILE FOUND FOR STUDENT REQUESTED BY ADMIN");
-            res.status(400).json({"error": "NO FILE FOUND ON SERVER"});
-        }
+        var id: any = req.query._id;
+        var student: STUDENT | null = await Student.findById(id);
+        var serve_file: string = student!.consent_form;
+        logger.info({"STUDENT_EMAIL": student!.email}, "ADMIN: Request to serve Consent form > > >");
+        // serve file as a download
+        res.download(String(serve_file), function(err){
+            var file_error: ERROR.BaseError
+            //@ts-ignore
+            if(err && err.statusCode == 404){
+                file_error = new ERROR.ClientError(ERROR.HttpStatusCode.NOT_FOUND, "No consent file found on server < < <", false);
+                error_handler.handleError(file_error, res);
+            }
+            else if(err){
+                file_error = new ERROR.BaseError("PDF Serve error", ERROR.HttpStatusCode.INTERNAL_SERVER_ERROR, "Could not serve consent form < < <", false, true);
+                file_error.stack = err.stack;
+                error_handler.handleError(file_error, res);
+            }
+            else{
+                logger.info({"STUDENT_EMAIL": student!.email, "SERVED_FILE": serve_file}, "ADMIN: Consent form is served < < <");
+            }
+        });
     }
     // forward login errors
     catch(err){
-        console.log(err);
-        res.status(500).json({"error": err});
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.DB_ERROR).json({"error": err.message}); throw err };
+        error_handler.handleError(err, res);
     }
 }
 
 // get excel file
-const get_excel = async (req, res) => {
-    // get data from mongodb
-    const data = await Student.find();
-
-    // initialize empty array for conversion to xlsl
-    var excel_array = [];
-
-    // remove mongoose id pairs 
-    data.forEach((student) => {
-        var pdf;
-        var consent_form;
-        var latest_dose_date;
-        var agreement = student.TnC1_Agreement && student.TnC2_Agreement && student.is_medically_fit;
-        if(student.latest_dose_date){
-            latest_dose_date = new Date('2020-01-14T17:43:37.000Z').toLocaleString(undefined, {timeZone: 'Asia/Kolkata'});
-        }
-        else{
-            latest_dose_date = "No latest dose";
-        }
-        if(student.pdf){
-            pdf = true;
-        }
-        else{
-            pdf = false;
-        }
-        if(student.consent_form){
-            consent_form = true;
-        }
-        else{
-            consent_form = false;
-        }
-        const excel_student =  {
-             "Name": student.name,
-             "Email": student.email,
-             "City": student.city,
-             "State": student.state,
-             "Vaccination Status": student.vaccination_status,
-             "Auto Verification": student.auto_verification,
-             "Manual Verification": student.manual_verification,
-             "Certificate Uploaded": pdf,
-             "Consent Uploaded": consent_form,
-             "Accepted All Agreements": agreement,
-             "Latest Dose Date": latest_dose_date,
-             "Arrival Date": new Date(student.arrival_date).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'}),
-        };
-                    //@ts-ignore
-        excel_array.push(excel_student);
-    });
-    
-    // prepare xlsx document
-    var excel_doc = await json2xls(excel_array);
-
-        // write to xlsx file
-    //@ts-ignore  FIXME
-    writeFileSync("ADMIN_ExcelFile.xlsx", excel_doc, 'binary', (err) => {
-        if (err) {
-            console.log("writeFileSync error :", err);
-         }
-        console.log("The file has been saved!");
-     });
-    res.download("ADMIN_ExcelFile.xlsx", function(err){
-        if(err){
-            console.log(err);
-            res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
-        }
-        //else{
-        //    console.log("CONSENT FORM FILE for student is served");
-        //}
-    });
+const get_excel = async (req: RequestType, res: ResponseType): Promise<void> => {
+    try{
+        // get data from mongodb, initialize empty array for conversion to xlsl
+        logger.info('ADMIN: Request for excel file > > >');
+        const data: STUDENT[] | null = await Student.find();
+        var excel_array: any[] = [];
+        // remove mongoose id pairs, etc
+        data.forEach((student) => {
+            var pdf: boolean = student.pdf ? true : false;
+            var consent_form: boolean = student.consent_form ? true : false;
+            var latest_dose_date: string;
+            var agreement: boolean = student.TnC1_Agreement && student.TnC2_Agreement && student.is_medically_fit;
+            if(student.latest_dose_date){
+                latest_dose_date = new Date('2020-01-14T17:43:37.000Z').toLocaleString(undefined, {timeZone: 'Asia/Kolkata'});
+            }
+            else{
+                latest_dose_date = "No latest dose";
+            }
+            const excel_student =  {
+                 "Name": student.name,
+                 "Email": student.email,
+                 "City": student.city,
+                 "State": student.state,
+                 "Vaccination Status": student.vaccination_status,
+                 "Auto Verification": student.auto_verification,
+                 "Manual Verification": student.manual_verification,
+                 "Certificate Uploaded": pdf,
+                 "Consent Uploaded": consent_form,
+                 "Accepted All Agreements": agreement,
+                 "Latest Dose Date": latest_dose_date,
+                 "Arrival Date": new Date(student.arrival_date).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'}),
+            };
+            excel_array.push(excel_student);
+        });
+        
+        // prepare xlsx document
+        var excel_doc: any = await json2xls(excel_array);
+        //@ts-ignore  FIXME
+        writeFileSync("ADMIN_ExcelFile.xlsx", excel_doc, 'binary', (err) => {
+            if(err){
+                var excel_error: ERROR.BaseError = new ERROR.BaseError("Excel write", ERROR.HttpStatusCode.INTERNAL_SERVER_ERROR, "Could not write ADMIN excel file.", false, false);
+                excel_error.stack = err.stack;
+                throw excel_error;
+            }
+            else{
+                logger.info({"ADMIN_FILE": filename}, 'ADMIN Excel file has been saved.');
+            }
+         });
+         // send for download 
+         res.download("ADMIN_ExcelFile.xlsx", function(err){
+            if(err){
+                var excel_error: ERROR.BaseError = new ERROR.BaseError("Excel upload", ERROR.HttpStatusCode.INTERNAL_SERVER_ERROR, "Could not provide as download ADMIN excel file.", false, false);
+                excel_error.stack = err.stack;
+                throw excel_error;
+            }
+            else{
+                logger.info({"ADMIN_FILE": filename}, 'ADMIN Excel file is served < < <');
+            }
+        });
+    }
+    catch(err){
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({"error": err.message}); throw err };
+        error_handler.handleError(err, res);
+    }
 }
 
 //alt details

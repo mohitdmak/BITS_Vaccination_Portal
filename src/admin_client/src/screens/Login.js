@@ -16,6 +16,9 @@ import {
     Link,
 } from "react-router-dom";
 
+// added by --- Mohit
+const host = "http://localhost:1370";
+
 const Login = (props) => {
     const history = useHistory();
     const [username, setUsername] = useState("")
@@ -23,7 +26,7 @@ const Login = (props) => {
     const handleSubmit = event => {
         event.preventDefault();
         console.log("fetching now")
-        fetch('https://vaccination.bits-dvm.org/api/admin/login', { // Your POST endpoint
+        fetch(host + '/api/admin/login', { // Your POST endpoint
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

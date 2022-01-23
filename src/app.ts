@@ -74,7 +74,7 @@ const redisClient = createClient({
 });
 
 // configure session settings for express
-import SESSION_SECRET from "./config/session-secret.js";
+import { SESSION_SECRET } from "./config/session-secret";
 app.use(Session({
     // Session configurations
     name: "express-session-id",
