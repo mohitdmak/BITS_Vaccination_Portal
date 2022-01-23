@@ -11,6 +11,8 @@ import Login from './screens/Login'
 import Landing from './screens/Landing'
 import Student from './screens/Student'
 
+// added by --- Mohit
+const host = "http://localhost:1370";
 
 function App() {
   const [isLoggedIn, setLogin] = useState(localStorage.getItem('jwt') ? true : false)
@@ -20,7 +22,7 @@ function App() {
   }, []);
 
   const apiRequest = () => {
-    fetch('https://vaccination.bits-dvm.org/api/admin/details/',
+    fetch(host + '/api/admin/details/',
       {
         method: 'POST',
         headers: {

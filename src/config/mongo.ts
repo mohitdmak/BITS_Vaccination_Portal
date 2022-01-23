@@ -1,0 +1,7 @@
+const MONGO_INITDB_ROOT_USERNAME: string = "BITS_VACC_PORTAL";
+const MONGO_INITDB_ROOT_PASSWORD: string = "bitsitstragic";
+
+export {
+    MONGO_INITDB_ROOT_PASSWORD,
+    MONGO_INITDB_ROOT_USERNAME
+} 

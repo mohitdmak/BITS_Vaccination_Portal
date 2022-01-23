@@ -16,6 +16,8 @@ import { useParams, Link } from "react-router-dom";
 
 // https://vaccination.bits-dvm.org/api/admin/students
 
+// added by --- Mohit
+const host = "http://localhost:1370";
 
 const Student = () => {
     let { id } = useParams();
@@ -24,7 +26,7 @@ const Student = () => {
     const [value2, setValue2] = React.useState("")
     
     const getData = (idparam) => {
-        fetch('https://vaccination.bits-dvm.org/api/admin/student', { // Your POST endpoint
+        fetch(host + '/api/admin/student', { // Your POST endpoint
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -51,7 +53,7 @@ const Student = () => {
     }
 
     const postData = () => {
-        fetch('https://vaccination.bits-dvm.org/api/admin/update', { // Your POST endpoint
+        fetch(host + '/api/admin/update', { // Your POST endpoint
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -213,12 +215,12 @@ const Student = () => {
 
            <Flex flexDir="row" width="50vw" padding="10px" justifyContent="space-between" alignItems="center">
                <Text>Certificate PDF</Text>
-                <Button onClick={() => window.open("https://vaccination.bits-dvm.org/api/admin/get_pdf?_id="+id)} isDisabled={!student.pdf}>View PDF</Button>
+                <Button onClick={() => window.open(host + "/api/admin/get_pdf?_id="+id)} isDisabled={!student.pdf}>View PDF</Button>
            </Flex>
 
            <Flex flexDir="row" width="50vw" padding="10px" justifyContent="space-between" alignItems="center">
                <Text>Consent Form PDF</Text>
-                <Button onClick={() => window.open("https://vaccination.bits-dvm.org/api/admin/get_consent?_id="+id)} isDisabled={!student.consent_form}>View PDF</Button>
+                <Button onClick={() => window.open(host + "/api/admin/get_consent?_id="+id)} isDisabled={!student.consent_form}>View PDF</Button>
            </Flex>
 
 

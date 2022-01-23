@@ -1,8 +1,6 @@
 // mongo ORM and validator
 import { Schema, model, Document } from 'mongoose';
-// const schema = Schema;
-//@ts-ignore  FIXME
-import { isEmail } from 'validator';
+import isEmail from 'validator';
 
 
 // ########################### Validators ###########################
@@ -33,23 +31,23 @@ function ValidateVaccineStatus(String: string){
 import { Vaccineschema } from "./vaccine";
 
 interface STUDENT extends Document{
-    name: String,
-    email: String,
-    city?: String,
-    state?: String,
-    is_containment_zone: Boolean,
-    is_medically_fit: Boolean,
-    TnC1_Agreement: Boolean,
-    TnC2_Agreement: Boolean,
+    name: string,
+    email: string,
+    city?: string,
+    state?: string,
+    is_containment_zone: boolean,
+    is_medically_fit: boolean,
+    TnC1_Agreement: boolean,
+    TnC2_Agreement: boolean,
     latest_dose_date?: Date,
     arrival_date: Date,
-    vaccination_status: String,
-    manual_verification: String,
-    auto_verification: String,
-    overall_status: Boolean,
-    pic: String,
-    pdf: String,
-    consent_form: String,
+    vaccination_status: string,
+    manual_verification: string,
+    auto_verification: string,
+    overall_status: boolean,
+    pic: string,
+    pdf: string,
+    consent_form: string,
     vaccine: any
 }
 

@@ -53,7 +53,7 @@ let upload = multer(
 
 
 // Handler for POST REQs submitting pdfs
-const post_pdf = async (req: RequestType, res: Response) => {
+const post_pdf = async (req: RequestType, res: Response): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger? res.locals.child_logger : logger;
     try{
         if(req.session["student"]){
@@ -79,14 +79,14 @@ const post_pdf = async (req: RequestType, res: Response) => {
         }
     }
     catch(err){
-        if(!error_handler.isHandleAble(err)) throw err;
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({"error": err.message}); throw err };
         error_handler.handleError(err, res, LOGGER);
     }
 }
 
 
 //POST CONSENT FORM
-const post_consent = async (req: RequestType, res: ResponseType) => {
+const post_consent = async (req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger? res.locals.child_logger : logger;
     try{
         if(req.session["student"]){
@@ -109,14 +109,14 @@ const post_consent = async (req: RequestType, res: ResponseType) => {
         }
     }
     catch(err){
-        if(!error_handler.isHandleAble(err)) throw err;
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({"error": err.message}); throw err };
         error_handler.handleError(err, res, LOGGER);
     }
 }
 
 
 // get consent form
-const get_consent = async (req: RequestType, res: ResponseType) => {
+const get_consent = async (req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger? res.locals.child_logger : logger;
     try{
         // get downloaded file path
@@ -141,14 +141,14 @@ const get_consent = async (req: RequestType, res: ResponseType) => {
         });
     }
     catch(err){
-        if(!error_handler.isHandleAble(err)) throw err;
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({"error": err.message}); throw err };
         error_handler.handleError(err, res, LOGGER);
     }
 }
 
 
 // post extra data
-const post_extra_data = async (req: RequestType, res:ResponseType) => {
+const post_extra_data = async (req: RequestType, res:ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger? res.locals.child_logger : logger;
     try{
         LOGGER.info("Post extra data called > > >");
@@ -168,13 +168,13 @@ const post_extra_data = async (req: RequestType, res:ResponseType) => {
         }
     }
     catch(err){
-        if(!error_handler.isHandleAble(err)) throw err;
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.DB_ERROR).json({"error": err.message}); throw err };
         error_handler.handleError(err, res, LOGGER);
     }
 }
 
 // The protected page
-const get_student_details = async (req: RequestType, res: ResponseType) => {
+const get_student_details = async (req: RequestType, res: ResponseType): Promise<void> => {
     if(req.session["student"]){
         res.status(HttpStatusCode.OK).json(req.session["student"]);
     }
@@ -221,33 +221,34 @@ const save_data = async (req: RequestType, res: ResponseType): Promise<void> => 
         });
         // if error during QR parsing, let handler handle, else save vaccine and student models and update session
         child.on('close', async function(){
+            var updated_student: STUDENT | null;
             if(pdf_error){
                 if(pdf_error instanceof ERROR.ClientError){
-                    await Student.findOneAndUpdate({email: req.session["student"].email}, {pdf: file_name, vaccination_status: "NONE", auto_verification: "FAILED"}, {new: true});
+                    updated_student = await Student.findOneAndUpdate({email: req.session["student"].email}, {pdf: file_name, vaccination_status: "NONE", auto_verification: "FAILED"}, {new: true});
                 }
                 error_handler.handleError(pdf_error, res, LOGGER);
             }
             else{
                 var vaccine: VACCINE | null = await new Vaccine({ 'QR': JSON.parse(parsedStr!) }).save();
-                var updated_student: STUDENT | null = await Student.findOneAndUpdate({email: req.session["student"].email}, { vaccine: vaccine, pdf: file_name }, {new: true});
-                //update session data for current student
-                if(updated_student) req.session["student"] = updated_student;
-                LOGGER.info({"QR_DATA": parsedStr}, 'Student vaccination data updated.');
-                req.session.save();
-                LOGGER.info({"QR_DATA": parsedStr}, 'Student session data updated < < <');
-                verify_authenticity(req, res);
+                updated_student = await Student.findOneAndUpdate({email: req.session["student"].email}, {vaccine: vaccine, pdf: file_name}, {new: true});
             }
+            //update session data for current student
+            if(updated_student!) req.session["student"] = updated_student;
+            LOGGER.info({"QR_DATA": parsedStr}, 'Student vaccination data updated.');
+            req.session.save();
+            LOGGER.info({"QR_DATA": parsedStr}, 'Student session data updated < < <');
+            if(!pdf_error) await verify_authenticity(req, res);
         });
     }
     catch(err){
-        if(!error_handler.isHandleAble(err)) throw err;
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.DB_ERROR).json({"error": err.message}); throw err };
         error_handler.handleError(err, res, LOGGER);
     }
 };
 
 
 // VERIFY AUTHENTICITY
-const verify_authenticity = async (req: RequestType, res: ResponseType) => {
+const verify_authenticity = async (req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger? res.locals.child_logger : logger;
     LOGGER.info('Verifying authenticity of uploaded qr > > >');
     // check if names on certificate and BITS records match enough
@@ -270,7 +271,7 @@ const verify_authenticity = async (req: RequestType, res: ResponseType) => {
         LOGGER.info({"BITS_RECORDS": BITS_ARRAY, "COWIN_RECORDS": PDF_ARRAY, "MATCH_COUNT": MATCH_COUNT}, 'Extracted student details from PDF/BITS data.');
     }
     catch(err){
-        if(!error_handler.isHandleAble(err)) throw err;
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.DB_ERROR).json({"error": err.message}); throw err };
         error_handler.handleError(err, res, LOGGER);
     }
 
@@ -309,7 +310,7 @@ const verify_authenticity = async (req: RequestType, res: ResponseType) => {
         }
     }
     catch(err){
-        if(!error_handler.isHandleAble(err)) throw err;
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.DB_ERROR).json({"error": err.message}); throw err };
         error_handler.handleError(err, res, LOGGER);
     }
 }
@@ -358,7 +359,7 @@ const verify_authenticity = async (req: RequestType, res: ResponseType) => {
 
 
 // // Provide Overall Status
-const update_overall_status = async (student: STUDENT, req: RequestType, res: ResponseType) => {
+const update_overall_status = async (student: STUDENT, req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger? res.locals.child_logger : logger;
     LOGGER.info("Checking for update in Overall Access > > >");
     // get current logged in student
@@ -376,14 +377,14 @@ const update_overall_status = async (student: STUDENT, req: RequestType, res: Re
         LOGGER.info({"OVERALL_STATUS" : req.session["student"].overall_status}, 'Updated overall status < < <');
     }
     catch(err){
-        if(!error_handler.isHandleAble(err)) throw err;
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.DB_ERROR).json({"error": err.message}); throw err };
         error_handler.handleError(err, res, LOGGER);
     }
 }
 
 
 // serving stored pdf file
-const get_pdf = async (req, res) => {
+const get_pdf = async (req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger? res.locals.child_logger : logger;
     try{
         // get downloaded file path
@@ -408,19 +409,19 @@ const get_pdf = async (req, res) => {
     }
     // forward login errors
     catch(err){
-        if(!error_handler.isHandleAble(err)) throw err;
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.DB_ERROR).json({"error": err.message}); throw err };
         error_handler.handleError(err, res, LOGGER);
     }
 }
 
 
 // landing page
-const get_all = async (req: RequestType, res: ResponseType) => {
+const get_all = async (req: RequestType, res: ResponseType): Promise<void> => {
     try{
         const students: STUDENT[] | null = await Student.find();
         res.status(HttpStatusCode.OK).json(students);
     }catch(err){
-        if(!error_handler.isHandleAble(err)) throw err;
+        if(!error_handler.isHandleAble(err)) { res.status(HttpStatusCode.DB_ERROR).json({"error": err.message}); throw err };
         error_handler.handleError(err, res);
     }
 };
@@ -432,14 +433,14 @@ const get_logout = (req: RequestType, res: ResponseType) => {
             if(!error_handler.isHandleAble(err)) throw err;
             error_handler.handleError(err, res);
         }else{
-            res.status(HttpStatusCode.OK).json({"success": "logged out"});
+            res.status(HttpStatusCode.OK).redirect("/");
         }
     });
 };
 
 
 //alt details
-const post_details = (req, res) => {
+const post_details = (req: RequestType, res: ResponseType) => {
     console.log("ALT ADMIN DETAILS CALLED");
     res.status(200).json({"success": "admin is allowed"});
 }

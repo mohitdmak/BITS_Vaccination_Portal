@@ -1,6 +1,5 @@
 // mongo ORM and validator
 import { Schema, model, Document } from 'mongoose';
-// const schema = Schema;
 
 interface VACCINE extends Document{
     QR: any,

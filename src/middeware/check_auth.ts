@@ -9,7 +9,6 @@ const check_auth = async (req: RequestType, res: ResponseType, next) => {
     try{
         if(req.session["student"]){
             res.locals.child_logger = logger.child({"STUDENT_EMAIL": req.session["student"].email});
-            res.locals.child_logger.info('Auth Middleware verified.');
             next();
         }
         else{
@@ -17,7 +16,7 @@ const check_auth = async (req: RequestType, res: ResponseType, next) => {
         }
     }
     catch(err){
-        if(!error_handler.isHandleAble(err)) throw err;
+        if(!error_handler.isHandleAble(err)) { res.status(ERROR.HttpStatusCode.DB_ERROR).json({"error": err.message}); throw err };
         error_handler.handleError(err, res);
     }
 }
