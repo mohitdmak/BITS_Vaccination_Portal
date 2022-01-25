@@ -31,6 +31,10 @@ interface STUDENT extends Document {
     email: string;
     city?: string;
     state?: string;
+    studentId?: string;
+    gender?: string;
+    is_above_18: boolean;
+    staying_on_campus: boolean;
     is_containment_zone: boolean;
     is_medically_fit: boolean;
     TnC1_Agreement: boolean;
@@ -58,13 +62,26 @@ const Studentschema = new Schema({
         unique: true,
         validate: [isEmail, "Request's email-id is not a valid email addresss"],
     },
-    // bits_id: {
-    //     type: String,
-    //     required: [true, 'Request does not have a BITS ID'],
-    //     unique: true,
-    //     default: "2020A7PS0048P"
+    studentId: {
+        type: String,
+        //required: [true, 'Request does not have a BITS ID'],
+        //unique: true,
+        //default: ""
     //     // validate: [ValidateBitsId, "Request's BITS ID is not valid"]
-    // },
+    },
+    is_above_18: {
+        type: Boolean,
+        required: [true, 'Request does not have is_above_18 field'],
+        default: true
+    },
+    staying_on_campus: {
+        type: Boolean,
+        required: [true, 'Request does not contain preference for staying on campus'],
+        default: true
+    },
+    gender: {
+        type: String
+    },
     city: {
         type: String,
         //required: [true, "Request does not have the Student Address"],
@@ -145,9 +162,13 @@ const Studentschema = new Schema({
     // consent_form_data: {
     //     type: Buffer
     // },
-    vaccine: Vaccineschema,
-});
-// ########################### / ########################### / ###########################
+    vaccine: Vaccineschema
+},
+    {
+        timestamps: true
+    });
+
+
 
 const Student = model<STUDENT>('student', Studentschema);
 export { Student, STUDENT };
