@@ -1,21 +1,45 @@
-name: Docker Image CI
+# Jobs to publish new versions of container to Dockerhub
+name: Publish Docker image to Dockerhub 
 
+# On pushing code (change later to only releases)
 on:
   push:
   pull_request:
     branches: [ main ]
 
+# Jobs to checkout, login, push to registry
 jobs:
 
-  build:
+  push_to_registries:
 
+    # Gsmaster Repo on Dockerhub
+    name: Push Docker image to project registries
     runs-on: ubuntu-latest
 
+    # Grant all perms
+    permissions:
+      packages: write
+      contents: read
+
+    # Checkout, Login, Push
     steps:
-    - uses: actions/checkout@v2
-    - name: Prepare to Build Docker containers
-      run: pwd && ls && touch src/config/mongo.env && touch src/config/mongo-express.env && touch src/config/DB_ADMIN_CONFIG.env
-    - name: Build the Docker images
-      run: docker-compose build
-    - name: Login to dockerhub and Push docker images
-      run: docker login --username=${{ secrets.DOCKERHUB_USERNAME }} --password=${{ secrets.DOCKERHUB_PASSWORD }} && docker logout && docker login && docker-compose push
+
+      # Checking out repo
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      
+      # Logging to my project repo
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          username: mohitdmak
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      # action to create images with tags and labels
+      - name: Extract metadata (tags, labels) for Docker
+        run: docker-compose up -d
+
+      # Pushing via docker-compose
+      - name: Build and push Docker images
+        
+        run: docker-compose push
