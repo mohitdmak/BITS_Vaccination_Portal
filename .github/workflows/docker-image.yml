@@ -9,7 +9,6 @@ on:
 
 # Jobs to checkout, login, push to registry
 jobs:
-
   push_to_registries:
 
     # Gsmaster Repo on Dockerhub

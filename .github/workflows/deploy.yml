@@ -1,11 +1,9 @@
 # Jobs to deploy my changes directly to aws server
-name: Build & Deploy
+name: Deploy to Lightsail
 
 # For both dev pushes and MRs to main
 on:
   push:
-    branches:
-      - dev
   workflow_dispatch:
 
 
@@ -13,14 +11,21 @@ on:
 jobs:
 
   # Ubuntu image for runner
-  build:
+  ssh-connect:
     runs-on: ubuntu-latest
     steps:
-
       - name: ssh-autodeployment-pipeline
-        # Using pipeline image configured for using ssh
-        uses: cross-the-world/ssh-pipeline@v1.2.0
+        # # Using pipeline image configured for using ssh
+        # uses: easingthemes/ssh-deploy@v2.1.4
+        # env:
+        #   SSH_PRIVATE_KEY: ${{ secrets.AWS_SSH_KEY }}
+        #   REMOTE_HOST: 13.127.86.120
+        #   REMOTE_USER: ubuntu
+        #   REMOTE_PORT: 22
+        #   SOURCE: "."
+        #   TARGET: /home/bits_vaccination_portal/new-repo/
 
+        uses: cross-the-world/ssh-pipeline@v1.2.0
         # Login details
         with:
 
@@ -31,7 +36,7 @@ jobs:
           port: 22
 
           # ssh remote user (not giving root perms currently)
-          user: bits_vaccination_portal
+          user: ubuntu
 
           # Using github secret for ssh key
           key: ${{ secrets.AWS_SSH_KEY }}
@@ -43,4 +48,4 @@ jobs:
           connect_timeout: 60s
 
           # execute commands on to pull changes
-          script: cd ~/new-repo && git status && sudo git pull https://mohitdmak:${{ secrets.REP_ACCESS_TOKEN_AWS }}@github.com/mohitdmak/BITS_Vaccination_Portal modular -s recursive -X theirs
+          script: cd /home/bits_vaccination_portal/new-repo && git status && sudo git pull https://mohitdmak:${{ secrets.REP_ACCESS_TOKEN_AWS }}@github.com/mohitdmak/BITS_Vaccination_Portal modular -s recursive -X theirs
