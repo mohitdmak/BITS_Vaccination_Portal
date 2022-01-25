@@ -1,7 +1,0 @@
-"use strict";
-const MONGO_INITDB_ROOT_USERNAME = "BITS_VACC_PORTAL";
-const MONGO_INITDB_ROOT_PASSWORD = "bitsitstragic";
-module.exports = {
-    MONGO_INITDB_ROOT_PASSWORD,
-    MONGO_INITDB_ROOT_USERNAME
-};

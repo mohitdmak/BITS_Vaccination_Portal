@@ -5,6 +5,7 @@
 PyDIVOC/PyDIVOC/__pycache__/*.pyc
 config/admin.js
 
+
 # DB ADMIN CONFIGURATION
 config/DB_ADMIN_CONFIG.env
 
@@ -41,7 +42,7 @@ config/session-secret.js
 github_access_token.txt
 
 # Redis DB local persistance
-redis/redis_db.rdb
+src/redis/redis_db.rdb
 
 # Local mongo data backup
 db/data
