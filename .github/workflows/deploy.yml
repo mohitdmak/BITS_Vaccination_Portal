@@ -4,6 +4,8 @@ name: Deploy to Lightsail
 # For both dev pushes and MRs to main
 on:
   push:
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 
