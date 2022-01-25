@@ -169,6 +169,20 @@ const get_consent = async (req: RequestType, res: ResponseType): Promise<void> =
     }
 };
 
+const update = async (req: RequestType, res: ResponseType): Promise<void> => {
+    try{
+        await Student.findOneAndUpdate({email: req.session["student"].email}, {is_above_18: req.body.is_above_18, staying_on_campus: req.body.staying_on_campus});
+        res.status(HttpStatusCode.CREATED_RESOURCE).json({"message": "Successfully updated details"});
+    }
+    catch(err){
+        if (!error_handler.isHandleAble(err)) {
+            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: err.message });
+            throw err;
+        }
+        error_handler.handleError(err, res);
+    }
+}
+
 // post extra data
 const post_extra_data = async (req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger ? res.locals.child_logger : logger;
@@ -535,6 +549,21 @@ const post_details = (req: RequestType, res: ResponseType) => {
     res.status(200).json({ success: 'admin is allowed' });
 };
 
+// endpoint for hostel portal verification
+const get_staying_on_campus_status = async (req: RequestType, res: ResponseType): Promise<void> => {
+    try{
+        var student: STUDENT | null = await Student.findOne({email: req.body.email});
+        res.status(HttpStatusCode.OK).json({"staying_on_campus": student!.staying_on_campus});
+    }
+    catch(err){
+        if (!error_handler.isHandleAble(err)) {
+            res.status(HttpStatusCode.DB_ERROR).json({ error: err.message });
+            throw err;
+        }
+        error_handler.handleError(err, res);
+    }
+}
+
 export default {
     get_all,
     get_student_details,
@@ -546,4 +575,6 @@ export default {
     get_consent,
     post_details,
     post_extra_data,
-};
+    update,
+    get_staying_on_campus_status
+}
