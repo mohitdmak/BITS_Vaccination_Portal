@@ -3,8 +3,10 @@
 
 # CACHESSSSSS
 src/PyDIVOC/PyDIVOC/__pycache__/*.pyc
-src/config/admin.js
+src/config/admin.ts
 
+# ADMIN Excel fiel
+ADMIN_ExcelFile.xlsx
 
 # DB ADMIN CONFIGURATION
 src/config/DB_ADMIN_CONFIG.env
@@ -27,7 +29,7 @@ src/config/oauth2-api-creds.json
 src/config/mongo-express2.env
 
 # Mongo creds js supplier
-src/config/mongo.js
+src/config/mongo.ts
 
 # Mongo Container env file
 src/config/mongo.env
@@ -36,7 +38,7 @@ src/config/mongo.env
 src/config/mongo-express.env
 
 # Session Credentials
-src/config/session-secret.js
+src/config/session-secret.ts
 
 # Access Token for AWS server
 github_access_token.txt

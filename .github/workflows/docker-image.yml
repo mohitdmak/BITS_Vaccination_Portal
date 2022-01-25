@@ -37,7 +37,7 @@ jobs:
       
       # action to create images with tags and labels
       - name: Extract metadata (tags, labels) for Docker
-        run: docker-compose up -d
+        run: pwd && ls && touch src/config/mongo.env && touch src/config/mongo-express.env && touch src/config/DB_ADMIN_CONFIG.env && docker-compose up -d
 
       # Pushing via docker-compose
       - name: Build and push Docker images
