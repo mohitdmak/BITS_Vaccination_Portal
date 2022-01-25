@@ -14,13 +14,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Prepare to Build Docker containers
-      run: pwd && touch config/mongo.env && touch config/mongo-express.env && touch config/DB_ADMIN_CONFIG.env
+      run: pwd && ls && touch src/config/mongo.env && touch src/config/mongo-express.env && touch src/config/DB_ADMIN_CONFIG.env
     - name: Build the Docker images
       run: docker-compose build
-    - name: Login to Dockerhub
-      uses: docker/login-action@v1
-      with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-    - name: Push docker images
-      run: docker-compose push
+    - name: Login to dockerhub and Push docker images
+      run: docker login --username=${{ secrets.DOCKERHUB_USERNAME }} --password=${{ secrets.DOCKERHUB_PASSWORD }} && docker logout && docker login && docker-compose push

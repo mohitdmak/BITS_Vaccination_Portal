@@ -2,12 +2,9 @@
 
 # TODO
 - gh actions auto deploy to main
-- use pm2/else
+- use pm2/else (production script)
 - Githooks pre-commit for testing
 - document api using swagger
-- setup mailer for mailing whenever critical error happens
-- write tests
-- gh action : docker push hub, db backup
 
 
 ## Getting started
