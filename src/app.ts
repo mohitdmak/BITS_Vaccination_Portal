@@ -30,7 +30,6 @@ app.get("/api/debug-sentry", async function mainHandler(req, res) {
 // ########################### / ########################### / ###########################
 
 
-
 // ########################### Request Parsing Middlewares ###########################
 // parse data through forms, and json formats
 app.use(urlencoded({ extended:true }));
@@ -44,7 +43,7 @@ app.use(cors());
 app.set('trust proxy', 1);
 
 // multer errors FIXME: multer add to errorhandler
-import multer from 'multer';
+// import multer from 'multer';
 //app.use(function (err, req, res, next){
 //    if(err instanceof multer.MulterError){
 //        console.log(err);
@@ -56,7 +55,6 @@ import multer from 'multer';
 //   }
 //});
 // ########################### / ########################### / ###########################
-
 
 
 // ########################### Session Management ###########################
@@ -91,7 +89,6 @@ app.use(Session({
     }
 }));
 // ########################### / ########################### / ###########################
-
 
 
 // ########################### Api Endpoints ###########################
@@ -133,7 +130,6 @@ app.use("/api/student", student_routes);
 import admin_router from "./routes/admin_routes";
 app.use("/api/admin", admin_router);
 // ########################### / ########################### / ###########################
-
 
 
  // exporting express app and redis client

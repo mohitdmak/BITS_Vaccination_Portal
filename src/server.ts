@@ -12,7 +12,6 @@ import { error_handler } from "./middeware/error_handler";
 // ########################### / ########################### / ###########################
 
 
-
 // ########################### Mongo database and ORM configs ###########################
 // import mongo ORM
 import mongoose from "mongoose";
@@ -25,7 +24,6 @@ mongoose.set('useUnifiedTopology', true);
 // setting db uri
 const db_uri: string = `mongodb://MongoContainer:27017/Portal?authSource=admin`;
 // ########################### / ########################### / ###########################
-
 
 
 // ########################### Connecting to Cache and db, opening port ###########################

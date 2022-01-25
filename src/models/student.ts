@@ -1,6 +1,6 @@
 // mongo ORM and validator
 import { Schema, model, Document } from 'mongoose';
-import isEmail from 'validator';
+const { isEmail } = require('validator');
 
 
 // ########################### Validators ###########################
