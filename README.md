@@ -7,6 +7,7 @@
 - document api using swagger
 - setup mailer for mailing whenever critical error happens
 - write tests
+- gh action : docker push hub, db backup
 
 
 ## Getting started
