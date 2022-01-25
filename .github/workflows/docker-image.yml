@@ -14,9 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Prepare to Build Docker containers
-      run: touch config/mongo.env && \
-           touch config/mongo-express.env && \
-           touch config/DB_ADMIN_CONFIG.env
+      run: pwd && touch config/mongo.env && touch config/mongo-express.env && touch config/DB_ADMIN_CONFIG.env
     - name: Build the Docker images
       run: docker-compose build
     - name: Login to Dockerhub
