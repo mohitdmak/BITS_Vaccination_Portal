@@ -1,5 +1,10 @@
 # Vaccination_Portal
 
+# TODO
+- gh actions auto deploy to main
+- use pm2/else (production script)
+- Githooks pre-commit for testing
+- document api using swagger
 
 
 ## Getting started
