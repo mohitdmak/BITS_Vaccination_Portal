@@ -50,4 +50,4 @@ jobs:
           connect_timeout: 60s
 
           # execute commands on to pull changes
-          script: cd /home/bits_vaccination_portal/new-repo && git status && sudo git pull https://mohitdmak:${{ secrets.REP_ACCESS_TOKEN_AWS }}@github.com/mohitdmak/BITS_Vaccination_Portal modular -s recursive -X theirs
+          script: cd /home/bits_vaccination_portal/BITS_Vaccination_Portal && git status && sudo git pull https://mohitdmak:${{ secrets.REP_ACCESS_TOKEN_AWS }}@github.com/mohitdmak/BITS_Vaccination_Portal main -s recursive -X theirs

@@ -17,7 +17,8 @@ import { useParams, Link } from "react-router-dom";
 // https://vaccination.bits-dvm.org/api/admin/students
 
 // added by --- Mohit
-const host = "http://localhost:1370";
+// const host = "http://localhost:1370";
+const host = "https://vaccination.bits-dvm.org";
 
 const Student = () => {
     let { id } = useParams();

@@ -12,7 +12,8 @@ import Landing from './screens/Landing'
 import Student from './screens/Student'
 
 // added by --- Mohit
-const host = "http://localhost:1370";
+// const host = "http://localhost:1370";
+const host = "https://vaccination.bits-dvm.org";
 
 function App() {
   const [isLoggedIn, setLogin] = useState(localStorage.getItem('jwt') ? true : false)

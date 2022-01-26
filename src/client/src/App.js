@@ -16,7 +16,8 @@ import Login from './screens/Login.js'
 import Devs from './screens/Devs.js'
 
 // added by --- Mohit
-const host = "http://localhost:1370";
+// const host = "http://localhost:1370";
+const host = "https://vaccination.bits-dvm.org";
 
 // /api/student/details
 
