@@ -30,7 +30,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 // added by --- Mohit
-const host = "http://localhost:1370";
+// const host = "http://localhost:1370";
+const host = "https://vaccination.bits-dvm.org";
 
 const Dashboard = (props) => {
 

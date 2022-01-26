@@ -61,6 +61,7 @@ RUN apt-get update && apt-get install ghostscript graphicsmagick -y
 # ########################### / ########################### / ###########################
 
 # RUN cd ../../
+RUN npm install -g ts-node
 
 # Dev environment
 CMD ["npm", "run", "dev_local"]
