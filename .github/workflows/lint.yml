@@ -1,0 +1,19 @@
+# Jobs to lint entire typescript base
+name: Linting
+
+# For both dev pushes and MRs to main
+on:
+  push:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  # Ubuntu image for runner
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Npm Lint script
+        run: pwd && ls && npm i && npm run lint
+

@@ -1,0 +1,240 @@
+version: "3.3"
+
+# Docker containers in the network
+services:
+
+  # Container to run frontend
+  admin_client_container:
+
+    # Passing build context
+    build:
+      context: ./src/admin_client
+      dockerfile: Dockerfile
+
+    # Syncing with dockerhub stored image
+    image: mohitdmak/bits_vaccination_portal:admin_client
+
+    # setting container name
+    container_name: AdminClientContainer
+
+    # Critical container
+    restart: always
+
+    # Set volumes
+    volumes:
+      - './src/admin_client:/app'
+      - '/app/node_modules' 
+
+    # Set ports config
+    ports:
+      - 1400:80
+
+
+  # Container to run frontend
+  client_container:
+
+    # Passing build context
+    build:
+      context: ./src/client
+      dockerfile: Dockerfile
+
+    # Syncing with dockerhub stored image
+    image: mohitdmak/bits_vaccination_portal:client
+
+    # setting container name
+    container_name: ClientContainer
+
+    # Critical container
+    restart: always
+
+    # Set volumes
+    volumes:
+      - './src/client:/app'
+      - '/app/node_modules' 
+
+    # Set ports config
+    ports:
+      - 80
+
+
+  # Container to run mongo db in same docker network
+  mongo_container:
+
+    # Passing build context
+    build:
+      context: .
+      dockerfile: dockerfiles/Mongo.dockerfile
+
+    # Syncing with dockerhub stored image
+    image: mohitdmak/bits_vaccination_portal:mongo
+
+    # Setting Container name to be called from express app
+    container_name: MongoContainer
+
+    # Mongo DB Config
+    # env_file:
+      # - config/mongo.env
+
+    # DB needs to always be up
+    restart: always
+
+    # Setting external volume for /data/db in mongo container
+    volumes:
+      - type: volume
+        source: mongodb_data_volume
+        target: /data/db
+
+    # Not binding mongo
+    ports:
+      - 27017
+
+
+# Container to provide admin interface to running mongo container
+  db-admin_container:
+
+    # Provide build context
+    build:
+      context: .
+      dockerfile: dockerfiles/DbAdmin.dockerfile
+
+    # Push to registry hosting containers
+    image: mohitdmak/bits_vaccination_portal:db_admin
+
+    # Name for nginx to access
+    container_name: DbAdminContainer
+
+    # Supply env configs
+    env_file:
+      - src/config/DB_ADMIN_CONFIG.env
+
+  # Dont start admin panel before db is running
+  #  depends_on:
+  #    - dev_container
+
+  # Critical container service
+    restart: always
+
+  # Dont expose port to local machine, keep secure https connection
+    ports:
+      - 8081
+
+
+  # # Container to provide interface to running mongo container
+  # mongo-express_container:
+
+  #   # default image
+  #   image: mongo-express
+
+  #   # Default name
+  #   container_name: MongoExpressContainer
+    
+  #   # environment configs
+  #   env_file:
+  #     - config/mongo-express2.env       
+
+  #   # Main mongo server needs to start first
+  #   depends_on:
+  #     - dev_container
+
+  #   # Restart always, since Mongo container needs time to be up
+  #   restart: always
+
+  #   # Linking host os here
+  #   ports:
+  #     - 8080:8081
+
+
+  # Container to run development environment
+  dev_container:
+
+    # Passing build context
+    build:
+        context: .
+        dockerfile: dockerfiles/Api.dockerfile
+
+    # Syncing with dockerhub stored image
+    image: mohitdmak/bits_vaccination_portal:dev_web
+
+    container_name: DevContainer
+
+    # Restart in-case of Test Container failure
+    restart: always
+
+    # Creating volume bind between source code and working dir
+    volumes:
+      - .:/Portal
+      - /Portal/node_modules/
+
+    # Binding port 3000 with host os.
+    ports:
+      - 3000
+
+    # Ensuring Db Container has been started before main app are ready
+    depends_on:
+      - mongo_container
+
+
+  # Container to proxy requests on port 80 of AWS to web api running in port 3000 in container
+  nginx_container:
+
+    # Build context
+    build:
+        context: .
+        dockerfile: dockerfiles/Nginx.dockerfile
+
+    # Sync with dockerhub stored image
+    image: mohitdmak/bits_vaccination_portal:nginx
+
+    # Setting up context 
+    container_name: NginxContainer
+
+    # Proxy to listen always
+    restart: always
+
+    # Binding port 80 with host port 1340
+    ports:
+      - 1370:443
+
+    # Using nginx config defined in folder
+    volumes:
+      - ./src/nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+
+    # Wait for web_api container to start first
+    depends_on:
+      - db-admin_container
+
+
+  # Container to proxy requests on port 80 of AWS to web api running in port 3000 in container
+  redis_container:
+
+    # Build context
+    build:
+        context: .
+        dockerfile: dockerfiles/Redis.dockerfile
+
+    # Sync with dockerhub stored image
+    image: mohitdmak/bits_vaccination_portal:redis_sessions
+
+    # Setting up context 
+    container_name: RedisSessionContainer
+
+    # Proxy to listen always
+    restart: always
+
+    # Binding port 80 with host os port 1340
+    ports:
+      - 7000
+
+    # Using nginx config defined in folder
+    volumes:
+      - ./src/redis:/data      
+
+    # Ensuring Dev Container has been started before redis sessions are ready
+    # depends_on:
+    #   - dev_container
+
+
+# NAMED VOLUMES
+volumes:
+  mongodb_data_volume:
+    external: true
