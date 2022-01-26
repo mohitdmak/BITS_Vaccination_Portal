@@ -41,9 +41,12 @@ import {
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css";
 import { parseISO } from 'date-fns'
+<<<<<<< HEAD:src/admin_client/src/screens/Landing.js
 
 // added by --- Mohit
 const host = "http://localhost:1370";
+=======
+>>>>>>> main:admin_client/src/screens/Landing.js
 
 const Landing = () => {
 
@@ -56,10 +59,17 @@ const Landing = () => {
     const [checkedAV, setCheckedAV] = useState(localStorage.getItem('checkedAV') ? JSON.parse(localStorage.getItem('checkedAV')) : (["FAILED", "PENDING", "DONE"]))
 
     const [batch, setBatch] = useState(localStorage.getItem('batch') ? JSON.parse(localStorage.getItem('batch')) : (["2021", "2020", "2019", "2018", "2017", "2016"])); // Interesting
+<<<<<<< HEAD:src/admin_client/src/screens/Landing.js
 
     // const [startDate, setStartDate] = useState(localStorage.getItem('startDate') ? JSON.parse(localStorage.getItem('startDate')): new Date("2021/10/01"))
     // const [endDate, setEndDate] = useState(localStorage.getItem('endDate') ? JSON.parse(localStorage.getItem('endDate')) : new Date("2021/12/01"))
 
+=======
+
+    // const [startDate, setStartDate] = useState(localStorage.getItem('startDate') ? JSON.parse(localStorage.getItem('startDate')): new Date("2021/10/01"))
+    // const [endDate, setEndDate] = useState(localStorage.getItem('endDate') ? JSON.parse(localStorage.getItem('endDate')) : new Date("2021/12/01"))
+
+>>>>>>> main:admin_client/src/screens/Landing.js
     const [startDate, setStartDate] = useState(new Date("2021/10/01"))
     const [endDate, setEndDate] = useState(new Date("2021/12/01"))
 
