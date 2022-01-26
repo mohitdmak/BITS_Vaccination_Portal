@@ -254,6 +254,16 @@ const Student = () => {
            </Flex>
 
            <Flex flexDir="row" width="50vw" padding="10px" justifyContent="space-between" alignItems="center">
+               <Text>Student BITS ID</Text>
+               <Text>{ student.studentId }</Text>
+           </Flex>
+
+           <Flex flexDir="row" width="50vw" padding="10px" justifyContent="space-between" alignItems="center">
+               <Text>Gender</Text>
+               <Text>{ student.gender }</Text>
+           </Flex>
+
+           <Flex flexDir="row" width="50vw" padding="10px" justifyContent="space-between" alignItems="center">
                <Text>City</Text>
                <Text>{ student.city }</Text>
            </Flex>
