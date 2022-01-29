@@ -93,7 +93,8 @@ app.use(
 // ########################### Api Endpoints ###########################
 // Home route
 app.get('/api', (req, res) => {
-    logger.info({ SESSION: req.session, SESSION_ID: req.sessionID }, 'Landed on API page');
+    console.log(process.env.API_ENV);
+    logger.info({ SESSION_ID: req.sessionID }, 'Landed on API page');
 
     // NOTE: MOVE THESE TO CONFIGS.
     // creating appropriate redirection url
