@@ -16,14 +16,14 @@ RUN npm install
 COPY . /app
 
 # Build npm
-RUN npm run build
+CMD ["npm", "run", "start"]
 
 # Use other alpine to set nginx to redirect req to home app
-# Stage 2
-FROM nginx:1.17.1-alpine
-
-# Expose 80 port for NGINX CONTAINER, secure https container
-EXPOSE 80
-
-# Take build dir from earlier image
-COPY --from=build-step /app/build /usr/share/nginx/html
+# # Stage 2
+# FROM nginx:1.17.1-alpine
+# 
+# # Expose 80 port for NGINX CONTAINER, secure https container
+# EXPOSE 80
+# 
+# # Take build dir from earlier image
+# COPY --from=build-step /app/build /usr/share/nginx/html

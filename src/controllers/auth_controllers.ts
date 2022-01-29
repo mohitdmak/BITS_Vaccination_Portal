@@ -17,11 +17,10 @@ import { Student, STUDENT } from '../models/student';
 
 // Setting appropriate callback url
 let RedirectionUrl: string;
-if (process.env.npm_lifecycle_event === 'dev_local') {
+if (process.env.API_ENV === 'development') {
     RedirectionUrl = 'http://localhost:1370/api/auth/oauthCallback';
-} else if (process.env.npm_lifecycle_event === 'dev_server') {
+} else if (process.env.API_ENV === 'production') {
     RedirectionUrl = 'https://vaccination.bits-dvm.org/api/auth/oauthCallback';
-    // AdminRedirectionUrl = "https://vaccination.bits-dvm.org/api/auth/AdminoauthCallback";
 }
 // Oauth2 client raw
 const OAuth2 = google.auth.OAuth2;

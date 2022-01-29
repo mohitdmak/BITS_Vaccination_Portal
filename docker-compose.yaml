@@ -14,6 +14,14 @@ services:
     # Syncing with dockerhub stored image
     image: mohitdmak/bits_vaccination_portal:admin_client
 
+    # Supply env configs
+    env_file:
+      - src/config/APP.env
+
+    # hot reloads
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+
     # setting container name
     container_name: AdminClientContainer
 
@@ -22,12 +30,12 @@ services:
 
     # Set volumes
     volumes:
-      - './src/admin_client:/app'
+      - ./src/admin_client:/app
       - '/app/node_modules' 
 
     # Set ports config
     ports:
-      - 1400:80
+      - 1400:3000
 
 
   # Container to run frontend
@@ -41,6 +49,14 @@ services:
     # Syncing with dockerhub stored image
     image: mohitdmak/bits_vaccination_portal:client
 
+    # Supply env configs
+    env_file:
+      - src/config/APP.env
+
+    # hot reloads
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+
     # setting container name
     container_name: ClientContainer
 
@@ -49,7 +65,7 @@ services:
 
     # Set volumes
     volumes:
-      - './src/client:/app'
+      - ./src/client:/app
       - '/app/node_modules' 
 
     # Set ports config
@@ -154,6 +170,10 @@ services:
 
     # Syncing with dockerhub stored image
     image: mohitdmak/bits_vaccination_portal:dev_web
+
+    # Supply env configs
+    env_file:
+      - src/config/APP.env
 
     container_name: DevContainer
 

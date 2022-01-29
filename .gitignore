@@ -5,6 +5,9 @@ src/config/admin.ts
 # ADMIN Excel files
 ADMIN_ExcelFile.xlsx
 
+# Running app env
+src/config/APP.env
+
 # DB ADMIN CONFIGURATION
 src/config/DB_ADMIN_CONFIG.env
 

@@ -14,8 +14,13 @@ import {
   } from "react-router-dom";
 
 // added by --- Mohit
-// const host = "http://localhost:1370";
-const host = "https://vaccination.bits-dvm.org";
+// Setting appropriate host 
+let host;
+if (process.env.REACT_APP_CLIENT_ENV === 'development') {
+    host = 'http://localhost:1370';
+} else if (process.env.REACT_APP_CLIENT_ENV === 'production') {
+    host = 'https://vaccination.bits-dvm.org';
+}
 
 const Login = (props) => {
     const [batches, setBatches] = useState([]);
