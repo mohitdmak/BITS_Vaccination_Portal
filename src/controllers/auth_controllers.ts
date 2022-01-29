@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/no-var-requires: "off" */
+
 // auth requirements
 import { google } from 'googleapis';
 const ClientId = require('../config/oauth2-api-creds.json').web.client_id;
@@ -77,7 +79,9 @@ const set_tokens = async (req: RequestType, res: ResponseType): Promise<void> =>
                     version: 'v2',
                 });
                 try {
-                    var user: any = await oauth2.userinfo.get();
+                    const user: any = await oauth2.userinfo.get();
+                    // set student data in session
+                    await set_session_data(user, req, res);
                 } catch (err) {
                     res.status(ERROR.HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: err.message });
                     throw new ERROR.BaseError(
@@ -88,8 +92,6 @@ const set_tokens = async (req: RequestType, res: ResponseType): Promise<void> =>
                         true,
                     );
                 }
-                // set student data in session
-                await set_session_data(user, req, res);
             } else {
                 if (!error_handler.isHandleAble(err)) throw err;
                 error_handler.handleError(err, res);

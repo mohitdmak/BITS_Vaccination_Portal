@@ -13,18 +13,19 @@ import { logger } from './middeware/logger';
 
 // test endpoint for sentry
 app.get('/api/debug-sentry', async function mainHandler(req, res) {
-    const { APIError } = require('./middeware/error_models');
-    const HttpStatusCode = require('./middeware/error_models').HttpStatusCode;
-    try {
-        throw new APIError(HttpStatusCode.UNAUTHORIZED_REQUEST, 'Student needs to login first', false);
-    } catch (e) {
-        // if(error_handler.isHandleAble(e)){
-        //     // await error_handler.handleError(e, res);
-        // }
-        // else{
-        console.log('DEBUG SENTRY');
-        // }
-    }
+    // FIXME: uncomment after fixing circular dep of handler
+    // const { APIError } = require('./middeware/error_models');
+    // const HttpStatusCode = require('./middeware/error_models').HttpStatusCode;
+    // try {
+    //     throw new APIError(HttpStatusCode.UNAUTHORIZED_REQUEST, 'Student needs to login first', false);
+    // } catch (e) {
+    //     // if(error_handler.isHandleAble(e)){
+    //     //     // await error_handler.handleError(e, res);
+    //     // }
+    //     // else{
+    //     console.log('DEBUG SENTRY');
+    //     // }
+    // }
 });
 // ########################### / ########################### / ###########################
 
@@ -96,12 +97,8 @@ app.get('/api', (req, res) => {
 
     // NOTE: MOVE THESE TO CONFIGS.
     // creating appropriate redirection url
-    let RedirectionUrl: string;
-    let LogoutUrl: string;
-
-    // for dev env
-    RedirectionUrl = '/api/auth/';
-    LogoutUrl = '/api/auth/logout/';
+    const RedirectionUrl = '/api/auth/';
+    const LogoutUrl = '/api/auth/logout/';
 
     // Intro response with routes of all APIs.
     res.status(200).json({

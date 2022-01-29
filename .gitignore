@@ -1,11 +1,8 @@
-# Excel files
-# ADMIN_ExcelFile.xlsx
-
 # CACHESSSSSS
 src/PyDIVOC/PyDIVOC/__pycache__/*.pyc
 src/config/admin.ts
 
-# ADMIN Excel fiel
+# ADMIN Excel files
 ADMIN_ExcelFile.xlsx
 
 # DB ADMIN CONFIGURATION

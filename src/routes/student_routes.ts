@@ -7,7 +7,6 @@ import student_fxn from '../controllers/student_controllers';
 // importing middleware
 import check_auth from '../middeware/check_auth';
 
-
 // ########################### Defining routes ###########################
 // handling certificate pdf post
 student_router.post('/post_pdf', check_auth, student_fxn.upload.single('pdf'), student_fxn.post_pdf);
@@ -33,10 +32,9 @@ student_router.post('/extra', student_fxn.post_extra_data);
 // Logout page
 student_router.get('/logout', student_fxn.get_logout);
 
-// overall status 
-student_router.post("/staying_on_campus", student_fxn.get_staying_on_campus_status); 
+// overall status
+student_router.post('/staying_on_campus', student_fxn.get_staying_on_campus_status);
 // ########################### / ########################### / ###########################
-
 
 // exporting express router
 export default student_router;

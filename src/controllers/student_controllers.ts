@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/no-var-requires: "off" */
+
 // Importing mongo student, vaccine models
 import { Student, STUDENT } from '../models/student';
 import { Vaccine, VACCINE } from '../models/vaccine';
@@ -170,18 +172,20 @@ const get_consent = async (req: RequestType, res: ResponseType): Promise<void> =
 };
 
 const update = async (req: RequestType, res: ResponseType): Promise<void> => {
-    try{
-        await Student.findOneAndUpdate({email: req.session["student"].email}, {is_above_18: req.body.is_above_18, staying_on_campus: req.body.staying_on_campus});
-        res.status(HttpStatusCode.CREATED_RESOURCE).json({"message": "Successfully updated details"});
-    }
-    catch(err){
+    try {
+        await Student.findOneAndUpdate(
+            { email: req.session['student'].email },
+            { is_above_18: req.body.is_above_18, staying_on_campus: req.body.staying_on_campus },
+        );
+        res.status(HttpStatusCode.CREATED_RESOURCE).json({ message: 'Successfully updated details' });
+    } catch (err) {
         if (!error_handler.isHandleAble(err)) {
             res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: err.message });
             throw err;
         }
         error_handler.handleError(err, res);
     }
-}
+};
 
 // post extra data
 const post_extra_data = async (req: RequestType, res: ResponseType): Promise<void> => {
@@ -349,7 +353,7 @@ const verify_authenticity = async (req: RequestType, res: ResponseType): Promise
         if (MATCH_COUNT >= 2) {
             const current_doses = Number(student.vaccine.QR.evidence[0].dose);
             const total_doses: number = student.vaccine.QR.evidence[0].totaldoses;
-            var updated_student: STUDENT | null;
+            let updated_student: STUDENT | null;
             if (current_doses > 0) {
                 if (current_doses < total_doses) {
                     updated_student = await Student.findOneAndUpdate(
@@ -387,7 +391,7 @@ const verify_authenticity = async (req: RequestType, res: ResponseType): Promise
             update_overall_status(updated_student!, req, res);
         } else {
             // update current session
-            var updated_student: STUDENT | null = await Student.findOneAndUpdate(
+            const updated_student: STUDENT | null = await Student.findOneAndUpdate(
                 { email: student.email },
                 { auto_verification: 'FAILED' },
                 { new: true },
@@ -551,18 +555,17 @@ const post_details = (req: RequestType, res: ResponseType) => {
 
 // endpoint for hostel portal verification
 const get_staying_on_campus_status = async (req: RequestType, res: ResponseType): Promise<void> => {
-    try{
-        var student: STUDENT | null = await Student.findOne({email: req.body.email});
-        res.status(HttpStatusCode.OK).json({"staying_on_campus": student!.staying_on_campus});
-    }
-    catch(err){
+    try {
+        const student: STUDENT | null = await Student.findOne({ email: req.body.email });
+        res.status(HttpStatusCode.OK).json({ staying_on_campus: student!.staying_on_campus });
+    } catch (err) {
         if (!error_handler.isHandleAble(err)) {
             res.status(HttpStatusCode.DB_ERROR).json({ error: err.message });
             throw err;
         }
         error_handler.handleError(err, res);
     }
-}
+};
 
 export default {
     get_all,
@@ -576,5 +579,5 @@ export default {
     post_details,
     post_extra_data,
     update,
-    get_staying_on_campus_status
-}
+    get_staying_on_campus_status,
+};
