@@ -44,9 +44,8 @@ admin_router.post('/allow', check_admin_auth, admin_fxn.restrict_access);
 admin_router.get('/allow', admin_fxn.get_restrict_access);
 
 // validator
-admin_router.get("/validate", admin_fxn.validate)
+admin_router.get('/validate', admin_fxn.validate);
 // ########################### / ########################### / ###########################
-
 
 // exporting express router
 export default admin_router;

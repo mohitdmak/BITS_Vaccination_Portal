@@ -45,7 +45,7 @@ const test_logger = pino(
                 // return {"Process ID": bindings.pid, "Process Hostname": bindings.hostname};
                 return {};
             },
-            log(logObject: Object) {
+            log(logObject) {
                 return logObject;
             },
         },
@@ -69,4 +69,4 @@ const test_logger = pino(
 
 // set log file dir and export
 test_logger.info({ error_log_file }, 'Logging Pino logs here . . .');
-export var logger = test_logger;
+export const logger = test_logger;

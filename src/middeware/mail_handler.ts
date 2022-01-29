@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/no-var-requires: "off" */
+
 // Pino logging instance
 import { logger } from './logger';
 // Message type for sending mail

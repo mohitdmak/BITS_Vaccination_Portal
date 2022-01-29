@@ -36,86 +36,80 @@ const get_restrict_access = async (req: RequestType, res: ResponseType): Promise
 
 // validate for hostel portal
 const validate = async (req: RequestType, res: ResponseType): Promise<void> => {
-    try{
-
-        var student: STUDENT | null = await Student.findOne({email: <string>req.query.email});
-        var valid: boolean = true;
-        var result: string = "";
-        var verdict: boolean;
-        var details: any = {};
-        if(!student){
-            result += "The Student with provided EmailId does not exist. \n";
+    try {
+        const student: STUDENT | null = await Student.findOne({ email: <string>req.query.email });
+        let valid = true;
+        let result = '';
+        let verdict: boolean;
+        const details: any = {};
+        if (!student) {
+            result += 'The Student with provided EmailId does not exist. \n';
             valid = false;
             verdict = false;
-        }
-        else{
-            details["name"] = student.name;
-            if(!(student.TnC1_Agreement && student.TnC2_Agreement && student.is_medically_fit)){
-                result += "Non Acceptance of Terms And Conditions,";
+        } else {
+            details['name'] = student.name;
+            if (!(student.TnC1_Agreement && student.TnC2_Agreement && student.is_medically_fit)) {
+                result += 'Non Acceptance of Terms And Conditions,';
                 valid = false;
             }
-            if(!student.consent_form){
-                result += " No Consent Form,";
+            if (!student.consent_form) {
+                result += ' No Consent Form,';
                 valid = false;
             }
-            if(!student.state){
-                result += " State of Residence not uploaded,";
+            if (!student.state) {
+                result += ' State of Residence not uploaded,';
                 valid = false;
+            } else {
+                details['state'] = student.state;
             }
-            else{
-                details["state"] = student.state;
-            }
-            if(!student.city){
-                result += " City of Residence not uploaded,";
+            if (!student.city) {
+                result += ' City of Residence not uploaded,';
                 valid = false;
+            } else {
+                details['city'] = student.city;
             }
-            else{
-                details["city"] = student.city;
-            }
-            if(student.vaccination_status == "NONE"){
-                result += " Vaccination status being NONE,";
+            if (student.vaccination_status == 'NONE') {
+                result += ' Vaccination status being NONE,';
                 valid = false;
+            } else {
+                details['vaccination_status'] = student.vaccination_status;
             }
-            else{
-                details["vaccination_status"] = student.vaccination_status;
-            }
-            if(!student.gender){
-                result += " gender not uploaded,";
+            if (!student.gender) {
+                result += ' gender not uploaded,';
                 valid = false;
+            } else {
+                details['gender'] = student.gender;
             }
-            else{
-                details["gender"] = student.gender;
-            }
-            if(!student.studentId){
-                result += " BITS ID not uploaded,";
+            if (!student.studentId) {
+                result += ' BITS ID not uploaded,';
                 valid = false;
+            } else {
+                details['studentId'] = student.studentId;
             }
-            else{
-                details["studentId"] = student.studentId;
-            }
-            if(valid){
+            if (valid) {
                 verdict = true;
-            }
-            else{
+            } else {
                 verdict = false;
-                result = "Student is not allowed to login due to: " + result;
+                result = 'Student is not allowed to login due to: ' + result;
                 result = result.slice(0, -1);
             }
         }
-        if(<string>req.query.email == "f20201976@pilani.bits-pilani.ac.in" || <string>req.query.email == "f20200931@pilani.bits-pilani.ac.in"){
-            result = "ADMINISTRATORS allowed access.";
+        if (
+            <string>req.query.email == 'f20201976@pilani.bits-pilani.ac.in' ||
+            <string>req.query.email == 'f20200931@pilani.bits-pilani.ac.in'
+        ) {
+            result = 'ADMINISTRATORS allowed access.';
             verdict = true;
         }
-        res.status(HttpStatusCode.OK).json({"result": verdict, "message": result, "details": details});
-    }
-    catch(err){
+        res.status(HttpStatusCode.OK).json({ result: verdict, message: result, details: details });
+    } catch (err) {
         if (!error_handler.isHandleAble(err)) {
             res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: err.message });
             throw err;
         }
         error_handler.handleError(err, res);
     }
-}
+};
 
 // function to paginate array after applying filters
 function paginate(array: any[], page_size: number, page_number: number): any[] {
@@ -125,7 +119,6 @@ function paginate(array: any[], page_size: number, page_number: number): any[] {
 
 function trim_res_data(students: any[], beggining?: number, ending?: number, student?: STUDENT): STUDENT[] | STUDENT {
     students = student ? new Array(1).fill(student) : students;
-    console.log(students);
     for (let i = 0; i < students.length; i++) {
         if (
             student ||
@@ -210,7 +203,7 @@ const post_students = async (req: RequestType, res: ResponseType): Promise<void>
                     i--;
                 } else {
                     // conversion to IST
-                    var date = new Date(Date.parse(<string>(students[i].arrival_date as any)));
+                    const date = new Date(Date.parse(<string>(students[i].arrival_date as any)));
                     date.setTime(date.getTime() + 19800000);
                     students[i].arrival_date = <Date>(date.toISOString() as any);
                 }
@@ -218,7 +211,7 @@ const post_students = async (req: RequestType, res: ResponseType): Promise<void>
         } else {
             for (let i = 0; i < students.length; i++) {
                 // conversion to IST
-                var date = new Date(Date.parse(<string>(students[i].arrival_date as any)));
+                const date = new Date(Date.parse(<string>(students[i].arrival_date as any)));
                 date.setTime(date.getTime() + 19800000);
                 students[i].arrival_date = <Date>(date.toISOString() as any);
             }
@@ -470,5 +463,5 @@ export default {
     allow_access,
     get_restrict_access,
     get_allow_access,
-    validate
-}
+    validate,
+};
