@@ -135,7 +135,10 @@ const get_consent = async (req: RequestType, res: ResponseType): Promise<void> =
     const LOGGER: pino.Logger = res.locals.child_logger ? res.locals.child_logger : logger;
     try {
         // get downloaded file path
-        const serve_file: string = req.session['student'].consent_form;
+        var serve_file: string = req.session['student'].consent_form;
+	if(serve_file.startsWith("src/") != true){
+	    serve_file = "src/" + serve_file;
+	}
         LOGGER.info('Request to serve Consent form > > >');
         // serve file as a download
         res.download(String(serve_file), function (err) {
@@ -485,7 +488,10 @@ const get_pdf = async (req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger ? res.locals.child_logger : logger;
     try {
         // get downloaded file path
-        const serve_file: string = req.session['student'].pdf;
+        var serve_file: string = req.session['student'].pdf;
+	if(serve_file.startsWith("src/") != true){
+	    serve_file = "src/" + serve_file;
+	}
         LOGGER.info('Request to serve Vaccine certificate > > >');
         res.download(String(serve_file), function (err) {
             let file_error: ERROR.BaseError;
