@@ -1,4 +1,4 @@
-// auth requirements
+// @ts-nocheck
 // import { google } from 'googleapis';
 // Importing mongo student model, error handlers, logger
 import * as ERROR from '../middeware/error_models';
@@ -17,6 +17,7 @@ import { hashed } from '../config/admin';
 import json2xls from 'json2xls';
 const filename = 'myExcel.xlsx';
 import { writeFileSync } from 'fs';
+const fs = require("fs");
 
 // set pagination limit
 const page_limit = 50;
@@ -278,7 +279,10 @@ const get_pdf = async (req: RequestType, res: ResponseType): Promise<void> => {
         // get downloaded file path
         const id: any = req.query._id;
         const student: STUDENT | null = await Student.findById(id);
-        const serve_file: string = student!.pdf;
+        var serve_file: string = student!.pdf;
+	if(serve_file.startsWith("src/") != true){
+	    serve_file = "src/" + serve_file;
+	}
         logger.info({ STUDENT_EMAIL: student!.email }, 'ADMIN: Request to serve Consent form > > >');
         // serve file as a download
         res.download(String(serve_file), function (err) {
@@ -324,7 +328,10 @@ const get_consent = async (req: RequestType, res: ResponseType): Promise<void> =
         // get downloaded file path
         const id: any = req.query._id;
         const student: STUDENT | null = await Student.findById(id);
-        const serve_file: string = student!.consent_form;
+        var serve_file: string = student!.consent_form;
+	if(serve_file.startsWith("src/") != true){
+	    serve_file = "src/" + serve_file;
+	}
         logger.info({ STUDENT_EMAIL: student!.email }, 'ADMIN: Request to serve Consent form > > >');
         // serve file as a download
         res.download(String(serve_file), function (err) {
@@ -365,7 +372,172 @@ const get_consent = async (req: RequestType, res: ResponseType): Promise<void> =
 };
 
 // get excel file
-const get_excel = async (req: RequestType, res: ResponseType): Promise<void> => {
+const get_excel = async (req, res) => {
+    // get data from mongodb
+    const data = await Student.find();
+
+    // initialize empty array for conversion to xlsl
+    var excel_array = [];
+
+    // remove mongoose id pairs
+    data.forEach((student) => {
+        var pdf;
+        var consent_form;
+        var latest_dose_date;
+        var vaccine;
+        var last_dose_date_start;
+        // var last_dose_date_finish;
+        var agreement = student.TnC1_Agreement && student.TnC2_Agreement && student.is_medically_fit;
+        if(student.latest_dose_date){
+            latest_dose_date = new Date(student.latest_dose_date).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
+        }
+        else if(student.manual_verification == "DONE" && student.vaccine){
+            latest_dose_date = new Date(student.vaccine.QR.evidence[0].date).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
+        }
+        else{
+            latest_dose_date = "DATA UNAVAILABLE";
+        }
+        if(student.pdf){
+            pdf = true;
+        }
+        else{
+            pdf = false;
+        }
+        if(student.consent_form){
+            consent_form = true;
+        }
+        else{
+            consent_form = false;
+        }
+        if(student.vaccine && latest_dose_date != "DATA UNAVAILABLE" && student.vaccination_status != "COMPLETE"){
+            vaccine = student.vaccine.QR.evidence[0].vaccine;
+            if(vaccine == "COVISHIELD"){
+                // if(student.auto_verification == ""){
+                    var date = new Date(Date.parse(latest_dose_date));
+                    date.setDate(date.getDate() + 84);
+                    last_dose_date_start = date.toISOString();
+                    date.setDate(date.getDate() + 112 - 84);
+                    //last_dose_date_finish = date.toISOString();
+                    last_dose_date_start = new Date(last_dose_date_start).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
+                    //last_dose_date_finish = new Date(last_dose_date_finish).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
+                // }
+                // else{
+                    // last_dose_date_start = "MANUALLY VERIFIED";
+                    // last_dose_date_finish = "MANUALLY VERIFIED";
+                // }
+            }
+            else if(vaccine == "COVAXIN"){
+                // if(student.auto_verification == "DONE"){
+                    var date = new Date(Date.parse(latest_dose_date));
+                    date.setDate(date.getDate() + 28);
+                    last_dose_date_start = date.toISOString();
+                    date.setDate(date.getDate() + 42 - 28);
+                    //last_dose_date_finish = date.toISOString();
+                    last_dose_date_start = new Date(last_dose_date_start).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
+                    //last_dose_date_finish = new Date(last_dose_date_finish).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
+                // }
+                // else{
+                //     last_dose_date_start = "MANUALLY VERIFIED";
+                //     last_dose_date_finish = "MANUALLY VERIFIED";
+                // }
+            }
+            else if(vaccine == "SPUTNIK V"){
+                // if(student.auto_verification == "DONE"){
+                    var date = new Date(Date.parse(latest_dose_date));
+                    date.setDate(date.getDate() + 21);
+                    last_dose_date_start = date.toISOString();
+                    last_dose_date_start = new Date(last_dose_date_start).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
+                    //last_dose_date_finish = "NO END DATE";
+                // }
+                // else{
+                //     last_dose_date_start = "MANUALLY VERIFIED";
+                //     last_dose_date_finish = "MANUALLY VERIFIED";
+                // }
+            }
+            // var date = new Date(Date.parse(last_dose_date_start));
+            // date.setDate(date.getDate() + 14);
+            // last_dose_date_finish = date.toISOString();
+            // last_dose_date_finish = new Date(last_dose_date_finish).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'});
+            var dates = latest_dose_date.split("/");
+            latest_dose_date = dates[1]+"/"+dates[0]+"/"+dates[2];
+            var dates = String(last_dose_date_start).split("/");
+            last_dose_date_start = dates[1]+"/"+dates[0]+"/"+dates[2];
+            //var dates = last_dose_date_finish.split("/");
+            //if(dates.length > 1){
+                //last_dose_date_finish = dates[1]+"/"+dates[0]+"/"+dates[2];
+            //}
+        }
+        else if(student.vaccination_status == "COMPLETE" && student.vaccine){
+            last_dose_date_start = "COMPLETELY VACCINATED";
+            //last_dose_date_finish = "COMPLETELY VACCINATED";
+            vaccine = student.vaccine.QR.evidence[0].vaccine;
+            var dates = latest_dose_date.split("/");
+            latest_dose_date = dates[1]+"/"+dates[0]+"/"+dates[2];
+        }
+        else{
+            vaccine = "DATA UNAVAILABLE";
+            last_dose_date_start = "DATA UNAVAILABLE";
+            //last_dose_date_finish = "DATA UNAVAILABLE";
+        }
+        var arrival_date = new Date(student.arrival_date).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'})
+        var createdAt = new Date(student.createdAt).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'})
+        var updatedAt = new Date(student.updatedAt).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'})
+        var dates = arrival_date.split("/");
+        arrival_date = dates[1]+"/"+dates[0]+"/"+dates[2];
+        var dates = createdAt.split("/");
+        createdAt = dates[1]+"/"+dates[0]+"/"+dates[2];
+        var dates = updatedAt.split("/");
+        updatedAt = dates[1]+"/"+dates[0]+"/"+dates[2];
+        const excel_student =  {
+             "Name": student.name,
+             "Gender": student.gender,
+             "BITS ID": student.studentId,
+             "Email": student.email,
+             "City": student.city,
+             "Arrival Date": arrival_date,
+             "State": student.state,
+             "Vaccine": vaccine,
+             "Vaccination Status": student.vaccination_status,
+             "Auto Verification": student.auto_verification,
+             "Manual Verification": student.manual_verification,
+             "Certificate Uploaded": pdf,
+             "Consent Uploaded": consent_form,
+             "Accepted All Agreements": agreement,
+             "Latest Dose Date": latest_dose_date,
+             "Last Dose Starting": last_dose_date_start,
+             // "Last Dose Ending": last_dose_date_finish,
+             "Is Above 18": student.is_above_18,
+             "Staying on campus": student.staying_on_campus,
+             "Created At": createdAt,
+             "Updated At": updatedAt
+        }
+        // if(consent_form){
+        excel_array.push(excel_student);
+        // }
+    });
+
+    // prepare xlsx document
+    var excel_doc = await json2xls(excel_array);
+
+        // write to xlsx file
+    fs.writeFileSync("ADMIN_ExcelFile.xlsx", excel_doc, 'binary', (err) => {
+        if (err) {
+            console.log("writeFileSync error :", err);
+         }
+        console.log("The file has been saved!");
+     });
+    res.download("ADMIN_ExcelFile.xlsx", function(err){
+        if(err){
+            console.log(err);
+            res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
+        }
+        //else{
+        //    console.log("CONSENT FORM FILE for student is served");
+        //}
+    });
+}
+// get excel file
+const get_excel_new = async (req: RequestType, res: ResponseType): Promise<void> => {
     try {
         // get data from mongodb, initialize empty array for conversion to xlsl
         logger.info('ADMIN: Request for excel file > > >');

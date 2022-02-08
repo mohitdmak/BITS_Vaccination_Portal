@@ -15,8 +15,5 @@ sudo docker exec MongoContainer sh -c 'exec mongodump --out /backups' || die "\n
 sudo docker cp MongoContainer:/backups /home/bits_vaccination_portal/backup_vaccination_portal || die "\n     Unable to copy created backup to local backups repository"
 
 # COMMIT NEW BACKUP, PUSH TO HOSTED REPO
-cd /home/bits_vaccination_portal/backup_vaccination_portal 
-    && git status \  
-    && git add .  \ 
-    && git commit -m "Regular Backup . . ." || die "\n     Unable to create git commit for procured backup"\ 
-    && git push  || die "\n       Unable to push to remote backup repository." \  
+cd /home/bits_vaccination_portal/backup_vaccination_portal && git status && git add . && git commit -m "Regular Backup . . ." || die "\n     Unable to create git commit for procured backup" 
+git push  || die "\n       Unable to push to remote backup repository." \  
