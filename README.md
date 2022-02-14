@@ -6,64 +6,23 @@
 [![Docker](https://badgen.net/badge/icon/docker?icon=dockerhub&label=ContainerRegistry)](https://hub.docker.com/r/mohitdmak/bits_vaccination_portal)
 
 ## Contents:
- - [Rest API](#api)
+ - [Rest API Docs](#api)
+ - [Problem Description](#problem)
+ - [Setup Server](#server)
+ - [Setup Client](#client)
+ - [Build/Run](#run)
+ - [Developers](#devs)
+ - [License](#lic)
  
 ## Api <a name="api"></a>
 * Rest API documentation is hosted using [apidoc](https://apidocjs.com/#demo) at [gh pages](https://mohitdmak.github.io/BITS_Vaccination_Portal/)
 
-## Setup
-1. Setup Authentication:
-  * Create a new project at https://console.cloud.google.com/ and get ClientId and Secret for an Oauth2 Api
-  * Download credentials to `src/config/oauth2-api-creds.json`
-2. Setup Mongo Database:
-  * Prepare .env file in `src/config/mongo.env` with following properties:
-    - *mongo_initdb_root_username*
-    - *mongo_initdb_root_password*
-    - *mongo_initdb_database*
-  * Also create `src/config/mongo.ts` to export above creds to controllers.
-  * Prepare credentials at `src/config/DB_ADMIN_CONFIG.env` for SuperAdmin (MongoExpress) Container:
-    - *me_config_basicauth_username*
-    - *me_config_basicauth_password*
-    - *me_config_mongodb_port*
-    - *me_config_mongodb_enable_admin*
-    - *me_config_mongodb_server*
-  * Also edit container settings for mongo at `src/db/db.conf`
-3. Session, Admin Portal config:
-  * Export a **SESSION_SECRET** from `src/config/session-secret.ts`
-  * Also edit container settings for redis at `src/redis/redis.conf`
-  * Export a *username*, *password*, *hashed* from  `src/config/admin.ts` for ADMIN Portal
-4. Development, Project config:
-  * Create `src/config/APP.env` with values of *development*/*production* for:
-    - *react_app_client_env*
-    - *react_app_admin_client_env*
-    - *api_env*
-  * Create dev/prod web server config at `src/nginx/nginx.conf`
-  * The respective docker containers will use Hosts and Build settings as specified in this file.
-  * Edit current project constants/settings at `src/setup_project.ts`
-
-## Run/Build
-1. Setup docker and docker-compose: 
-  * This requires your machine to have Docker runtime installed.
-    - [Mac OS](https://docs.docker.com/docker-for-mac/install/), [Windows](https://docs.docker.com/docker-for-windows/install/), [Linux](https://docs.docker.com/engine/install/) (Browse by distributions)
-  * Further Install docker compose https://docs.docker.com/compose/install/
-  * Create a docker user group to not require running as sudo
-2. Build containers:
-  - Either build or pull containers: `docker-compose build` or `docker-compose pull`
-  - Run as: `docker-compose up -d`, preferrably install [lazydocker](https://github.com/jesseduffield/lazydocker) for quick logs view
-  - Else, access [pino logs](https://getpino.io/#/) at `src/middeware/error_logs`
-3. Regular Tasks:
-  * Edit `src/middeware/logger.ts` and configure pino logger.
-  * Customize `src/backup_script.sh` and create a [crontab](https://man7.org/linux/man-pages/man5/crontab.5.html) to run it every few hours.
-  * Also create complimentory repository for versioning database backups, edit it in the backup script.
-
-## Client Repo
-[![Netlify Status](https://api.netlify.com/api/v1/badges/ec919ae6-f1a0-4d59-a0b9-796beec493ea/deploy-status)](https://app.netlify.com/sites/bits-vaccine-portal/deploys)
 
 _As the BITS Pilani campus reopens for students of the 2019 and 2020 batches, a cornerstone of the process has been the Vaccination Portal, a comprehensive system developed by students from DVM to verify student’s vaccination statuses and smoothen the process for the administration._
 
 **BITS Pilani, Pilani campus is one of the first campuses in India to incorporate such a system to ensure a safe return of its students.\***
 
-## Project Description
+## Project Description <a name="problem"></a>
 
 ### Problem Statement
 
@@ -101,7 +60,40 @@ With over 4.5k users to date and counting, we’re extremely proud of the Vaccin
 
 _(last updated on 12th September, 2021)_
 
-## Installation
+
+## Setup <a name="server"></a>
+1. Setup Authentication:
+  * Create a new project at https://console.cloud.google.com/ and get ClientId and Secret for an Oauth2 Api
+  * Download credentials to `src/config/oauth2-api-creds.json`
+2. Setup Mongo Database:
+  * Prepare .env file in `src/config/mongo.env` with following properties:
+    - *mongo_initdb_root_username*
+    - *mongo_initdb_root_password*
+    - *mongo_initdb_database*
+  * Also create `src/config/mongo.ts` to export above creds to controllers.
+  * Prepare credentials at `src/config/DB_ADMIN_CONFIG.env` for SuperAdmin (MongoExpress) Container:
+    - *me_config_basicauth_username*
+    - *me_config_basicauth_password*
+    - *me_config_mongodb_port*
+    - *me_config_mongodb_enable_admin*
+    - *me_config_mongodb_server*
+  * Also edit container settings for mongo at `src/db/db.conf`
+3. Session, Admin Portal config:
+  * Export a **SESSION_SECRET** from `src/config/session-secret.ts`
+  * Also edit container settings for redis at `src/redis/redis.conf`
+  * Export a *username*, *password*, *hashed* from  `src/config/admin.ts` for ADMIN Portal
+4. Development, Project config:
+  * Create `src/config/APP.env` with values of *development*/*production* for:
+    - *react_app_client_env*
+    - *react_app_admin_client_env*
+    - *api_env*
+  * Create dev/prod web server config at `src/nginx/nginx.conf`
+  * The respective docker containers will use Hosts and Build settings as specified in this file.
+  * Edit current project constants/settings at `src/setup_project.ts`
+
+
+## Client Repo <a name="client"></a>
+[![Netlify Status](https://api.netlify.com/api/v1/badges/ec919ae6-f1a0-4d59-a0b9-796beec493ea/deploy-status)](https://app.netlify.com/sites/bits-vaccine-portal/deploys)
 
 This app was made with <3 by students from BITS Pilani, using **React.js** for the frontend and **Node.js** for the backend. It uses the **Chakra-UI library, Google O-Auth,** and **Docker+Nginx** for hosting.
 
@@ -129,7 +121,23 @@ npm start
 
 In case you'd like to contribute or squash a bug, just open a pull request!
 
-## Developers
+## Run/Build <a name="run"></a>
+1. Setup docker and docker-compose: 
+  * This requires your machine to have Docker runtime installed.
+    - [Mac OS](https://docs.docker.com/docker-for-mac/install/), [Windows](https://docs.docker.com/docker-for-windows/install/), [Linux](https://docs.docker.com/engine/install/) (Browse by distributions)
+  * Further Install docker compose https://docs.docker.com/compose/install/
+  * Create a docker user group to not require running as sudo
+2. Build containers:
+  - Either build or pull containers: `docker-compose build` or `docker-compose pull`
+  - Run as: `docker-compose up -d`, preferrably install [lazydocker](https://github.com/jesseduffield/lazydocker) for quick logs view
+  - Else, access [pino logs](https://getpino.io/#/) at `src/middeware/error_logs`
+3. Regular Tasks:
+  * Edit `src/middeware/logger.ts` and configure pino logger.
+  * Customize `src/backup_script.sh` and create a [crontab](https://man7.org/linux/man-pages/man5/crontab.5.html) to run it every few hours.
+  * Also create complimentory repository for versioning database backups, edit it in the backup script.
+
+
+## Developers <a name="devs"></a>
 
 **Parth Sharma** (Frontend Developer)  
 **Mohit Makwana** (Backend Developer)
@@ -138,6 +146,6 @@ In case you'd like to contribute or squash a bug, just open a pull request!
 **Anshal Shukla** (Backend Mentor)  
 **Darsh Mishra** (Backend Mentor)
 
-## License
+## License <a name="lic"></a>
 
 This code is the intellectual property of BITS Pilani and the developers listed above. In case you'd like to repurpose some of this code, please get in touch with one of the developers so that we can get you explicit permission to use the codebase.
