@@ -11,9 +11,9 @@
   * Download credentials to `src/config/oauth2-api-creds.json`
 2. Setup Mongo Database:
   * Prepare .env file in `src/config/mongo.env` with following properties:
-    - MONGO_INITDB_ROOT_USERNAME
-    - MONGO_INITDB_ROOT_PASSWORD
-    - MONGO_INITDB_DATABASE="Portal"
+    - *MONGO_INITDB_ROOT_USERNAME*
+    - *MONGO_INITDB_ROOT_PASSWORD*
+    - *MONGO_INITDB_DATABASE*
   * Also create `src/config/mongo.ts` to export above creds to controllers.
   * Prepare credentials at `src/config/DB_ADMIN_CONFIG.env` for SuperAdmin (MongoExpress) Container:
     - ME_CONFIG_BASICAUTH_USERNAME
