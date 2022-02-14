@@ -1,107 +1,155 @@
-# Vaccination_Portal
+# BITS Vaccination Portal
 
-# TODO
+[![Deploy to Lightsail](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/deploy.yml/badge.svg)](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/deploy.yml)
+[![Publish Docker image to Dockerhub](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/docker-image.yml/badge.svg)](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/docker-image.yml)
+[![Linting](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/lint.yml/badge.svg)](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/lint.yml)
+[![Docker](https://badgen.net/badge/icon/docker?icon=dockerhub&label=ContainerRegistry)](https://hub.docker.com/r/mohitdmak/bits_vaccination_portal)
+
+## Contents:
+ - [Rest API Docs](#api)
+ - [Problem Description](#problem)
+ - [Setup Server](#server)
+ - [Setup Client](#client)
+ - [Build/Run](#run)
+ - [Developers](#devs)
+ - [License](#lic)
+ 
+## Api <a name="api"></a>
+* Rest API documentation is hosted using [apidoc](https://apidocjs.com/#demo) at [gh pages](https://mohitdmak.github.io/BITS_Vaccination_Portal/)
+
+
+_As the BITS Pilani campus reopens for students of the 2019 and 2020 batches, a cornerstone of the process has been the Vaccination Portal, a comprehensive system developed by students from DVM to verify student’s vaccination statuses and smoothen the process for the administration._
+
+**BITS Pilani, Pilani campus is one of the first campuses in India to incorporate such a system to ensure a safe return of its students.\***
+
+## Project Description <a name="problem"></a>
+
+### Problem Statement
+
+With more than 2500 students being called back to campus as the pandemic eased up, we needed to find a way to ensure that students were vaccinated and being safe about their arrival. The immediate problem was to have a system to verify whether students were vaccinated, track how many vaccines they had received, ensure the validity of each certificate, and track where students were returning to campus from. Without automating this process, it would be a mountain of data for the administration to have to manually sit and verify.
+
+### Research
+
+As soon as we heard that the campus would be re-opening, we realised the impossible task that SWD would have to undertake in order to manually scan thousands of certificates and manually keep track of student data in various sources. We started to research and try to find a way to automatically verify students’ vaccination status and have all the data in a single-source-of-truth database for easy access.
+
+### Implementation
+
+After extensively reading and analysing the Indian Government’s CoWIN API (official application programming interface), we devised an automated solution to read PDFs and verify them with the official Government database. The system was simple — a student would upload their PDF, the backend would process the document, read the QR code, transpile the data and then query it against the Government database. We then cross-referenced the data with the student’s data according to their BITS email address and returned a vaccination status for the student.
+
+This, while being a near-perfect solution, still left out certain edge cases. For example, students who might not have been vaccinated in India, or students who had different names on their certificate and BITS email. Thus, we also built a manual verification system — in case a student had certain difficulties with being automatically verified, an authorised member of SWD could log into a backend interface and manually verify the students.
+
+### Platform
+
+Having sorted out the logic and functioning of the portal, we now needed to devise a clean and easy-to-use interface for both the student body and the admin personnel at SWD. Thus, we built two separate portals — https://vaccination.bits-dvm.org for the student body, and https://vaccination-admin.bits-dvm.org for SWD.
+
+<img src="https://i.imgur.com/LKQbhCm.png" alt="BITS Vaccine Portal — Students" style="width:80%;"/>
+
+The student portal is a clean interface that allows only certain batches to access the portal at one time. Once approved students log in with their BITS email, they can quickly see their vaccination status. They are then able to upload their vaccine certificate, signed parents consent form, date of arrival, location, and agree to certain health declarations. Once they add all their details, the lightning-fast portal updates instantly with the student’s new vaccination status.
+
+<img src="https://i.imgur.com/4sEUqdC.png" alt="BITS Vaccine Portal — Admin" style="width:80%;"/>
+
+The admin portal is a functional tool for the SWD team to quickly access any details they may require. Any authenticated member has controls over which batches can currently update their vaccination details. They also have the power to instantly download a physical copy of all the students in an Excel spreadsheet format. On the admin portal, they can filter down the students by batches/vaccination status/date of arrival or search by name in order to quickly access a group of students at once. Each student has their own page where the admin can see all their details, the uploaded PDFs and even manually update their status.
+
+### Usage
+
+The reception to the portal has been amazing — students of all batches and branches alike have commended the easy-to-use nature of the portal and were easily able to provide all the requested data to the SWD. After two batches have used this portal to submit their information, the SWD now has access to all the data without having to manually scan even a single certificate in one, consolidated database.
+
+<img src="https://imgur.com/9pYU2Ea.png" alt="BITS Vaccine Portal — Analytics" style="width:60%; border: 10px solid white;"/>
+
+With over 4.5k users to date and counting, we’re extremely proud of the Vaccine Portal and honoured to be able to share this with our student body and the BITS administration.
+
+_(last updated on 12th September, 2021)_
+
+
+## Setup <a name="server"></a>
+1. Setup Authentication:
+  * Create a new project at https://console.cloud.google.com/ and get ClientId and Secret for an Oauth2 Api
+  * Download credentials to `src/config/oauth2-api-creds.json`
+2. Setup Mongo Database:
+  * Prepare .env file in `src/config/mongo.env` with following properties:
+    - *mongo_initdb_root_username*
+    - *mongo_initdb_root_password*
+    - *mongo_initdb_database*
+  * Also create `src/config/mongo.ts` to export above creds to controllers.
+  * Prepare credentials at `src/config/DB_ADMIN_CONFIG.env` for SuperAdmin (MongoExpress) Container:
+    - *me_config_basicauth_username*
+    - *me_config_basicauth_password*
+    - *me_config_mongodb_port*
+    - *me_config_mongodb_enable_admin*
+    - *me_config_mongodb_server*
+  * Also edit container settings for mongo at `src/db/db.conf`
+3. Session, Admin Portal config:
+  * Export a **SESSION_SECRET** from `src/config/session-secret.ts`
+  * Also edit container settings for redis at `src/redis/redis.conf`
+  * Export a *username*, *password*, *hashed* from  `src/config/admin.ts` for ADMIN Portal
+4. Development, Project config:
+  * Create `src/config/APP.env` with values of *development*/*production* for:
+    - *react_app_client_env*
+    - *react_app_admin_client_env*
+    - *api_env*
+  * Create dev/prod web server config at `src/nginx/nginx.conf`
+  * The respective docker containers will use Hosts and Build settings as specified in this file.
+  * Edit current project constants/settings at `src/setup_project.ts`
+
+### TODO
 - use pm2/else (production script), remove dev_local/dev_server
-- Githooks pre-commit for testing
 - global ts declaration file
-- few logs for /details unnecessary
-- document api using swagger
 
 
-## Getting started
+## Client Repo <a name="client"></a>
+[![Netlify Status](https://api.netlify.com/api/v1/badges/ec919ae6-f1a0-4d59-a0b9-796beec493ea/deploy-status)](https://app.netlify.com/sites/bits-vaccine-portal/deploys)
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+This app was made with <3 by students from BITS Pilani, using **React.js** for the frontend and **Node.js** for the backend. It uses the **Chakra-UI library, Google O-Auth,** and **Docker+Nginx** for hosting.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+In case you'd like to run this on your local machine, follow these steps:
 
-## Add your files
-
-- [ ] [Create](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+**Clone the repository**
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/dvm-bitspilani/vaccination_portal.git
-git branch -M main
-git push -uf origin main
+git clone https://github.com/psrth/bits-vaccination-portal.git
 ```
 
-## Integrate with your tools
+**Build the clients**
 
-- [ ] [Set up project integrations](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/user/project/integrations/)
+```
+cd vaccine-portal
+npm install
+npm start
+```
 
-## Collaborate with your team
+```
+cd vaccine-admin-portal
+npm install
+npm start
+```
 
-- [ ] [Invite team members and collaborators](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Automatically merge when pipeline succeeds](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+In case you'd like to contribute or squash a bug, just open a pull request!
 
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/user/application_security/sast/)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!).  Thank you to [makeareadme.com](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-
-
+## Run/Build <a name="run"></a>
+1. Setup docker and docker-compose: 
+  * This requires your machine to have Docker runtime installed.
+    - [Mac OS](https://docs.docker.com/docker-for-mac/install/), [Windows](https://docs.docker.com/docker-for-windows/install/), [Linux](https://docs.docker.com/engine/install/) (Browse by distributions)
+  * Further Install docker compose https://docs.docker.com/compose/install/
+  * Create a docker user group to not require running as sudo
+2. Build containers:
+  - Either build or pull containers: `docker-compose build` or `docker-compose pull`
+  - Run as: `docker-compose up -d`, preferrably install [lazydocker](https://github.com/jesseduffield/lazydocker) for quick logs view
+  - Else, access [pino logs](https://getpino.io/#/) at `src/middeware/error_logs`
+3. Regular Tasks:
+  * Edit `src/middeware/logger.ts` and configure pino logger.
+  * Customize `src/backup_script.sh` and create a [crontab](https://man7.org/linux/man-pages/man5/crontab.5.html) to run it every few hours.
+  * Also create complimentory repository for versioning database backups, edit it in the backup script.
 
 
+## Developers <a name="devs"></a>
 
+**Parth Sharma** (Frontend Developer)  
+**Mohit Makwana** (Backend Developer)
 
+**Nidheesh Jain** (Frontend Mentor)  
+**Anshal Shukla** (Backend Mentor)  
+**Darsh Mishra** (Backend Mentor)
 
+## License <a name="lic"></a>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can adocument commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-## Authors and acknowledgment
-## Li
-For source projects, say how it is licensed.
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
-
+This code is the intellectual property of BITS Pilani and the developers listed above. In case you'd like to repurpose some of this code, please get in touch with one of the developers so that we can get you explicit permission to use the codebase.
