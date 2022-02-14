@@ -5,7 +5,6 @@
   "main": "./src/server.ts",
   "scripts": {
     "test": "npm run test",
-    "dev_local": "nodemon src/server.ts",
     "dev_server": "nodemon src/server.ts",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "production": "node src/server.ts"
