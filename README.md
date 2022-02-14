@@ -43,8 +43,8 @@
   * Create a docker user group to not require running as sudo
 2. Build containers:
   - Either build or pull containers: `docker-compose build` or `docker-compose pull`
-  - Run as: `docker-compose up -d`, preferrably install https://github.com/jesseduffield/lazydocker for quick logs view
-  - Else, access pino logs at `src/middeware/error_logs`
+  - Run as: `docker-compose up -d`, preferrably install [lazydocker](https://github.com/jesseduffield/lazydocker) for quick logs view
+  - Else, access [pino logs](https://getpino.io/#/) at `src/middeware/error_logs`
 3. Regular Tasks:
-  * Customize `src/backup_script.sh` and create a crontab (https://man7.org/linux/man-pages/man5/crontab.5.html) to run it every few hours.
+  * Customize `src/backup_script.sh` and create a [crontab](https://man7.org/linux/man-pages/man5/crontab.5.html) to run it every few hours.
   * Also create complimentory repository for versioning database backups, edit it in the backup script.
