@@ -5,7 +5,10 @@
 [![Linting](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/lint.yml/badge.svg)](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/lint.yml)
 [![Docker](https://badgen.net/badge/icon/docker?icon=dockerhub&label=ContainerRegistry)](https://hub.docker.com/r/mohitdmak/bits_vaccination_portal)
 
-## Api
+## Contents:
+ - [Rest API](#api)
+ 
+## Api <a name="api"></a>
 * Rest API documentation is hosted using [apidoc](https://apidocjs.com/#demo) at [gh pages](https://mohitdmak.github.io/BITS_Vaccination_Portal/)
 
 ## Setup
