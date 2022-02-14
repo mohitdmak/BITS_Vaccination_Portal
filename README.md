@@ -38,9 +38,7 @@
 ## Run/Build
 1. Setup docker and docker-compose: 
   * This requires your machine to have Docker runtime installed.
-    - (Mac OS) https://docs.docker.com/docker-for-mac/install/
-    - (Windows) https://docs.docker.com/docker-for-windows/install/
-    - (Linux) https://docs.docker.com/engine/install/ (Browse by distributions)
+    - [Mac OS](https://docs.docker.com/docker-for-mac/install/), [Windows](https://docs.docker.com/docker-for-windows/install/), [Linux](https://docs.docker.com/engine/install/) (Browse by distributions)
   * Further Install docker compose https://docs.docker.com/compose/install/
   * Create a docker user group to not require running as sudo
 2. Build containers:
