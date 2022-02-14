@@ -5,6 +5,9 @@
 [![Linting](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/lint.yml/badge.svg)](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/lint.yml)
 [![Docker](https://badgen.net/badge/icon/docker?icon=dockerhub&label=ContainerRegistry)](https://hub.docker.com/r/mohitdmak/bits_vaccination_portal)
 
+## Api
+* Rest API documentation is hosted using [apidoc](https://apidocjs.com/#demo) at [gh pages](https://mohitdmak.github.io/BITS_Vaccination_Portal/)
+
 ## Setup
 1. Setup Authentication:
   * Create a new project at https://console.cloud.google.com/ and get ClientId and Secret for an Oauth2 Api
@@ -46,5 +49,6 @@
   - Run as: `docker-compose up -d`, preferrably install [lazydocker](https://github.com/jesseduffield/lazydocker) for quick logs view
   - Else, access [pino logs](https://getpino.io/#/) at `src/middeware/error_logs`
 3. Regular Tasks:
+  * Edit `src/middeware/logger.ts` and configure pino logger.
   * Customize `src/backup_script.sh` and create a [crontab](https://man7.org/linux/man-pages/man5/crontab.5.html) to run it every few hours.
   * Also create complimentory repository for versioning database backups, edit it in the backup script.
