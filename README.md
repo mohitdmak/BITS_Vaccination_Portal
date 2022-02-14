@@ -1,92 +1,52 @@
-# Vaccination_Portal
+# BITS Vaccination Portal
+
 [![Deploy to Lightsail](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/deploy.yml/badge.svg)](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/deploy.yml)
 [![Publish Docker image to Dockerhub](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/docker-image.yml/badge.svg)](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/docker-image.yml)
 [![Linting](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/lint.yml/badge.svg)](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/lint.yml)
 [![Docker](https://badgen.net/badge/icon/docker?icon=dockerhub&label=ContainerRegistry)](https://hub.docker.com/r/mohitdmak/bits_vaccination_portal)
 
+## Setup
+1. Setup Authentication:
+  * Create a new project at https://console.cloud.google.com/ and get ClientId and Secret for an Oauth2 Api
+  * Download credentials to `src/config/oauth2-api-creds.json`
+2. Setup Mongo Database:
+  * Prepare .env file in `src/config/mongo.env` with following properties:
+    - MONGO_INITDB_ROOT_USERNAME
+    - MONGO_INITDB_ROOT_PASSWORD
+    - MONGO_INITDB_DATABASE="Portal"
+  * Also create `src/config/mongo.ts` to export above creds to controllers.
+  * Prepare credentials at `src/config/DB_ADMIN_CONFIG.env` for SuperAdmin (MongoExpress) Container:
+    - ME_CONFIG_BASICAUTH_USERNAME
+    - ME_CONFIG_BASICAUTH_PASSWORD
+    - ME_CONFIG_MONGODB_PORT
+    - ME_CONFIG_MONGODB_ENABLE_ADMIN
+    - ME_CONFIG_MONGODB_SERVER
+  * Also edit container settings for mongo at `src/db/db.conf`
+3. Session, Admin Portal config:
+  * Export a **SESSION_SECRET** from `src/config/session-secret.ts`
+  * Also edit container settings for redis at `src/redis/redis.conf`
+  * Export a *username*, *password*, *hashed* from  `src/config/admin.ts` for ADMIN Portal
+4. Development, Project config:
+  * Create `src/config/APP.env` with values of *development*/*production* for:
+    - REACT_APP_CLIENT_ENV
+    - REACT_APP_ADMIN_CLIENT_ENV
+    - API_ENV
+  * Create dev/prod web server config at `src/nginx/nginx.conf`
+  * The respective docker containers will use Hosts and Build settings as specified in this file.
+  * Edit current project constants/settings at `src/setup_project.ts`
 
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.com/dvm-bitspilani/vaccination_portal.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/user/project/integrations/)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Automatically merge when pipeline succeeds](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://docs.gitlab.com/ee/user/application_security/sast/)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!).  Thank you to [makeareadme.com](https://gitlab.com/-/experiment/new_project_readme_content:8ed54d4736af6fa291d59e641c50e377?https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
-
+## Run/Build
+1. Setup docker and docker-compose: 
+  * This requires your machine to have Docker runtime installed.
+    - (Mac OS) https://docs.docker.com/docker-for-mac/install/
+    - (Windows) https://docs.docker.com/docker-for-windows/install/
+    - (Linux) https://docs.docker.com/engine/install/ (Browse by distributions)
+  * Further Install docker compose https://docs.docker.com/compose/install/
+  * Create a docker user group to not require running as sudo
+2. Build containers:
+  - Either build or pull containers: `docker-compose build` or `docker-compose pull`
+  - Run as: `docker-compose up -d`, preferrably install https://github.com/jesseduffield/lazydocker for quick logs view
+  - Else, access pino logs at `src/middeware/error_logs`
+3. Regular Tasks:
+  * Customize `src/backup_script.sh` and create a crontab (https://man7.org/linux/man-pages/man5/crontab.5.html) to run it every few hours.
+  * Also create complimentory repository for versioning database backups, edit it in the backup script.
