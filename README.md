@@ -18,7 +18,7 @@
 * Rest API documentation is hosted using [apidoc](https://apidocjs.com/#demo) at [gh pages](https://mohitdmak.github.io/BITS_Vaccination_Portal/)
 
 
-_As the BITS Pilani campus reopens for students of the 2019 and 2020 batches, a cornerstone of the process has been the Vaccination Portal, a comprehensive system developed by students from DVM to verify student’s vaccination statuses and smoothen the process for the administration._
+_As the BITS Pilani campus reopens for students of the all batches, a cornerstone of the process has been the Vaccination Portal, a comprehensive system developed by students from DVM to verify student’s vaccination statuses and smoothen the process for the administration._
 
 **BITS Pilani, Pilani campus is one of the first campuses in India to incorporate such a system to ensure a safe return of its students.\***
 
@@ -90,6 +90,14 @@ _(last updated on 12th September, 2021)_
   * Create dev/prod web server config at `src/nginx/nginx.conf`
   * The respective docker containers will use Hosts and Build settings as specified in this file.
   * Edit current project constants/settings at `src/setup_project.ts`
+5. Ci Cd setup:
+  * Create following secrets in your gh repo:
+    - AWS_SSH_KEY (*and correspondingly change host at `.github/deploy.yml`*)
+    - DOCKER_PASSWORD (*if you want to push/pull from a new registry*)
+    - DOCKER_USERNAME (*if you want to push/pull from a new registry*)
+  * There are 2 pre-commit hooks which can be ignored if necessary while commiting by using `--no-verify` tag:
+    - linting check using husky
+    - automatic docs generation into `docs/`
 
 ### TODO
 - use pm2/else (production script), remove dev_local/dev_server
