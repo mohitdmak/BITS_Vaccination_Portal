@@ -25,22 +25,47 @@ const fs = require('fs');
 let allow_access = config.ALLOW_ACCESS;
 
 /** Helper for oauth2 auth */
+/**
+ * @apiDefine ADMIN Restriction: Only accessible when logged in at ADMIN Portal
+ * @apiParam {Number} id Users unique ID.
+ * @apiIgnore Internally used method
+ */
 const get_allow_access = () => {
     return allow_access;
 };
 
-/** Helper for react admin client to get restrict current allowed batches to login */
+/**
+ * @api {POST} /api/admin/allow/ Restrict login access
+ * @apiBody {string} batch=f2020 Batch to restrict login access to
+ * @apiDescription Helper for react admin client to get restrict current allowed batches to login
+ * @apiPermission ADMIN
+ * @apiGroup ADMIN
+ * @apiSuccess {string[]} batch Array of allowed batches
+ */
 const restrict_access = async (req: RequestType, res: ResponseType): Promise<void> => {
     allow_access = req.body.batch;
     res.status(HttpStatusCode.CREATED_RESOURCE).json({ batch: allow_access });
 };
 
-/** Helper for react client to get current allowed batches to login */
+/**
+ * @api {GET} /api/admin/allow/ Get current batches allowed
+ * @apiDescription Helper for react client to get current allowed batches to login
+ * @apiGroup ADMIN
+ * @apiSuccess {string[]} batch Array of allowed batches
+ */
 const get_restrict_access = async (req: RequestType, res: ResponseType): Promise<void> => {
     res.status(HttpStatusCode.OK).json({ batch: allow_access });
 };
 
-/** Validator for allowable entry to hostel portal */
+/**
+ * @api {POST} /api/admin/allow/ Hostel Portal login access
+ * @apiParam {string} email Requesting student's emailid
+ * @apiDescription Validator for allowable entry to hostel portal
+ * @apiGroup Hostel Allocation
+ * @apiSuccess {json} details Relevant details required by Hostel Allocation Portal
+ * @apiSuccess {boolean} result Whether to allow login
+ * @apiSuccess {string} message Reasons if any, to disallow login
+ */
 const validate = async (req: RequestType, res: ResponseType): Promise<void> => {
     try {
         const student: STUDENT | null = await Student.findOne({ email: <string>req.query.email });
@@ -152,7 +177,16 @@ function trim_res_data(students: any[], beggining?: number, ending?: number, stu
     }
     return student ? students[0] : students;
 }
-/** Handler for admin login */
+
+/**
+ * @api {POST} /api/admin/login/ Admin Portal Login
+ * @apiGroup ADMIN
+ * @apiDescription Handler for admin login
+ * @apiBody {string} client_username Admin Username
+ * @apiBody {string} client_password Admin Password
+ * @apiError ClientError Admin password or username is incorrect
+ * @apiSuccess Sets jwt token on browser cookie, which then embeds as a header for further requests
+ */
 const post_login = async (req: RequestType, res: ResponseType): Promise<void> => {
     try {
         const { client_username, client_password } = req.body;
@@ -170,7 +204,17 @@ const post_login = async (req: RequestType, res: ResponseType): Promise<void> =>
     }
 };
 
-/** Handler for providing data of students requested in admin page */
+/**
+ * @api {POST} /api/admin/students/ Provide multi student data
+ * @apiGroup ADMIN
+ * @apiPermission ADMIN
+ * @apiDescription Handler for providing data of students requested in admin page
+ * @apiBody {filters} filters Filters to apply on student data model
+ * @apiBody {number} page Return all student data at this page
+ * @apiBody {between} start-end Filter student data by arrival dates within this range
+ * @apiSuccess {number} total_pages Total pages of students formed by filter
+ * @apiSuccess {json} data Data of all students on page requested
+ */
 const post_students = async (req: RequestType, res: ResponseType): Promise<void> => {
     // get page no, iterate through json to get filter specs
     const page = Number(req.body.page);
@@ -233,7 +277,15 @@ const post_students = async (req: RequestType, res: ResponseType): Promise<void>
     }
 };
 
-/** Handler for get reqs on particular student by admin */
+/**
+ * @api {POST} /api/admin/student/ Provide single student data
+ * @apiGroup ADMIN
+ * @apiPermission ADMIN
+ * @apiError DBError Problems locating student document by given id
+ * @apiDescription Handler for get reqs on particular student by admin
+ * @apiBody {id} id Object Id of student to get details of
+ * @apiSuccess {json} student Relavant student data
+ */
 const get_student = async (req: RequestType, res: ResponseType): Promise<void> => {
     const id: number = req.body._id;
     try {
@@ -250,7 +302,16 @@ const get_student = async (req: RequestType, res: ResponseType): Promise<void> =
     }
 };
 
-/** Handler for update reqs on a particular student by admin */
+/**
+ * @api {POST} /api/admin/update/ Update student data
+ * @apiGroup ADMIN
+ * @apiPermission ADMIN
+ * @apiError DBError Problems locating/updating student document by given id
+ * @apiDescription Handler for update reqs on a particular student by admin
+ * @apiBody {_id} id Object Id of student to update details of
+ * @apiBody {json} updates Set of changes to be made to student data
+ * @apiSuccess {json} student Updated student data
+ */
 const update_student = async (req: RequestType, res: ResponseType): Promise<void> => {
     const id = req.body._id;
     try {
@@ -264,7 +325,15 @@ const update_student = async (req: RequestType, res: ResponseType): Promise<void
     }
 };
 
-/** Handler for view reqs of pdfs for student by admin */
+/**
+ * @api {GET} /api/admin/get_pdf/ Get Vacccination Certificate
+ * @apiGroup ADMIN
+ * @apiPermission ADMIN
+ * @apiError DBError Problems locating/serving student certificate by given id
+ * @apiDescription Handler for view reqs of vaccination certificate pdfs for student by admin
+ * @apiParam {_id} id Object Id of student to get certificate of
+ * @apiSuccess {file} serve_file Vaccination Certificate as a download
+ */
 const get_pdf = async (req: RequestType, res: ResponseType): Promise<void> => {
     try {
         // get downloaded file path
@@ -309,7 +378,15 @@ const get_pdf = async (req: RequestType, res: ResponseType): Promise<void> => {
     }
 };
 
-/** Handler for view requests of consent form by admin */
+/**
+ * @api {GET} /api/admin/get_consent/ Get Consent Form
+ * @apiGroup ADMIN
+ * @apiPermission ADMIN
+ * @apiError DBError Problems locating/serving student consent form by given id
+ * @apiDescription Handler for view requests of consent form by admin
+ * @apiParam {_id} id Object Id of student to get form of
+ * @apiSuccess {file} serve_file Consent Form as a download
+ */
 const get_consent = async (req: RequestType, res: ResponseType): Promise<void> => {
     try {
         // get downloaded file path
@@ -388,7 +465,14 @@ function get_cooldown_date(student: STUDENT, latest_dose_date: string): string {
     }
 }
 
-/** Create Student data's excel file, and serve post authentication */
+/**
+ * @api {GET} /api/admin/excel/ Get Excel Data
+ * @apiGroup ADMIN
+ * @apiPermission ADMIN
+ * @apiError DBError Problems creating/serving excel data of all students
+ * @apiDescription Create Student data's excel file, and serve post authentication
+ * @apiSuccess {file} serve_file Excel data as a download
+ */
 const get_excel = async (req: RequestType, res: ResponseType): Promise<void> => {
     try {
         // get data from mongodb, initialize empty array for conversion to xlsx

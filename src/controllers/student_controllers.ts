@@ -54,7 +54,15 @@ const upload = multer({
     },
 });
 
-/** Handler for post reqs submitting pdfs */
+/**
+ * @api {POST} /api/student/post_pdf/ Post Vacccination Certificate
+ * @apiGroup Students
+ * @apiPermission LOGGED-IN STUDENT
+ * @apiError ClientError Invalid requests by client/invalid file format/invalid certificate
+ * @apiDescription Handler for post reqs submitting vaccination certificate pdfs
+ * @apiBody {file} serve_file Vaccination certificate pdf
+ * @apiSuccess {string} success Confirmation message
+ */
 const post_pdf = async (req: RequestType, res: Response): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger ? res.locals.child_logger : logger;
     try {
@@ -90,7 +98,15 @@ const post_pdf = async (req: RequestType, res: Response): Promise<void> => {
     }
 };
 
-/** Handler for post requests of consent form by student */
+/**
+ * @api {POST} /api/student/post_consent/ Post Consent Form
+ * @apiGroup Students
+ * @apiPermission LOGGED-IN STUDENT
+ * @apiError ClientError Invalid requests by client/invalid file format/invalid file size
+ * @apiDescription Handler for post requests of consent form by student
+ * @apiBody {file} serve_file Consent Form pdf
+ * @apiSuccess {string} success Confirmation message
+ */
 const post_consent = async (req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger ? res.locals.child_logger : logger;
     try {
@@ -127,7 +143,14 @@ const post_consent = async (req: RequestType, res: ResponseType): Promise<void> 
     }
 };
 
-/** Handler for get requests for consent form by student */
+/**
+ * @api {GET} /api/student/get_consent/ Get Consent Form
+ * @apiGroup Students
+ * @apiPermission LOGGED-IN STUDENT
+ * @apiError ClientError No file exists on server/problems in serving as a download
+ * @apiDescription Handler for get requests for consent form by student
+ * @apiSuccess {file} serve_file Consent Form as a download
+ */
 const get_consent = async (req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger ? res.locals.child_logger : logger;
     try {
@@ -168,7 +191,7 @@ const get_consent = async (req: RequestType, res: ResponseType): Promise<void> =
     }
 };
 
-/** Handler for updating student details by student */
+/** Handler for storing extra data into student model */
 const update = async (req: RequestType, res: ResponseType): Promise<void> => {
     try {
         await Student.findOneAndUpdate(
@@ -181,7 +204,15 @@ const update = async (req: RequestType, res: ResponseType): Promise<void> => {
     }
 };
 
-/** Handler for storing extra data into student model */
+/**
+ * @api {POST} /api/student/extra/ Post Student Details
+ * @apiGroup Students
+ * @apiPermission LOGGED-IN STUDENT
+ * @apiError ClientError Attempt to make cross site request forgery/Invalid Session/Expired Session
+ * @apiDescription Handler for updating student details by student
+ * @apiBody {json} body Secondary data to store in student model
+ * @apiSuccess {string} message Confirmation message
+ */
 const post_extra_data = async (req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger ? res.locals.child_logger : logger;
     try {
@@ -212,7 +243,13 @@ const post_extra_data = async (req: RequestType, res: ResponseType): Promise<voi
     }
 };
 
-/** The protected page */
+/**
+ * @api {GET} /api/student/details/ Get Student Details
+ * @apiGroup Students
+ * @apiPermission LOGGED-IN STUDENT
+ * @apiDescription React client makes continuous requests here to have latest version of a student's data
+ * @apiSuccess {json} student Current logged in student's data
+ */
 const get_student_details = async (req: RequestType, res: ResponseType): Promise<void> => {
     if (req.session['student']) {
         res.status(HttpStatusCode.OK).json(req.session['student']);
@@ -454,7 +491,14 @@ const update_overall_status = async (student: STUDENT, req: RequestType, res: Re
     }
 };
 
-/** Handler for serving vaccination certificates, req by student */
+/**
+ * @api {GET} /api/student/get_pdf/ Get Vaccination Certificate
+ * @apiGroup Students
+ * @apiPermission LOGGED-IN STUDENT
+ * @apiError ClientError No file exists on server/problems in serving as a download
+ * @apiDescription Handler for serving vaccination certificates, req by student
+ * @apiSuccess {file} serve_file Vaccination Certificate as a download
+ */
 const get_pdf = async (req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger ? res.locals.child_logger : logger;
     try {
@@ -504,7 +548,12 @@ const get_all = async (req: RequestType, res: ResponseType): Promise<void> => {
     }
 };
 
-/** Logout Handler */
+/**
+ * @api {GET} /api/student/logout/ Call Oauth2 Logout
+ * @apiGroup Students
+ * @apiDescription Logout Handler
+ * @apiSuccess {set} Destroy session data, remove cookies from session
+ */
 const get_logout = (req: RequestType, res: ResponseType) => {
     // removing tokens from session
     req.session.destroy(function (err) {

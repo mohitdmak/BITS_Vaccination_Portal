@@ -28,7 +28,12 @@ function getOAuthClient() {
     return new OAuth2(ClientId, ClientSecret, config.REDIRECTION_URL);
 }
 
-/** Obtaining auth url by specifying scopes */
+/**
+ * @api {GET} /api/auth/ Get Oauth2 Url
+ * @apiDescription Obtaining auth url by specifying scopes
+ * @apiGroup Oauth2 Authentication
+ * @apiSuccess {url} redirect Redirect user to perform oauth2 at created url
+ */
 function getAuthUrl() {
     const oauth2Client: any = getOAuthClient();
     const url: string = oauth2Client.generateAuthUrl({
@@ -111,7 +116,12 @@ const set_session_data = async (user: any, req: RequestType, res: ResponseType):
     }
 };
 
-/** The protected page - testing user details */
+/**
+ * @api {GET} /api/auth/details/ Get Authenticated Details
+ * @apiDescription The protected page - testing user details
+ * @apiGroup Oauth2 Authentication
+ * @apiSuccess {json} session_data All student data present on current express session
+ */
 const get_user_details = async (req: RequestType, res: ResponseType): Promise<void> => {
     // getting oauth2Client
     const oauth2Client = getOAuthClient();
@@ -144,7 +154,12 @@ const get_auth_url = (req: RequestType, res: ResponseType): void => {
     }
 };
 
-/** Logout Handler */
+/**
+ * @api {GET} /api/auth/logout/ Get Oauth2 logout
+ * @apiDescription Oauth2 Logout Handler
+ * @apiGroup Oauth2 Authentication
+ * @apiSuccess {set} Destroy session data, remove cookies from session
+ */
 const get_logout = (req: RequestType, res: ResponseType): void => {
     // removing tokens from session
     req.session.destroy(function (err) {
@@ -157,7 +172,12 @@ const get_logout = (req: RequestType, res: ResponseType): void => {
     });
 };
 
-/** Login Handler */
+/**
+ * @api {GET} /api/auth/login/ Get Oauth2 login
+ * @apiDescription Oauth2 Login Handler
+ * @apiGroup Oauth2 Authentication
+ * @apiSuccess {set} Set cookies on current user session with required details for react client
+ */
 const get_login = async (req: RequestType, res: ResponseType): Promise<void> => {
     if (req.query.access_token && process.env.npm_lifecycle_event === 'dev_server') {
         //// getting oauth2Client
