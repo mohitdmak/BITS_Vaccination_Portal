@@ -1,41 +1,46 @@
-// @ts-nocheck
+/* eslint @typescript-eslint/no-var-requires: "off" */
 // import { google } from 'googleapis';
 // Importing mongo student model, error handlers, logger
 import * as ERROR from '../middeware/error_models';
 import { HttpStatusCode } from '../middeware/error_models';
 import { error_handler } from '../middeware/error_handler';
+import { forward_errors } from '../controllers/forward_errors';
 import { Student, STUDENT } from '../models/student';
 import { RequestType, ResponseType } from '../controllers/student_controllers';
 import { logger } from '../middeware/logger';
 
-//password configs
+//password and configs
 import { password } from '../config/admin';
 import { username } from '../config/admin';
 import { hashed } from '../config/admin';
+import * as config from '../setup_project';
 
 // reqs for sending excel file
 import json2xls from 'json2xls';
-const filename = 'myExcel.xlsx';
 import { writeFileSync } from 'fs';
-const fs = require("fs");
+//@ts-ignore
+const fs = require('fs');
 
-// set pagination limit
-const page_limit = 50;
+/** Currently allowed batches set by admin (defaults) */
+let allow_access = config.ALLOW_ACCESS;
 
-// access data
-let allow_access = [];
+/** Helper for oauth2 auth */
 const get_allow_access = () => {
     return allow_access;
 };
+
+/** Helper for react admin client to get restrict current allowed batches to login */
 const restrict_access = async (req: RequestType, res: ResponseType): Promise<void> => {
     allow_access = req.body.batch;
     res.status(HttpStatusCode.CREATED_RESOURCE).json({ batch: allow_access });
 };
+
+/** Helper for react client to get current allowed batches to login */
 const get_restrict_access = async (req: RequestType, res: ResponseType): Promise<void> => {
     res.status(HttpStatusCode.OK).json({ batch: allow_access });
 };
 
-// validate for hostel portal
+/** Validator for allowable entry to hostel portal */
 const validate = async (req: RequestType, res: ResponseType): Promise<void> => {
     try {
         const student: STUDENT | null = await Student.findOne({ email: <string>req.query.email });
@@ -95,6 +100,7 @@ const validate = async (req: RequestType, res: ResponseType): Promise<void> => {
                 result = result.slice(0, -1);
             }
         }
+        // allow hostel administrators at all times
         if (
             <string>req.query.email == 'f20201976@pilani.bits-pilani.ac.in' ||
             <string>req.query.email == 'f20200931@pilani.bits-pilani.ac.in'
@@ -104,21 +110,19 @@ const validate = async (req: RequestType, res: ResponseType): Promise<void> => {
         }
         res.status(HttpStatusCode.OK).json({ result: verdict, message: result, details: details });
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res);
+        forward_errors(err, HttpStatusCode.INTERNAL_SERVER_ERROR, res);
     }
 };
 
-// function to paginate array after applying filters
+/** Helper function to paginate array after applying filters */
 function paginate(array: any[], page_size: number, page_number: number): any[] {
     // human-readable page numbers usually start with 1, so we reduce 1 in the first argument
     return array.slice((page_number - 1) * page_size, page_number * page_size);
 }
 
+/** Trim response data and minimize json load attached to respones */
 function trim_res_data(students: any[], beggining?: number, ending?: number, student?: STUDENT): STUDENT[] | STUDENT {
+    // parse according to student data available
     students = student ? new Array(1).fill(student) : students;
     for (let i = 0; i < students.length; i++) {
         if (
@@ -148,7 +152,7 @@ function trim_res_data(students: any[], beggining?: number, ending?: number, stu
     }
     return student ? students[0] : students;
 }
-// admin login
+/** Handler for admin login */
 const post_login = async (req: RequestType, res: ResponseType): Promise<void> => {
     try {
         const { client_username, client_password } = req.body;
@@ -157,20 +161,16 @@ const post_login = async (req: RequestType, res: ResponseType): Promise<void> =>
         } else {
             throw new ERROR.ClientError(
                 ERROR.HttpStatusCode.UNAUTHORIZED_REQUEST,
-                'ADMIN PASSWORD OR USERNAME IS INCORRECT',
+                'Admin password or username is incorrect',
                 false,
             );
         }
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res);
+        forward_errors(err, HttpStatusCode.INTERNAL_SERVER_ERROR, res);
     }
 };
 
-// handle providing data of students requested in admin page
+/** Handler for providing data of students requested in admin page */
 const post_students = async (req: RequestType, res: ResponseType): Promise<void> => {
     // get page no, iterate through json to get filter specs
     const page = Number(req.body.page);
@@ -205,7 +205,7 @@ const post_students = async (req: RequestType, res: ResponseType): Promise<void>
                 } else {
                     // conversion to IST
                     const date = new Date(Date.parse(<string>(students[i].arrival_date as any)));
-                    date.setTime(date.getTime() + 19800000);
+                    date.setTime(date.getTime() + config.TIMEZONE_DIFF);
                     students[i].arrival_date = <Date>(date.toISOString() as any);
                 }
             }
@@ -213,78 +213,70 @@ const post_students = async (req: RequestType, res: ResponseType): Promise<void>
             for (let i = 0; i < students.length; i++) {
                 // conversion to IST
                 const date = new Date(Date.parse(<string>(students[i].arrival_date as any)));
-                date.setTime(date.getTime() + 19800000);
+                date.setTime(date.getTime() + config.TIMEZONE_DIFF);
                 students[i].arrival_date = <Date>(date.toISOString() as any);
             }
         }
+        // trim actual content sent into response
         students! = <STUDENT[]>trim_res_data(students, beggining, ending);
-        if (students.length % page_limit === 0) {
-            total_pages = students.length / page_limit;
+        if (students.length % config.PAGINATION_LIMIT === 0) {
+            total_pages = students.length / config.PAGINATION_LIMIT;
         } else {
-            total_pages = Math.floor(students.length / page_limit) + 1;
+            total_pages = Math.floor(students.length / config.PAGINATION_LIMIT) + 1;
         }
-        students = paginate(students, page_limit, page);
+        // server paginated response
+        students = paginate(students, config.PAGINATION_LIMIT, page);
         res.status(HttpStatusCode.OK).json({ total_pages: total_pages, data: students });
         logger.info({ FILTERS: req.body }, 'Provided students list < < <');
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res);
+        forward_errors(err, HttpStatusCode.INTERNAL_SERVER_ERROR, res);
     }
 };
 
-// Handler for GET REQs on particular student
+/** Handler for get reqs on particular student by admin */
 const get_student = async (req: RequestType, res: ResponseType): Promise<void> => {
     const id: number = req.body._id;
     try {
+        // convert to IST, and post to db
         let student: STUDENT | null = await Student.findById(id);
-        // convert to IST
         const date = new Date(Date.parse(<string>(student!.arrival_date as any)));
-        date.setTime(date.getTime() + 19800000);
+        date.setTime(date.getTime() + config.TIMEZONE_DIFF);
         student!.arrival_date = <Date>(date.toISOString() as any);
         logger.info({ STUDENT_EMAIL: student!.email }, 'Admin provided student detail.');
         student! = <STUDENT>trim_res_data([], undefined, undefined, student!);
         res.status(HttpStatusCode.OK).json(student);
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.DB_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res);
+        forward_errors(err, HttpStatusCode.DB_ERROR, res);
     }
 };
 
-// Handler for UPDATE REQs on a particular student
+/** Handler for update reqs on a particular student by admin */
 const update_student = async (req: RequestType, res: ResponseType): Promise<void> => {
     const id = req.body._id;
     try {
+        // post updates to db
         const updates: any[] = req.body.updates;
         const student: STUDENT | null = await Student.findOneAndUpdate({ _id: id }, updates, { new: true });
         res.status(HttpStatusCode.CREATED_RESOURCE).json(student);
         logger.info({ STUDENT_EMAIL: student!.email }, 'Admin updated student status.');
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.DB_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res);
+        forward_errors(err, HttpStatusCode.DB_ERROR, res);
     }
 };
 
-// Handler for VIEW REQs of pdfs for student
+/** Handler for view reqs of pdfs for student by admin */
 const get_pdf = async (req: RequestType, res: ResponseType): Promise<void> => {
     try {
         // get downloaded file path
         const id: any = req.query._id;
         const student: STUDENT | null = await Student.findById(id);
-        var serve_file: string = student!.pdf;
-	if(serve_file.startsWith("src/") != true){
-	    serve_file = "src/" + serve_file;
-	}
+        let serve_file: string = student!.pdf;
+        // preserve consistency between old and new batch uploads
+        if (serve_file.startsWith('src/') != true) {
+            serve_file = 'src/' + serve_file;
+        }
         logger.info({ STUDENT_EMAIL: student!.email }, 'ADMIN: Request to serve Consent form > > >');
-        // serve file as a download
+        // serve file for download
         res.download(String(serve_file), function (err) {
             let file_error: ERROR.BaseError;
             //@ts-ignore
@@ -313,27 +305,23 @@ const get_pdf = async (req: RequestType, res: ResponseType): Promise<void> => {
             }
         });
     } catch (err) {
-        // forward login errors
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.DB_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res);
+        forward_errors(err, HttpStatusCode.DB_ERROR, res);
     }
 };
 
-//Handler for view requests of consent form by admin
+/** Handler for view requests of consent form by admin */
 const get_consent = async (req: RequestType, res: ResponseType): Promise<void> => {
     try {
         // get downloaded file path
         const id: any = req.query._id;
         const student: STUDENT | null = await Student.findById(id);
-        var serve_file: string = student!.consent_form;
-	if(serve_file.startsWith("src/") != true){
-	    serve_file = "src/" + serve_file;
-	}
+        let serve_file: string = student!.consent_form;
+        // preserve consistency between old and new batch uploads
+        if (serve_file.startsWith('src/') != true) {
+            serve_file = 'src/' + serve_file;
+        }
         logger.info({ STUDENT_EMAIL: student!.email }, 'ADMIN: Request to serve Consent form > > >');
-        // serve file as a download
+        // serve file for download
         res.download(String(serve_file), function (err) {
             let file_error: ERROR.BaseError;
             //@ts-ignore
@@ -362,261 +350,141 @@ const get_consent = async (req: RequestType, res: ResponseType): Promise<void> =
             }
         });
     } catch (err) {
-        // forward login errors
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.DB_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res);
+        forward_errors(err, HttpStatusCode.DB_ERROR, res);
     }
 };
 
-// get excel file
-const get_excel = async (req, res) => {
-    // get data from mongodb
-    const data = await Student.find();
-
-    // initialize empty array for conversion to xlsl
-    var excel_array = [];
-
-    // remove mongoose id pairs
-    data.forEach((student) => {
-        var pdf;
-        var consent_form;
-        var latest_dose_date;
-        var vaccine;
-        var last_dose_date_start;
-        // var last_dose_date_finish;
-        var agreement = student.TnC1_Agreement && student.TnC2_Agreement && student.is_medically_fit;
-        if(student.latest_dose_date){
-            latest_dose_date = new Date(student.latest_dose_date).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
-        }
-        else if(student.manual_verification == "DONE" && student.vaccine){
-            latest_dose_date = new Date(student.vaccine.QR.evidence[0].date).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
-        }
-        else{
-            latest_dose_date = "DATA UNAVAILABLE";
-        }
-        if(student.pdf){
-            pdf = true;
-        }
-        else{
-            pdf = false;
-        }
-        if(student.consent_form){
-            consent_form = true;
-        }
-        else{
-            consent_form = false;
-        }
-        if(student.vaccine && latest_dose_date != "DATA UNAVAILABLE" && student.vaccination_status != "COMPLETE"){
-            vaccine = student.vaccine.QR.evidence[0].vaccine;
-            if(vaccine == "COVISHIELD"){
-                // if(student.auto_verification == ""){
-                    var date = new Date(Date.parse(latest_dose_date));
-                    date.setDate(date.getDate() + 84);
-                    last_dose_date_start = date.toISOString();
-                    date.setDate(date.getDate() + 112 - 84);
-                    //last_dose_date_finish = date.toISOString();
-                    last_dose_date_start = new Date(last_dose_date_start).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
-                    //last_dose_date_finish = new Date(last_dose_date_finish).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
-                // }
-                // else{
-                    // last_dose_date_start = "MANUALLY VERIFIED";
-                    // last_dose_date_finish = "MANUALLY VERIFIED";
-                // }
-            }
-            else if(vaccine == "COVAXIN"){
-                // if(student.auto_verification == "DONE"){
-                    var date = new Date(Date.parse(latest_dose_date));
-                    date.setDate(date.getDate() + 28);
-                    last_dose_date_start = date.toISOString();
-                    date.setDate(date.getDate() + 42 - 28);
-                    //last_dose_date_finish = date.toISOString();
-                    last_dose_date_start = new Date(last_dose_date_start).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
-                    //last_dose_date_finish = new Date(last_dose_date_finish).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
-                // }
-                // else{
-                //     last_dose_date_start = "MANUALLY VERIFIED";
-                //     last_dose_date_finish = "MANUALLY VERIFIED";
-                // }
-            }
-            else if(vaccine == "SPUTNIK V"){
-                // if(student.auto_verification == "DONE"){
-                    var date = new Date(Date.parse(latest_dose_date));
-                    date.setDate(date.getDate() + 21);
-                    last_dose_date_start = date.toISOString();
-                    last_dose_date_start = new Date(last_dose_date_start).toLocaleDateString(undefined, {timeZone: 'Asia/Kolkata'});
-                    //last_dose_date_finish = "NO END DATE";
-                // }
-                // else{
-                //     last_dose_date_start = "MANUALLY VERIFIED";
-                //     last_dose_date_finish = "MANUALLY VERIFIED";
-                // }
-            }
-            // var date = new Date(Date.parse(last_dose_date_start));
-            // date.setDate(date.getDate() + 14);
-            // last_dose_date_finish = date.toISOString();
-            // last_dose_date_finish = new Date(last_dose_date_finish).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'});
-            var dates = latest_dose_date.split("/");
-            latest_dose_date = dates[1]+"/"+dates[0]+"/"+dates[2];
-            var dates = String(last_dose_date_start).split("/");
-            last_dose_date_start = dates[1]+"/"+dates[0]+"/"+dates[2];
-            //var dates = last_dose_date_finish.split("/");
-            //if(dates.length > 1){
-                //last_dose_date_finish = dates[1]+"/"+dates[0]+"/"+dates[2];
-            //}
-        }
-        else if(student.vaccination_status == "COMPLETE" && student.vaccine){
-            last_dose_date_start = "COMPLETELY VACCINATED";
-            //last_dose_date_finish = "COMPLETELY VACCINATED";
-            vaccine = student.vaccine.QR.evidence[0].vaccine;
-            var dates = latest_dose_date.split("/");
-            latest_dose_date = dates[1]+"/"+dates[0]+"/"+dates[2];
-        }
-        else{
-            vaccine = "DATA UNAVAILABLE";
-            last_dose_date_start = "DATA UNAVAILABLE";
-            //last_dose_date_finish = "DATA UNAVAILABLE";
-        }
-        var arrival_date = new Date(student.arrival_date).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'})
-        var createdAt = new Date(student.createdAt).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'})
-        var updatedAt = new Date(student.updatedAt).toLocaleString(undefined, {timeZone: 'Asia/Kolkata'})
-        var dates = arrival_date.split("/");
-        arrival_date = dates[1]+"/"+dates[0]+"/"+dates[2];
-        var dates = createdAt.split("/");
-        createdAt = dates[1]+"/"+dates[0]+"/"+dates[2];
-        var dates = updatedAt.split("/");
-        updatedAt = dates[1]+"/"+dates[0]+"/"+dates[2];
-        const excel_student =  {
-             "Name": student.name,
-             "Gender": student.gender,
-             "BITS ID": student.studentId,
-             "Email": student.email,
-             "City": student.city,
-             "Arrival Date": arrival_date,
-             "State": student.state,
-             "Vaccine": vaccine,
-             "Vaccination Status": student.vaccination_status,
-             "Auto Verification": student.auto_verification,
-             "Manual Verification": student.manual_verification,
-             "Certificate Uploaded": pdf,
-             "Consent Uploaded": consent_form,
-             "Accepted All Agreements": agreement,
-             "Latest Dose Date": latest_dose_date,
-             "Last Dose Starting": last_dose_date_start,
-             // "Last Dose Ending": last_dose_date_finish,
-             "Is Above 18": student.is_above_18,
-             "Staying on campus": student.staying_on_campus,
-             "Created At": createdAt,
-             "Updated At": updatedAt
-        }
-        // if(consent_form){
-        excel_array.push(excel_student);
-        // }
-    });
-
-    // prepare xlsx document
-    var excel_doc = await json2xls(excel_array);
-
-        // write to xlsx file
-    fs.writeFileSync("ADMIN_ExcelFile.xlsx", excel_doc, 'binary', (err) => {
-        if (err) {
-            console.log("writeFileSync error :", err);
-         }
-        console.log("The file has been saved!");
-     });
-    res.download("ADMIN_ExcelFile.xlsx", function(err){
-        if(err){
-            console.log(err);
-            res.status(500).json({"error": "NO FILE FOUND ON SERVER"});
-        }
-        //else{
-        //    console.log("CONSENT FORM FILE for student is served");
-        //}
-    });
+/** Prettify dates for admin excel file */
+function humanify_dates(arg_date: string): string {
+    const temp_date = arg_date.split('/');
+    arg_date = temp_date[1] + '/' + temp_date[0] + '/' + temp_date[2];
+    return arg_date;
 }
-// get excel file
-const get_excel_new = async (req: RequestType, res: ResponseType): Promise<void> => {
+
+/** Get cooldown date for student's currently taken vaccine dose */
+function get_cooldown_date(student: STUDENT, latest_dose_date: string): string {
+    /** Individual vaccine data from cowin */
+    const Dose_Cooldown_Period = new Map<string, number>([
+        ['COVISHIELD', config.DOSE_COOLDOWN_COVISHIELD],
+        ['COVAXIN', config.DOSE_COOLDOWN_COVAXIN],
+        ['SPUTNIK V', config.DOSE_COOLDOWN_SPUTNIK_V],
+    ]);
+    // Return cooldown data if vaccine dose information is available
+    if (student.vaccine && latest_dose_date != config.NOT_KNOWN_MSG && student.vaccination_status != 'COMPLETE') {
+        if (student.auto_verification == 'DONE') {
+            let temp_date: string | Date = new Date(Date.parse(latest_dose_date));
+            temp_date.setDate(
+                temp_date.getDate() + Number(Dose_Cooldown_Period.get(student.vaccine.QR.evidence[0].vaccine)),
+            );
+            temp_date = temp_date.toLocaleDateString(undefined, { timeZone: config.TIMEZONE_CURRENT });
+            return humanify_dates(temp_date);
+        } else {
+            return 'Manually verified';
+        }
+    } else if (student.vaccination_status == 'COMPLETE' && student.vaccine) {
+        return 'Completely vaccinated';
+    } else {
+        return config.NOT_KNOWN_MSG;
+    }
+}
+
+/** Create Student data's excel file, and serve post authentication */
+const get_excel = async (req: RequestType, res: ResponseType): Promise<void> => {
     try {
-        // get data from mongodb, initialize empty array for conversion to xlsl
+        // get data from mongodb, initialize empty array for conversion to xlsx
         logger.info('ADMIN: Request for excel file > > >');
         const data: STUDENT[] | null = await Student.find();
         const excel_array: any[] = [];
-        // remove mongoose id pairs, etc
+        // parse data into human readable formats, remove mongoose id pairs, etc
         data.forEach((student) => {
             const pdf: boolean = student.pdf ? true : false;
             const consent_form: boolean = student.consent_form ? true : false;
-            let latest_dose_date: string;
+            const vaccine: string = student.vaccine ? student.vaccine.QR.evidence[0].vaccine : config.NOT_KNOWN_MSG;
             const agreement: boolean = student.TnC1_Agreement && student.TnC2_Agreement && student.is_medically_fit;
+            let latest_dose_date: string;
             if (student.latest_dose_date) {
-                latest_dose_date = new Date('2020-01-14T17:43:37.000Z').toLocaleString(undefined, {
-                    timeZone: 'Asia/Kolkata',
+                latest_dose_date = new Date(student.latest_dose_date).toLocaleDateString(undefined, {
+                    timeZone: config.TIMEZONE_CURRENT,
+                });
+            } else if (student.manual_verification == 'DONE' && student.vaccine) {
+                latest_dose_date = new Date(student.vaccine.QR.evidence[0].date).toLocaleDateString(undefined, {
+                    timeZone: config.TIMEZONE_CURRENT,
                 });
             } else {
-                latest_dose_date = 'No latest dose';
+                latest_dose_date = config.NOT_KNOWN_MSG;
             }
-            const excel_student = {
+            const last_dose_date_start: string = get_cooldown_date(student, latest_dose_date);
+            /** prepare each student row for excel file */
+            const excel_student: any = {
                 Name: student.name,
+                Gender: student.gender,
+                'BITS Id': student.studentId,
                 Email: student.email,
                 City: student.city,
                 State: student.state,
+                Vaccine: vaccine,
+                'Is Above 18': student.is_above_18,
+                'Staying on campus': student.staying_on_campus,
                 'Vaccination Status': student.vaccination_status,
                 'Auto Verification': student.auto_verification,
                 'Manual Verification': student.manual_verification,
                 'Certificate Uploaded': pdf,
                 'Consent Uploaded': consent_form,
                 'Accepted All Agreements': agreement,
-                'Latest Dose Date': latest_dose_date,
-                'Arrival Date': new Date(student.arrival_date).toLocaleString(undefined, { timeZone: 'Asia/Kolkata' }),
+                'Last Dose Starting': last_dose_date_start,
+                'Latest Dose Date': humanify_dates(latest_dose_date),
+                'Arrival Date': humanify_dates(
+                    new Date(student.arrival_date).toLocaleDateString(undefined, { timeZone: config.TIMEZONE_CURRENT }),
+                ),
+                'Created At': humanify_dates(
+                    new Date(student.createdAt).toLocaleString(undefined, { timeZone: config.TIMEZONE_CURRENT }),
+                ),
+                'Updated At': humanify_dates(
+                    new Date(student.updatedAt).toLocaleString(undefined, { timeZone: config.TIMEZONE_CURRENT }),
+                ),
             };
             excel_array.push(excel_student);
         });
-
-        // prepare xlsx document
+        // create xlsx document
         const excel_doc: any = await json2xls(excel_array);
         //@ts-ignore  FIXME
-        writeFileSync('ADMIN_ExcelFile.xlsx', excel_doc, 'binary', (err) => {
+        writeFileSync(config.ADMIN_EXCELFILE, excel_doc, 'binary', (err) => {
             if (err) {
                 const excel_error: ERROR.BaseError = new ERROR.BaseError(
-                    'Excel write',
+                    'Excel write error',
                     ERROR.HttpStatusCode.INTERNAL_SERVER_ERROR,
-                    'Could not write ADMIN excel file.',
+                    `Could not write to ${config.ADMIN_EXCELFILE}.`,
                     false,
                     false,
                 );
                 excel_error.stack = err.stack;
                 throw excel_error;
             } else {
-                logger.info({ ADMIN_FILE: filename }, 'ADMIN Excel file has been saved.');
+                logger.info({ ADMIN_FILE: config.ADMIN_EXCELFILE }, `${config.ADMIN_EXCELFILE} has been saved.`);
             }
         });
-        // send for download
-        res.download('ADMIN_ExcelFile.xlsx', function (err) {
+        // serve excel file for download
+        res.download(config.ADMIN_EXCELFILE, function (err) {
             if (err) {
                 const excel_error: ERROR.BaseError = new ERROR.BaseError(
                     'Excel upload',
                     ERROR.HttpStatusCode.INTERNAL_SERVER_ERROR,
-                    'Could not provide as download ADMIN excel file.',
+                    `Could not provide ${config.ADMIN_EXCELFILE} as download.`,
                     false,
                     false,
                 );
                 excel_error.stack = err.stack;
                 throw excel_error;
             } else {
-                logger.info({ ADMIN_FILE: filename }, 'ADMIN Excel file is served < < <');
+                logger.info({ ADMIN_FILE: config.ADMIN_EXCELFILE }, `${config.ADMIN_EXCELFILE} is served < < <`);
             }
         });
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res);
+        forward_errors(err, HttpStatusCode.INTERNAL_SERVER_ERROR, res);
     }
 };
 
-//alt details
+/// alt details
 const post_details = (req, res) => {
     console.log('ALT ADMIN DETAILS CALLED');
     res.status(200).json({ success: 'admin is allowed' });

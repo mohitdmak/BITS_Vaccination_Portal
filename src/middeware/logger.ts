@@ -1,7 +1,7 @@
 import pino, { stdTimeFunctions } from 'pino';
 
 import { join } from 'path';
-const error_log_file = join('/Portal/middeware', 'error_logs');
+const error_log_file = join('/Portal/src/middeware', 'error_logs');
 // const fatal_log_file = join("/Portal/middeware", "fatal_logs");
 
 // create test logger instance

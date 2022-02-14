@@ -1,0 +1,10 @@
+# entire git dir
+.git/
+
+# other git stuff
+.gitignore
+.gitlab-ci-yml
+.gitmodules
+
+# libs
+node_modules

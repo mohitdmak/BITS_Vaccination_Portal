@@ -4,9 +4,11 @@
 import { google } from 'googleapis';
 const ClientId = require('../config/oauth2-api-creds.json').web.client_id;
 const ClientSecret = require('../config/oauth2-api-creds.json').web.client_secret;
-// Req, Res types, logger
+// Req, Res types, logger, config set
 import { RequestType, ResponseType } from '../controllers/student_controllers';
+import { forward_errors } from '../controllers/forward_errors';
 import { logger } from '../middeware/logger';
+import * as config from '../setup_project';
 
 // import error handlers
 import * as ERROR from '../middeware/error_models';
@@ -15,50 +17,31 @@ import { error_handler } from '../middeware/error_handler';
 // Importing Student Model
 import { Student, STUDENT } from '../models/student';
 
-// Setting appropriate callback url
-let RedirectionUrl: string;
-if (process.env.API_ENV === 'development') {
-    RedirectionUrl = 'http://localhost:1370/api/auth/oauthCallback';
-} else if (process.env.API_ENV === 'production') {
-    RedirectionUrl = 'https://vaccination.bits-dvm.org/api/auth/oauthCallback';
-}
 // Oauth2 client raw
 const OAuth2 = google.auth.OAuth2;
 
 // get allowed batches
 const get_allow_access = require('./admin_controllers').default.get_allow_access;
-// admins allowed always
-const ADMINISTRATORS: string[] = [
-    'f20200048@pilani.bits-pilani.ac.in', // MOHIT MAKWANA
-    'f20201229@pilani.bits-pilani.ac.in', // PARTH SHARMA
-    'f20190024@pilani.bits-pilani.ac.in', // NIDHEESH JAIN
-    'f20190663@pilani.bits-pilani.ac.in', // DARSH MISHRA
-    'f20190363@pilani.bits-pilani.ac.in', // ANSHAL SHUKLA
-];
 
-// Oauth2 client with api credentials
+/** Oauth2 client with api credentials */
 function getOAuthClient() {
-    return new OAuth2(ClientId, ClientSecret, RedirectionUrl);
+    return new OAuth2(ClientId, ClientSecret, config.REDIRECTION_URL);
 }
 
-// Obtaining auth url by specifying scopes
+/** Obtaining auth url by specifying scopes */
 function getAuthUrl() {
     const oauth2Client: any = getOAuthClient();
-    // generate a url that asks permissions for email and profile scopes
-    const scopes: string[] = [
-        'https://www.googleapis.com/auth/userinfo.email',
-        'https://www.googleapis.com/auth/userinfo.profile',
-    ];
     const url: string = oauth2Client.generateAuthUrl({
         access_type: 'offline',
-        scope: scopes, // we can pass it as string, if its a single scope
+        // generate a url that asks permissions for email and profile scopes
+        scope: config.OAUTH2_SCOPES, // we can pass it as string, if its a single scope
         // We ensure that only emails of BITS Pilani (Pilani Campus) are validated
-        hd: 'pilani.bits-pilani.ac.in',
+        hd: config.ALLOWED_EMAIL_DOMAIN,
     });
     return url;
 }
 
-// Obtaining token from Oauth2 client and setting it in sessions dict
+/** Obtaining token from Oauth2 client and setting it in sessions dict */
 const set_tokens = async (req: RequestType, res: ResponseType): Promise<void> => {
     // setting new details in oauth2Client
     const oauth2Client: any = getOAuthClient();
@@ -96,16 +79,12 @@ const set_tokens = async (req: RequestType, res: ResponseType): Promise<void> =>
                 error_handler.handleError(err, res);
             }
         } catch (err) {
-            if (!error_handler.isHandleAble(err)) {
-                res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: err.message });
-                throw err;
-            }
-            error_handler.handleError(err, res);
+            forward_errors(err, HttpStatusCode.INTERNAL_SERVER_ERROR, res);
         }
     });
 };
 
-// non admin
+/** Sets logged in user's session data in redis cache */
 const set_session_data = async (user: any, req: RequestType, res: ResponseType): Promise<void> => {
     try {
         // find for user in db
@@ -120,7 +99,7 @@ const set_session_data = async (user: any, req: RequestType, res: ResponseType):
         const allow_access: string[] = get_allow_access();
         const rollNo = String(student.email.substr(0, 5));
         // allow restricted batches and admins
-        if (allow_access.indexOf(rollNo) > -1 || ADMINISTRATORS.indexOf(<string>student.email) > -1) {
+        if (allow_access.indexOf(rollNo) > -1 || config.ADMINISTRATORS.indexOf(<string>student.email) > -1) {
             logger.info({ ALLOWED_BATCHES: allow_access, STUDENT_ROLL: rollNo }, 'Student allowed to login.');
             req.session['student'] = student;
         } else {
@@ -128,12 +107,11 @@ const set_session_data = async (user: any, req: RequestType, res: ResponseType):
         }
         res.redirect('/');
     } catch (err) {
-        error_handler.logError(err);
-        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: err.message });
+        forward_errors(err, HttpStatusCode.INTERNAL_SERVER_ERROR, res);
     }
 };
 
-// The protected page
+/** The protected page - testing user details */
 const get_user_details = async (req: RequestType, res: ResponseType): Promise<void> => {
     // getting oauth2Client
     const oauth2Client = getOAuthClient();
@@ -147,8 +125,7 @@ const get_user_details = async (req: RequestType, res: ResponseType): Promise<vo
             logger.info({ STUDENT_ID: user.data }, 'Student data provided.');
             res.status(HttpStatusCode.OK).json({ user: user.data, session: req.session });
         } catch (err) {
-            error_handler.logError(err);
-            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: err.message });
+            forward_errors(err, HttpStatusCode.INTERNAL_SERVER_ERROR, res);
         }
     } else if (process.env.npm_lifecycle_event === 'dev_local' && req.session['student']) {
         res.status(HttpStatusCode.OK).json(req.session['student']);
@@ -157,17 +134,17 @@ const get_user_details = async (req: RequestType, res: ResponseType): Promise<vo
     }
 };
 
-// landing page
+/** Authentication landing page */
 const get_auth_url = (req: RequestType, res: ResponseType): void => {
     try {
         const url: string = getAuthUrl();
         res.redirect(url);
     } catch (err) {
-        error_handler.logError(err);
-        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: err.message });
+        forward_errors(err, HttpStatusCode.INTERNAL_SERVER_ERROR, res);
     }
 };
 
+/** Logout Handler */
 const get_logout = (req: RequestType, res: ResponseType): void => {
     // removing tokens from session
     req.session.destroy(function (err) {
@@ -180,6 +157,7 @@ const get_logout = (req: RequestType, res: ResponseType): void => {
     });
 };
 
+/** Login Handler */
 const get_login = async (req: RequestType, res: ResponseType): Promise<void> => {
     if (req.query.access_token && process.env.npm_lifecycle_event === 'dev_server') {
         //// getting oauth2Client

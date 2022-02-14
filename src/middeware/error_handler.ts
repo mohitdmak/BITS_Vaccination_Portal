@@ -1,12 +1,16 @@
 /* eslint @typescript-eslint/no-var-requires: "off" */
 
 // NOTE THAT FOLL NEEDS TO BE INSTALLED FOR TS : : : : : : : : : : npm install --save-dev @types/jquery
+// NOTE THAT :::::::::: FOLL TYPE DEFS MUST BE INSTALLED TO USE EXPRESS TYPES :  npm install @types/express
 
 // express server instance (returned by "app.listen()")
 // import server from "../server";
 
 // Pino logging instance
 import { logger } from './logger';
+
+// import project config
+import * as config from '../setup_project';
 
 // Error Models
 import { BaseError } from './error_models';
@@ -23,7 +27,6 @@ const Tracing = require('@sentry/tracing');
 import { mail_handler } from './mail_handler';
 import { Message } from './mail_handler';
 
-// NOTE THAT :::::::::: FOLL TYPE DEFS MUST BE INSTALLED TO USE EXPRESS TYPES :  npm install @types/express
 // express app
 import * as express from 'express';
 import { app } from '../app';
@@ -31,7 +34,7 @@ import pino from 'pino';
 
 // sentry configuration and attaching project to assigned dsn
 Sentry.init({
-    dsn: 'https://82f368f549ed43fbb3db4437ac2b2c79@o562134.ingest.sentry.io/5923095',
+    dsn: config.SENTRY_DSN,
     integrations: [
         // enable HTTP calls tracing
         new Sentry.Integrations.Http({ tracing: true }),
@@ -80,9 +83,11 @@ class ErrorHandler {
                 response.status((error as any).httpCode).json(res_data);
                 break;
             case DBError.name:
+                logger.warn({ 'RESPONSE SENT': res_data }, `Automated response sent for ${error.constructor.name}`);
                 response.status((error as any).httpCode).json(res_data);
                 break;
             case BaseError.name:
+                logger.warn(`Automated response sent for ${error.constructor.name}`);
                 response.status((error as any).httpCode).json(res_data);
                 break;
             default:

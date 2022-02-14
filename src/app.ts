@@ -4,28 +4,23 @@ const app = express();
 
 // import logger
 import { logger } from './middeware/logger';
+import { forward_errors } from './controllers/forward_errors';
 
 // import centralized error handler FIXME: Circular Dependancy!
 // error_handler = require("./middeware/error_handler").error_handler;
+import * as ERROR from './middeware/error_models';
 
 // NOTE: When you have 'type': 'module' in the package.json file, your source code should use import syntax. When you do not have, you should use require syntax.
 // Adding 'type': 'module' to the package.json enables ES 6 modules.
 
 // test endpoint for sentry
 app.get('/api/debug-sentry', async function mainHandler(req, res) {
-    // FIXME: uncomment after fixing circular dep of handler
-    // const { APIError } = require('./middeware/error_models');
-    // const HttpStatusCode = require('./middeware/error_models').HttpStatusCode;
-    // try {
-    //     throw new APIError(HttpStatusCode.UNAUTHORIZED_REQUEST, 'Student needs to login first', false);
-    // } catch (e) {
-    //     // if(error_handler.isHandleAble(e)){
-    //     //     // await error_handler.handleError(e, res);
-    //     // }
-    //     // else{
-    //     console.log('DEBUG SENTRY');
-    //     // }
-    // }
+    // ~FIXME~: uncomment after fixing circular dep of handler
+    try {
+        throw new ERROR.APIError(ERROR.HttpStatusCode.UNAUTHORIZED_REQUEST, 'Test Error handling mech.', false);
+    } catch (e) {
+        forward_errors(e, e.httpCode, res);
+    }
 });
 // ########################### / ########################### / ###########################
 
