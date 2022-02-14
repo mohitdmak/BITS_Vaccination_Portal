@@ -8,9 +8,12 @@ import { logger } from '../middeware/logger';
 import * as ERROR from '../middeware/error_models';
 import { HttpStatusCode } from '../middeware/error_models';
 import { error_handler } from '../middeware/error_handler';
+import { forward_errors } from '../controllers/forward_errors';
 
-// Req and Res types
+// Req and Res types, config
 import { Request, Response } from 'express';
+import * as config from '../setup_project';
+
 export interface RequestType extends Request {
     path: string;
     fileValidationError?: Error;
@@ -26,9 +29,9 @@ import pino from 'pino';
 const storage = multer.diskStorage({
     destination: function (req: RequestType, file: Express.Multer.File, cb) {
         if (req.path == '/post_pdf') {
-            cb(null, './src/media/pdf/');
+            cb(null, config.VACCINATION_PDFS_STORAGE);
         } else if (req.path == '/post_consent') {
-            cb(null, './src/media/consent/');
+            cb(null, config.CONSENT_PDFS_STORAGE);
         }
     },
 
@@ -38,6 +41,7 @@ const storage = multer.diskStorage({
     },
 });
 
+/** Multer Upload middleware */
 const upload = multer({
     storage: storage,
     // limits: {fileSize: 1 * 1000},
@@ -50,13 +54,14 @@ const upload = multer({
     },
 });
 
-// Handler for POST REQs submitting pdfs
+/** Handler for post reqs submitting pdfs */
 const post_pdf = async (req: RequestType, res: Response): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger ? res.locals.child_logger : logger;
     try {
         if (req.session['student']) {
             // allowing only pdfs
             try {
+                // NOTE: child logging removed, metadata used instead in log load
                 // const child_logger: pino.Logger = logger.child({"STUDENT_EMAIL": req.session["student"].email});
                 LOGGER.info('Checking validity of post_pdf file > > >');
                 if (req.fileValidationError || !req.file) {
@@ -76,20 +81,16 @@ const post_pdf = async (req: RequestType, res: Response): Promise<void> => {
         } else {
             throw new ERROR.ClientError(
                 ERROR.HttpStatusCode.UNAUTHORIZED_REQUEST,
-                'Post_PDF path accessed without logging in.',
+                'Post_PDF path accessed without logging in',
                 false,
             );
         }
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res, LOGGER);
+        forward_errors(err, HttpStatusCode.INTERNAL_SERVER_ERROR, res, LOGGER);
     }
 };
 
-//POST CONSENT FORM
+/** Handler for post requests of consent form by student */
 const post_consent = async (req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger ? res.locals.child_logger : logger;
     try {
@@ -122,23 +123,20 @@ const post_consent = async (req: RequestType, res: ResponseType): Promise<void> 
             );
         }
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res, LOGGER);
+        forward_errors(err, HttpStatusCode.INTERNAL_SERVER_ERROR, res, LOGGER);
     }
 };
 
-// get consent form
+/** Handler for get requests for consent form by student */
 const get_consent = async (req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger ? res.locals.child_logger : logger;
     try {
         // get downloaded file path
-        var serve_file: string = req.session['student'].consent_form;
-	if(serve_file.startsWith("src/") != true){
-	    serve_file = "src/" + serve_file;
-	}
+        let serve_file: string = req.session['student'].consent_form;
+        // preserve consistency between old and new batch uploads
+        if (serve_file.startsWith('src/') != true) {
+            serve_file = 'src/' + serve_file;
+        }
         LOGGER.info('Request to serve Consent form > > >');
         // serve file as a download
         res.download(String(serve_file), function (err) {
@@ -166,14 +164,11 @@ const get_consent = async (req: RequestType, res: ResponseType): Promise<void> =
             }
         });
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res, LOGGER);
+        forward_errors(err, HttpStatusCode.INTERNAL_SERVER_ERROR, res, LOGGER);
     }
 };
 
+/** Handler for updating student details by student */
 const update = async (req: RequestType, res: ResponseType): Promise<void> => {
     try {
         await Student.findOneAndUpdate(
@@ -182,15 +177,11 @@ const update = async (req: RequestType, res: ResponseType): Promise<void> => {
         );
         res.status(HttpStatusCode.CREATED_RESOURCE).json({ message: 'Successfully updated details' });
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res);
+        forward_errors(err, HttpStatusCode.INTERNAL_SERVER_ERROR, res);
     }
 };
 
-// post extra data
+/** Handler for storing extra data into student model */
 const post_extra_data = async (req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger ? res.locals.child_logger : logger;
     try {
@@ -217,15 +208,11 @@ const post_extra_data = async (req: RequestType, res: ResponseType): Promise<voi
             );
         }
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.DB_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res, LOGGER);
+        forward_errors(err, HttpStatusCode.DB_ERROR, res, LOGGER);
     }
 };
 
-// The protected page
+/** The protected page */
 const get_student_details = async (req: RequestType, res: ResponseType): Promise<void> => {
     if (req.session['student']) {
         res.status(HttpStatusCode.OK).json(req.session['student']);
@@ -234,7 +221,7 @@ const get_student_details = async (req: RequestType, res: ResponseType): Promise
     }
 };
 
-// The protected page
+/** Save uploaded vaccination pdf data post parsing */
 const save_data = async (req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger ? res.locals.child_logger : logger;
     try {
@@ -310,15 +297,11 @@ const save_data = async (req: RequestType, res: ResponseType): Promise<void> => 
             if (!pdf_error) await verify_authenticity(req, res);
         });
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.DB_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res, LOGGER);
+        forward_errors(err, HttpStatusCode.DB_ERROR, res, LOGGER);
     }
 };
 
-// VERIFY AUTHENTICITY
+/** Verify authenticity of stored vaccination data from pdf file */
 const verify_authenticity = async (req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger ? res.locals.child_logger : logger;
     LOGGER.info('Verifying authenticity of uploaded qr > > >');
@@ -344,16 +327,12 @@ const verify_authenticity = async (req: RequestType, res: ResponseType): Promise
             'Extracted student details from PDF/BITS data.',
         );
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.DB_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res, LOGGER);
+        forward_errors(err, HttpStatusCode.DB_ERROR, res, LOGGER);
     }
 
     // update/reject appropriately
     try {
-        if (MATCH_COUNT >= 2) {
+        if (MATCH_COUNT >= config.MIN_MATCH_REQUIRED) {
             const current_doses = Number(student.vaccine.QR.evidence[0].dose);
             const total_doses: number = student.vaccine.QR.evidence[0].totaldoses;
             let updated_student: STUDENT | null;
@@ -406,11 +385,7 @@ const verify_authenticity = async (req: RequestType, res: ResponseType): Promise
             update_overall_status(updated_student!, req, res);
         }
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.DB_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res, LOGGER);
+        forward_errors(err, HttpStatusCode.DB_ERROR, res, LOGGER);
     }
 };
 
@@ -454,7 +429,7 @@ const verify_authenticity = async (req: RequestType, res: ResponseType): Promise
 //    }
 //}
 
-// // Provide Overall Status
+/** Compulsory checker post request processing to update overall_status of student */
 const update_overall_status = async (student: STUDENT, req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger ? res.locals.child_logger : logger;
     LOGGER.info('Checking for update in Overall Access > > >');
@@ -475,23 +450,20 @@ const update_overall_status = async (student: STUDENT, req: RequestType, res: Re
         }
         LOGGER.info({ OVERALL_STATUS: req.session['student'].overall_status }, 'Updated overall status < < <');
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.DB_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res, LOGGER);
+        forward_errors(err, HttpStatusCode.DB_ERROR, res, LOGGER);
     }
 };
 
-// serving stored pdf file
+/** Handler for serving vaccination certificates, req by student */
 const get_pdf = async (req: RequestType, res: ResponseType): Promise<void> => {
     const LOGGER: pino.Logger = res.locals.child_logger ? res.locals.child_logger : logger;
     try {
         // get downloaded file path
-        var serve_file: string = req.session['student'].pdf;
-	if(serve_file.startsWith("src/") != true){
-	    serve_file = "src/" + serve_file;
-	}
+        let serve_file: string = req.session['student'].pdf;
+        // preserve consistency between old and new batch uploads
+        if (serve_file.startsWith('src/') != true) {
+            serve_file = 'src/' + serve_file;
+        }
         LOGGER.info('Request to serve Vaccine certificate > > >');
         res.download(String(serve_file), function (err) {
             let file_error: ERROR.BaseError;
@@ -518,29 +490,21 @@ const get_pdf = async (req: RequestType, res: ResponseType): Promise<void> => {
             }
         });
     } catch (err) {
-        // forward login errors
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.DB_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res, LOGGER);
+        forward_errors(err, HttpStatusCode.DB_ERROR, res, LOGGER);
     }
 };
 
-// landing page
+/** Dashboard landing page */
 const get_all = async (req: RequestType, res: ResponseType): Promise<void> => {
     try {
         const students: STUDENT[] | null = await Student.find();
         res.status(HttpStatusCode.OK).json(students);
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.DB_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res);
+        forward_errors(err, HttpStatusCode.DB_ERROR, res);
     }
 };
 
+/** Logout Handler */
 const get_logout = (req: RequestType, res: ResponseType) => {
     // removing tokens from session
     req.session.destroy(function (err) {
@@ -553,23 +517,19 @@ const get_logout = (req: RequestType, res: ResponseType) => {
     });
 };
 
-//alt details
+// alt details
 const post_details = (req: RequestType, res: ResponseType) => {
     console.log('ALT ADMIN DETAILS CALLED');
     res.status(200).json({ success: 'admin is allowed' });
 };
 
-// endpoint for hostel portal verification
+/** Handler for status endpoint for hostel portal verification */
 const get_staying_on_campus_status = async (req: RequestType, res: ResponseType): Promise<void> => {
     try {
         const student: STUDENT | null = await Student.findOne({ email: req.body.email });
         res.status(HttpStatusCode.OK).json({ staying_on_campus: student!.staying_on_campus });
     } catch (err) {
-        if (!error_handler.isHandleAble(err)) {
-            res.status(HttpStatusCode.DB_ERROR).json({ error: err.message });
-            throw err;
-        }
-        error_handler.handleError(err, res);
+        forward_errors(err, HttpStatusCode.DB_ERROR, res);
     }
 };
 

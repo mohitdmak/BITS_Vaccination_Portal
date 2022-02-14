@@ -7,7 +7,7 @@
     "test": "npm run test",
     "dev_local": "nodemon src/server.ts",
     "dev_server": "nodemon src/server.ts",
-    "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet",
+    "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "production": "node src/server.ts"
   },
   "husky": {
@@ -56,6 +56,7 @@
     "multer": "^1.4.3",
     "path": "^0.12.7",
     "pino": "^7.6.2",
+    "pino-multi-stream": "^6.0.0",
     "pino-pretty": "^7.3.0",
     "prettier": "^2.5.1",
     "redis": "^3.1.2",

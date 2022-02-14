@@ -2,6 +2,8 @@
 
 // Pino logging instance
 import { logger } from './logger';
+// import project config
+import * as config from '../setup_project';
 // Message type for sending mail
 export type Message = {
     subject: string;
@@ -12,13 +14,15 @@ export type Message = {
 // error handler for mailgun
 const { MailError } = require('./error_models');
 const { HttpStatusCode } = require('./error_models');
+// import api secret
+import { MAILGUN_API_KEY } from '../config/session-secret';
 
 // mail handling class
 class MailHandler {
     // configs
-    private DOMAIN = 'sandbox03e7b28e47f7491980efea3fafbb21f5.mailgun.org';
+    private DOMAIN = config.MAILGUN_DOMAIN;
     private mg = require('mailgun-js')({
-        apiKey: '7056832ed208911f6465435b73e71895-8ed21946-ce4e317a',
+        apiKey: MAILGUN_API_KEY,
         domain: this.DOMAIN,
     });
 
@@ -28,7 +32,7 @@ class MailHandler {
         new Promise((resolve, reject) => {
             // load data body
             const data = {
-                from: 'BITS Vaccination Portal Admin <mohitdmak@sandbox03e7b28e47f7491980efea3fafbb21f5.mailgun.org>',
+                from: `BITS Vaccination Portal Admin <mohitdmak@${config.MAILGUN_DOMAIN}>`,
                 to: recipient,
                 subject: message.subject,
                 text: message.body,

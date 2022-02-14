@@ -4,6 +4,7 @@ src/config/admin.ts
 
 # ADMIN Excel files
 ADMIN_ExcelFile.xlsx
+STUDENT_DATA.xlsx
 
 # Running app env
 src/config/APP.env

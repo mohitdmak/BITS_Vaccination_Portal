@@ -51,6 +51,8 @@ interface STUDENT extends Document {
     pdf: string;
     consent_form: string;
     vaccine: any;
+    createdAt: string;
+    updatedAt: string;
 }
 
 const Studentschema = new Schema(
