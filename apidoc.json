@@ -1,6 +1,6 @@
 {
   "name": "BITS Vaccination Portal",
-  "version": "0.3.0",
+  "version": "0.0.0",
   "description": "REST Api Documentation for BITS Vaccination Portal, scans and verifies validity of uploaded Cowin certificates, stores other relevant student data for campus reopening.",
   "title": "API Documentation",
   "url": "https://vaccination.bits-dvm.org",
@@ -8,14 +8,6 @@
     "title": "Setup Instructions Info",
     "filename": "README.md"
   },
-  "footer": {
-    "title": "Project Contributions",
-    "filename": "README.md"
-  },
-  "order": [
-    "GetUser",
-    "PostUser"
-  ],
   "template": {
     "withCompare": true,
     "withGenerator": true
