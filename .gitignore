@@ -45,10 +45,10 @@ src/config/session-secret.ts
 github_access_token.txt
 
 # Redis DB local persistance
-src/redis/redis_db.rdb
+redis/redis_db.rdb
 
 # Local mongo data backup
-src/db/data
+db/data
 
 # Logs
 logs
