@@ -11,16 +11,16 @@
   * Download credentials to `src/config/oauth2-api-creds.json`
 2. Setup Mongo Database:
   * Prepare .env file in `src/config/mongo.env` with following properties:
-    - *MONGO_INITDB_ROOT_USERNAME*
-    - *MONGO_INITDB_ROOT_PASSWORD*
-    - *MONGO_INITDB_DATABASE*
+    - *mongo_initdb_root_username*
+    - *mongo_initdb_root_password*
+    - *mongo_initdb_database*
   * Also create `src/config/mongo.ts` to export above creds to controllers.
   * Prepare credentials at `src/config/DB_ADMIN_CONFIG.env` for SuperAdmin (MongoExpress) Container:
-    - ME_CONFIG_BASICAUTH_USERNAME
-    - ME_CONFIG_BASICAUTH_PASSWORD
-    - ME_CONFIG_MONGODB_PORT
-    - ME_CONFIG_MONGODB_ENABLE_ADMIN
-    - ME_CONFIG_MONGODB_SERVER
+    - *me_config_basicauth_username*
+    - *me_config_basicauth_password*
+    - *me_config_mongodb_port*
+    - *me_config_mongodb_enable_admin*
+    - *me_config_mongodb_server*
   * Also edit container settings for mongo at `src/db/db.conf`
 3. Session, Admin Portal config:
   * Export a **SESSION_SECRET** from `src/config/session-secret.ts`
@@ -28,9 +28,9 @@
   * Export a *username*, *password*, *hashed* from  `src/config/admin.ts` for ADMIN Portal
 4. Development, Project config:
   * Create `src/config/APP.env` with values of *development*/*production* for:
-    - REACT_APP_CLIENT_ENV
-    - REACT_APP_ADMIN_CLIENT_ENV
-    - API_ENV
+    - *react_app_client_env*
+    - *react_app_admin_client_env*
+    - *api_env*
   * Create dev/prod web server config at `src/nginx/nginx.conf`
   * The respective docker containers will use Hosts and Build settings as specified in this file.
   * Edit current project constants/settings at `src/setup_project.ts`
