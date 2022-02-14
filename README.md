@@ -2,7 +2,7 @@
 [![Deploy to Lightsail](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/deploy.yml/badge.svg)](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/deploy.yml)
 [![Publish Docker image to Dockerhub](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/docker-image.yml/badge.svg)](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/docker-image.yml)
 [![Linting](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/lint.yml/badge.svg)](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/lint.yml)
-[![Docker](https://badgen.net/badge/icon/docker?icon=docker&label=ContainerRegistry)](https://hub.docker.com/r/mohitdmak/bits_vaccination_portal)
+[![Docker](https://badgen.net/badge/icon/docker?icon=dockerhub&label=ContainerRegistry)](https://hub.docker.com/r/mohitdmak/bits_vaccination_portal)
 
 
 ## Getting started
