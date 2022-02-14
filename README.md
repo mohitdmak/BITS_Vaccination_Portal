@@ -1,5 +1,7 @@
 # Vaccination_Portal
-
+[![Deploy to Lightsail](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/deploy.yml/badge.svg)](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/deploy.yml)
+[![Publish Docker image to Dockerhub](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/docker-image.yml/badge.svg)](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/docker-image.yml)
+[![Linting](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/lint.yml/badge.svg)](https://github.com/mohitdmak/BITS_Vaccination_Portal/actions/workflows/lint.yml)
 
 
 ## Getting started
