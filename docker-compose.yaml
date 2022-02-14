@@ -217,7 +217,7 @@ services:
 
     # Using nginx config defined in folder
     volumes:
-      - ./src/nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
 
     # Wait for web_api container to start first
     depends_on:
@@ -247,7 +247,7 @@ services:
 
     # Using nginx config defined in folder
     volumes:
-      - ./src/redis:/data      
+      - ./redis:/data      
 
     # Ensuring Dev Container has been started before redis sessions are ready
     # depends_on:

@@ -5,7 +5,7 @@ FROM mongo:3.4
 WORKDIR /data
 
 # Using custom configs for mongo
-COPY ./src/db/mongod.conf /etc/mongod.conf
+COPY ./db/mongod.conf /etc/mongod.conf
 
 # expose MongoDB's default port of 27017
 EXPOSE 27017

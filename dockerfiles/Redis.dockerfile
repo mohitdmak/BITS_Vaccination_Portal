@@ -2,7 +2,7 @@
 FROM redis:latest
 
 # Overriding defaults custom conf
-COPY src/redis/redis.conf /usr/local/etc/redis/redis.conf
+COPY redis/redis.conf /usr/local/etc/redis/redis.conf
 
 # Exposing working port for other containers to access
 EXPOSE 7000

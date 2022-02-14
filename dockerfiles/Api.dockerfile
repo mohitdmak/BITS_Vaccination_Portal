@@ -1,5 +1,4 @@
-# Node alpine image
-FROM node:latest
+FROM node:14.19.0
 
 # ########################### Python and libs support for PyDIVOC Qr scanner ###########################
 # install python support tools and pip
@@ -44,6 +43,9 @@ RUN npm install
 # Copy source code
 ADD src /Portal/src
 # PyDIVOC dependencies
+RUN apt update
+RUN apt install python3-pip
+RUN apt-get update && apt-get upgrade python-pip -y
 RUN cd src/PyDIVOC && pip3 install -r requirements.txt && python3 setup.py build 
 
 # ########################### / ########################### / ###########################
