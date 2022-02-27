@@ -1,6 +1,9 @@
 #!/bin/sh
 
 # This updates the mirror repo present @ gitlab.com/dvm-bitspilani for new commits on original repo @ github.com/mohitdmak/BITS_Vaccination_Portal
+# For Reference: https://www.opentechguides.com/how-to/article/git/177/git-sync-repos.html
+
+# Create a bare clone : git clone --mirror <repo> on the same parent dir as this repo for the script to work
 
 # Where scripts go to fail
 die() {
