@@ -1,5 +1,5 @@
 # Gathering alpine for building
-FROM node:10-alpine as build-step
+FROM node:latest as build-step
 
 # create home app
 RUN mkdir /app
@@ -11,6 +11,8 @@ WORKDIR /app
 COPY package.json /app
 
 RUN npm install
+
+RUN mkdir -p node_modules/.cache && chmod -R 777 node_modules/.cache
 
 # Copy source code
 COPY . /app

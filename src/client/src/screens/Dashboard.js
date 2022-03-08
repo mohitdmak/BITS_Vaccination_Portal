@@ -35,7 +35,8 @@ let host;
 if (process.env.REACT_APP_CLIENT_ENV === 'development') {
     host = 'http://localhost:1370';
 } else if (process.env.REACT_APP_CLIENT_ENV === 'production') {
-    host = 'https://vaccination.bits-dvm.org';
+    //host = 'https://vaccination.bits-dvm.org';
+    host = 'http://40.88.13.106';
 }
 
 const Dashboard = (props) => {

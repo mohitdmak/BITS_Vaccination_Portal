@@ -55,7 +55,8 @@ export let HOST: string;
 if (process.env.API_ENV === 'development') {
     HOST = 'http://localhost:1370';
 } else if (process.env.API_ENV === 'production') {
-    HOST = 'https://vaccination.bits-dvm.org';
+    //HOST = 'https://vaccination.bits-dvm.org';
+    HOST = 'http://40.88.13.106';
 } else {
     HOST = 'DevContainer:3000';
 }
