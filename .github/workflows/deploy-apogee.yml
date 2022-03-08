@@ -52,4 +52,4 @@ jobs:
           connect_timeout: 60s
 
           # execute commands on to pull changes
-          script: cd /home/server_admin/BITS_Vaccination_Portal && git status && sudo git pull https://mohitdmak:${{ secrets.REP_ACCESS_TOKEN_AWS }}@github.com/mohitdmak/BITS_Vaccination_Portal apogeee -s recursive -X theirs
+          script: cd /home/server_admin/BITS_Vaccination_Portal && git status && sudo git pull https://mohitdmak:${{ secrets.REP_ACCESS_TOKEN_AWS }}@github.com/mohitdmak/BITS_Vaccination_Portal apogee -s recursive -X theirs

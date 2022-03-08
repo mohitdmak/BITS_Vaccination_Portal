@@ -54,7 +54,7 @@ const Login = (props) => {
         <>
             <Flex alignItems="center" flexDir="column" m="50px" >
                 <Flex width="80vw" alignItems="center" flexDir="column" justifyContent="center">
-                    <Heading fontSize="24px" textAlign="center" fontWeight="bold" mt="70px" mb="5px">BITS Vaccination Status Portal</Heading>
+                    <Heading fontSize="24px" textAlign="center" fontWeight="bold" mt="70px" mb="5px">BITS Apogee Vaccination Status Portal</Heading>
                     <Text mt="0px" fontWeight="bold" mb="20px" fontSize="20px" color="gray.600">An initiative by SWD</Text>
 
                     <Text mt="30px" width={["300px", "300px", "400px", "400px", "400px"]} textAlign="center" color="grey">Please note, only students from the following batches will be currently allowed access:</Text>
