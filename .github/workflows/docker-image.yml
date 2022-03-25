@@ -4,6 +4,7 @@ name: Publish Docker image to Dockerhub
 # On pushing code (change later to only releases)
 on:
   push:
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
