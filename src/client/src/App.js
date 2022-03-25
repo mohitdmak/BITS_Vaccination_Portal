@@ -55,7 +55,7 @@ const apiRequest = () => {
 }
 
   return (
-    <Router>
+    <Router basename="/rejoining">
       <>
       <Switch>
         <Route path="/login">
