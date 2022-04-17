@@ -68,20 +68,20 @@ function App() {
       <>
         <Switch>
 
-          <Route path="/student/:id">
+          <Route path="/rejoining/admin/student/:id">
             <Student />
           </Route>
 
-          <Route path="/dashboard">
-            {localStorage.getItem('jwt') ? <Landing /> : <Redirect to="/" />}
+          <Route path="/rejoining/admin/dashboard">
+            {localStorage.getItem('jwt') ? <Landing /> : <Redirect to="/rejoining/admin" />}
           </Route>
 
-          <Route path="/">
+          <Route path="/rejoining/admin">
             {localStorage.getItem('jwt') ? <Landing /> : <Login />}
           </Route>
 
           <Route path="*">
-            <Redirect to="/" />
+            <Redirect to="/rejoining/admin" />
           </Route>
 
         </Switch>

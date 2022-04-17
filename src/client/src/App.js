@@ -58,20 +58,20 @@ const apiRequest = () => {
     <Router>
       <>
       <Switch>
-        <Route path="/login">
+        <Route path="/rejoining/login">
           <Login />
         </Route>
-        <Route path="/dashboard">
-          {isLoggedIn ? <Dashboard /> :  <Redirect to="/login" />}
+        <Route path="/rejoining/dashboard">
+          {isLoggedIn ? <Dashboard /> :  <Redirect to="/rejoining/login" />}
         </Route>
-        <Route exact path="/">
+        <Route exact path="/rejoining">
           {isLoggedIn ? <Dashboard /> : <Login />}
         </Route>
-        <Route path="/devs">
+        <Route path="/rejoining/devs">
           <Devs />
         </Route>
         <Route path="*">
-          <Redirect to="/" />
+          <Redirect to="/rejoining" />
         </Route>
        
       </Switch>
