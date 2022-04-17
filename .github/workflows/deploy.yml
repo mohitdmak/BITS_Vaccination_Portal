@@ -39,7 +39,7 @@ jobs:
           port: 22
 
           # ssh remote user (not giving root perms currently)
-          user: ubuntu
+          user: bits_vaccination_portal
 
           # Using github secret for ssh key
           key: ${{ secrets.AWS_SSH_KEY }}
@@ -51,4 +51,4 @@ jobs:
           connect_timeout: 60s
 
           # execute commands on to pull changes
-          script: cd /home/bits_vaccination_portal/BITS_Vaccination_Portal && git status && sudo git pull https://mohitdmak:${{ secrets.REP_ACCESS_TOKEN_AWS }}@github.com/mohitdmak/BITS_Vaccination_Portal main -s recursive -X theirs
+          script: cd /home/bits_vaccination_portal/BITS_Vaccination_Portal && git status && git config --global --add safe.directory /home/bits_vaccination_portal/BITS_Vaccination_Portal && echo ${{ secrets.AWS_SUDO_PASS }} | sudo -S git pull https://mohitdmak:${{ secrets.REP_ACCESS_TOKEN_AWS }}@github.com/mohitdmak/BITS_Vaccination_Portal main -s recursive -X theirs
