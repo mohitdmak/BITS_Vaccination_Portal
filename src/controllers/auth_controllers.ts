@@ -110,7 +110,7 @@ const set_session_data = async (user: any, req: RequestType, res: ResponseType):
         } else {
             logger.info({ ALLOWED_BATCHES: allow_access, STUDENT_ROLL: rollNo }, 'Student NOT allowed to login.');
         }
-        res.redirect('/');
+        res.redirect(config.PROJECT_ROOT_URL);
     } catch (err) {
         forward_errors(err, HttpStatusCode.INTERNAL_SERVER_ERROR, res);
     }
@@ -167,7 +167,7 @@ const get_logout = (req: RequestType, res: ResponseType): void => {
             if (!error_handler.isHandleAble(err)) throw err;
             error_handler.handleError(err, res);
         } else {
-            res.status(HttpStatusCode.OK).redirect('/');
+            res.status(HttpStatusCode.OK).redirect(config.PROJECT_ROOT_URL);
         }
     });
 };

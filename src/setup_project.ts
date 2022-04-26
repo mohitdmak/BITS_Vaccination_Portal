@@ -9,6 +9,7 @@
 /** 
     Settings for Auth controllers 
     @redirection_url - Path to redirect user to after successful oauth2 login
+    @project_root_url - Path to redirect user to after logout or upon auth
     @administrators - Portal admins will always be allowed to login 
     @allowed_email_domain - Only email addresses with this domain shall be allowed to login
     @oauth2_scopes - The only information accessed by the portal from student's oauth2 token
@@ -60,6 +61,7 @@ if (process.env.API_ENV === 'development') {
     HOST = 'DevContainer:3000';
 }
 export const REDIRECTION_URL: string = HOST + '/api/auth/oauthCallback';
+export const PROJECT_ROOT_URL = '/rejoining';
 
 export const VACCINATION_PDFS_STORAGE = './src/media/pdf/';
 export const CONSENT_PDFS_STORAGE = './src/media/consent/';
