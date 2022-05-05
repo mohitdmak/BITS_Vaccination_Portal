@@ -57,6 +57,8 @@ if (process.env.API_ENV === 'development') {
     HOST = 'http://localhost:1370';
 } else if (process.env.API_ENV === 'production') {
     HOST = 'https://vaccination.bits-dvm.org';
+} else if (process.env.API_ENV === 'swd_production') {
+    HOST = 'https://swdservices.bits-pilani.ac.in';
 } else {
     HOST = 'DevContainer:3000';
 }

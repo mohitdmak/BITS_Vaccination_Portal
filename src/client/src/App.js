@@ -22,6 +22,8 @@ if (process.env.REACT_APP_CLIENT_ENV === 'development') {
     host = 'http://localhost:1370';
 } else if (process.env.REACT_APP_CLIENT_ENV === 'production') {
     host = 'https://vaccination.bits-dvm.org';
+} else if (process.env.REACT_APP_CLIENT_ENV === 'swd_production') {
+    host = 'https://swdservices.bits-pilani.ac.in';
 }
 
 // /api/student/details
