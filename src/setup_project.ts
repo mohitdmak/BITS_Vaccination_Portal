@@ -8,24 +8,25 @@
 */
 /** 
     Settings for Auth controllers 
-    @redirection_url - Path to redirect user to after successful oauth2 login
-    @project_root_url - Path to redirect user to after logout or upon auth
-    @administrators - Portal admins will always be allowed to login 
-    @allowed_email_domain - Only email addresses with this domain shall be allowed to login
-    @oauth2_scopes - The only information accessed by the portal from student's oauth2 token
+    @redirection_url         - Path to redirect user to after successful oauth2 login
+    @project_root_url        - Path to redirect user to after logout or upon auth
+    @administrators          - Portal admins will always be allowed to login
+    @constrain_email_domains - Boolean to determine whether to allow only certain mail domains to login
+    @allowed_email_domain    - Only email addresses with this domain shall be allowed to login
+    @oauth2_scopes           - The only information accessed by the portal from student's oauth2 token
 */
 /** 
     Settings for Student controllers 
     @vaccination_pdfs_storage - Path on server to store posted certificate pdfs
-    @consent_pdfs_storage - Path on server to store posted consent form pdfs
-    @min_match_required - Minimum extent of matching required of name between BITS email and cert info
+    @consent_pdfs_storage     - Path on server to store posted consent form pdfs
+    @min_match_required       - Minimum extent of matching required of name between BITS email and cert info
 */
 /**
     General Settings
     @timezone_current - To be used for all date parsing and setting
-    @timezone_diff - Difference from standard timezone
-    @mailgun_domain - Email domain from which Critical Logs will be mailed to admin
-    @sentry_dsn - DSN at which statistics and traces will be captured
+    @timezone_diff    - Difference from standard timezone
+    @mailgun_domain   - Email domain from which Critical Logs will be mailed to admin
+    @sentry_dsn       - DSN at which statistics and traces will be captured
 */
 
 export const ADMIN_EXCELFILE = 'STUDENT_DATA.xlsx';
@@ -40,6 +41,7 @@ export const DOSE_COOLDOWN_COVISHIELD = 84;
 export const DOSE_COOLDOWN_COVAXIN = 28;
 export const DOSE_COOLDOWN_SPUTNIK_V = 21;
 
+export const CONSTRAIN_EMAIL_DOMAINS = true;
 export const ALLOWED_EMAIL_DOMAIN = 'pilani.bits-pilani.ac.in';
 export const OAUTH2_SCOPES: string[] = [
     'https://www.googleapis.com/auth/userinfo.email',

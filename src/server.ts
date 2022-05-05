@@ -3,8 +3,9 @@
 import { app } from './app';
 import { redisClient } from './app';
 
-// import logger
+// import logger and configs
 import { logger } from './middeware/logger';
+import * as config from './setup_project';
 
 // import ERROR models and error handler
 import * as ERROR from './middeware/error_models';
@@ -39,7 +40,15 @@ redisClient.on('connect', async function () {
 
         //* Opening port for express app.
         app.listen(port, () => {
-            logger.info(`Server started on port: ${port} with mode: ${process.env.npm_lifecycle_event}`);
+            logger.info(
+                {
+                    SERVER_HOST: config.HOST,
+                    PROJECT_ROOT_URL: config.PROJECT_ROOT_URL,
+                    SENTRY_ERRORS_DSN: config.SENTRY_DSN,
+                    CURRENT_TIMEZONE: config.TIMEZONE_CURRENT,
+                },
+                `Server started on port: ${port} with mode: ${process.env.npm_lifecycle_event}`,
+            );
         });
 
         // Stop for any redis errors
