@@ -1,5 +1,5 @@
 # Getting non alpine latest
-FROM redis:latest
+FROM redis:7-bullseye
 
 # Overriding defaults custom conf
 COPY redis/redis.conf /usr/local/etc/redis/redis.conf
