@@ -41,13 +41,14 @@ export const DOSE_COOLDOWN_COVISHIELD = 84;
 export const DOSE_COOLDOWN_COVAXIN = 28;
 export const DOSE_COOLDOWN_SPUTNIK_V = 21;
 
-export const CONSTRAIN_EMAIL_DOMAINS = true;
+export const CONSTRAIN_EMAIL_DOMAINS = false;
 export const ALLOWED_EMAIL_DOMAIN = 'pilani.bits-pilani.ac.in';
 export const OAUTH2_SCOPES: string[] = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
 ];
 export const ADMINISTRATORS: string[] = [
+    'mdmohitrc@gmail.com', // MOHIT MAKWANA (Personal test email)
     'f20200048@pilani.bits-pilani.ac.in', // MOHIT MAKWANA
     'f20201229@pilani.bits-pilani.ac.in', // PARTH SHARMA
     'f20190024@pilani.bits-pilani.ac.in', // NIDHEESH JAIN

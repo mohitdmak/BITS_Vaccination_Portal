@@ -46,6 +46,8 @@ redisClient.on('connect', async function () {
                     PROJECT_ROOT_URL: config.PROJECT_ROOT_URL,
                     SENTRY_ERRORS_DSN: config.SENTRY_DSN,
                     CURRENT_TIMEZONE: config.TIMEZONE_CURRENT,
+                    CONSTRAIN_EMAIL_DOMAINS: config.CONSTRAIN_EMAIL_DOMAINS,
+                    ALLOWED_EMAIL_DOMAINS: config.ALLOWED_EMAIL_DOMAIN,
                 },
                 `Server started on port: ${port} with mode: ${process.env.npm_lifecycle_event}`,
             );

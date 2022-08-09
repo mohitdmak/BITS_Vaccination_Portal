@@ -45,13 +45,7 @@ function getAuthUrl() {
         // We ensure that only emails of BITS Pilani (Pilani Campus) are validated
         oauth2Configs['hd'] = config.ALLOWED_EMAIL_DOMAIN;
     }
-    const url: string = oauth2Client.generateAuthUrl({
-        access_type: 'offline',
-        // generate a url that asks permissions for email and profile scopes
-        scope: config.OAUTH2_SCOPES, // we can pass it as string, if its a single scope
-        // We ensure that only emails of BITS Pilani (Pilani Campus) are validated
-        hd: config.ALLOWED_EMAIL_DOMAIN,
-    });
+    const url: string = oauth2Client.generateAuthUrl(oauth2Configs);
     return url;
 }
 
