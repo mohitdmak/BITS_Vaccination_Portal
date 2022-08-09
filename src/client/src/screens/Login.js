@@ -59,7 +59,10 @@ const Login = (props) => {
                     <Text mt="0px" fontWeight="bold" mb="20px" fontSize="20px" color="gray.600">An initiative by SWD</Text>
 
                     <Text mt="30px" width={["300px", "300px", "400px", "400px", "400px"]} textAlign="center" color="grey">Please note, only students from the following batches will be currently allowed access:</Text>
-                    <Text mt="10px" width={["300px", "300px", "400px", "400px", "400px"]} textAlign="center" fontWeight="bold" color="green">{batches.toString()}</Text>
+                    <Text mt="10px" width={["300px", "300px", "400px", "400px", "400px"]} textAlign="center" fontWeight="bold" color="green">
+//                         {batches.toString()?batches.toString():"No batches are allowed to login"}
+                            No batches are allowed to login
+                            </Text>
                     {/* <Text mt="10px" width={["300px", "300px", "400px", "400px", "400px"]} textAlign="center" color="red.400">PS2/off-campus thesis students are not allowed.</Text> */}
 
                     <Button
