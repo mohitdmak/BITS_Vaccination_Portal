@@ -41,7 +41,7 @@ export const DOSE_COOLDOWN_COVISHIELD = 84;
 export const DOSE_COOLDOWN_COVAXIN = 28;
 export const DOSE_COOLDOWN_SPUTNIK_V = 21;
 
-export const CONSTRAIN_EMAIL_DOMAINS = false;
+export const CONSTRAIN_EMAIL_DOMAINS = true;
 export const ALLOWED_EMAIL_DOMAIN = 'pilani.bits-pilani.ac.in';
 export const OAUTH2_SCOPES: string[] = [
     'https://www.googleapis.com/auth/userinfo.email',

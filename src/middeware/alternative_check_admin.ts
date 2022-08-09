@@ -1,6 +1,7 @@
 // import logger
 import { logger } from './logger';
 import { RequestType, ResponseType } from '../controllers/student_controllers';
+import { HOST } from '../setup_project';
 // import error handlers
 import * as ERROR from '../middeware/error_models';
 import { error_handler } from '../middeware/error_handler';
@@ -15,7 +16,7 @@ const alternative_check_admin = async (req: RequestType, res: ResponseType, next
                 false,
             );
         } else {
-            if (domain == 'https://vaccination-admin.bits-dvm.org/') {
+            if (domain.startsWith(HOST)) {
                 logger.info('ADMIN allowed access.');
                 next();
             } else {

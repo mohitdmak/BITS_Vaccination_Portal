@@ -78,7 +78,7 @@ const Login = (props) => {
 
 
 
-                    <Link to="/devs">
+                    <Link to="/rejoining/devs">
                         <Text color="grey" mt="45px">Meet the Developers | Powered by <span style={{"font-weight": "600"}}>DVM</span></Text>
                     </Link>
                 </Flex>

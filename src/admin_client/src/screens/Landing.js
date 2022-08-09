@@ -492,7 +492,7 @@ const Landing = () => {
                         </Td>}
                         
 
-                        <Link to={"/student/"+student._id}>
+                        <Link to={"/rejoining/admin/student/"+student._id}>
                             <Button size="sm" mt="10px">View More</Button>
                         </Link>
                     </Tr>
