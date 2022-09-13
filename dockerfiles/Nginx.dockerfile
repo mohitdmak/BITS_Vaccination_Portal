@@ -1,5 +1,5 @@
 # Avoiding alpine here
-FROM nginx:latest
+FROM nginx:1.23.1
 
 # Confirmatory echo
 RUN echo "\n    Spinning up nginx container\n"
