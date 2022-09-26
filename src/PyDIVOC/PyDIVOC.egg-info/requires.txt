@@ -1,5 +1,5 @@
 autopep8==1.5.7
-joblib==1.0.1
+joblib==1.2.0
 numpy==1.21.0
 opencv-python
 pycodestyle==2.7.0
