@@ -1,4 +1,4 @@
-FROM node:14.19.0
+FROM node:14.21.1
 
 # ########################### Python and libs support for PyDIVOC Qr scanner ###########################
 # install python support tools and pip
