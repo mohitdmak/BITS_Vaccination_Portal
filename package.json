@@ -48,7 +48,7 @@
     "fs": "^0.0.1-security",
     "googleapis": "^82.0.0",
     "json2xls": "^0.1.2",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "mailgun-js": "^0.6.7",
     "mailgun.js": "^4.1.2",
     "mongoose": "^5.13.4",
