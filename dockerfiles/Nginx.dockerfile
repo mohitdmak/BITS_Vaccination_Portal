@@ -1,5 +1,5 @@
 # Avoiding alpine here
-FROM nginx:latest
+FROM nginx:1-bullseye
 
 # Confirmatory echo
 RUN echo "\n    Spinning up nginx container\n"
