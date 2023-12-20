@@ -1,5 +1,5 @@
 # Getting non alpine latest
-FROM redis:latest
+FROM redis:7.2.3-bookworm
 
 # Overriding defaults custom conf
 COPY redis/redis.conf /usr/local/etc/redis/redis.conf
