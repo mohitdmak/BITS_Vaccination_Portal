@@ -6,3 +6,4 @@ pycodestyle==2.7.0
 toml==0.10.2
 zbar-py==1.0.4
 pdf2image
+pillow>=10.2.0 # not directly required, pinned by Snyk to avoid a vulnerability
