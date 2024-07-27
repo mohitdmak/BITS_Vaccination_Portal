@@ -46,7 +46,7 @@
     "express-session": "^1.17.2",
     "form-data": "^4.0.0",
     "fs": "^0.0.1-security",
-    "googleapis": "^82.0.0",
+    "googleapis": "^124.0.0",
     "json2xls": "^0.1.2",
     "jsonwebtoken": "^8.5.1",
     "mailgun-js": "^0.6.7",
