@@ -52,7 +52,7 @@
     "mailgun-js": "^0.6.7",
     "mailgun.js": "^4.1.2",
     "mongoose": "^5.13.4",
-    "multer": "^1.4.3",
+    "multer": "^2.0.1",
     "path": "^0.12.7",
     "pino": "^7.6.2",
     "pino-multi-stream": "^6.0.0",
