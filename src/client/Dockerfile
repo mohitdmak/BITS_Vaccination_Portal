@@ -1,6 +1,6 @@
 # Gathering alpine for building
 #FROM node:10-alpine as build-step
-FROM node:latest as build-step
+FROM node:25.6.0-bookworm as build-step
 
 # create home app
 RUN mkdir /app
